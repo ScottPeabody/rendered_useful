@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Github, Twitter, Rss, Heart } from 'lucide-react'
+import { Github, Rss, Heart } from 'lucide-react'
 
 const footerLinks = {
   explore: [
@@ -16,7 +16,6 @@ const footerLinks = {
   ],
   social: [
     { label: 'GitHub', href: 'https://github.com/ScottPeabody/rendered_useful', icon: Github },
-    { label: 'Twitter', href: 'https://twitter.com/render_useful', icon: Twitter },
     { label: 'RSS', href: '/rss.xml', icon: Rss },
   ],
 }
