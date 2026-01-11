@@ -49,7 +49,7 @@ export const articles: Article[] = [
     relatedProject: 'tetris-react',
   },
   {
-    slug: 'the-freedom-security-tradeoff',
+    slug: 'building-open-platforms',
     title: 'Building Open Platforms Without Repeating History',
     description: 'Reflecting on what made early social media great, why it changed, and how we can build open platforms that balance freedom with security.',
     author: 'scott-peabody',
