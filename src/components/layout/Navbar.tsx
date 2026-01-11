@@ -134,17 +134,17 @@ export default function Navbar() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="md:hidden glass border-t border-[var(--color-border)]"
+            className="md:hidden bg-[var(--color-background)] border-t border-[var(--color-border)] shadow-lg"
           >
-            <div className="px-4 py-4 space-y-1">
+            <div className="px-4 py-4 space-y-2">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
                   to={item.href}
-                  className={`block px-4 py-3 rounded-lg font-medium transition-all ${
+                  className={`block px-4 py-3 rounded-xl font-medium transition-all border ${
                     location.pathname === item.href
-                      ? 'text-[var(--color-accent-primary)] bg-[var(--color-accent-primary)]/10'
-                      : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]'
+                      ? 'text-[var(--color-accent-primary)] bg-[var(--color-accent-primary)]/15 border-[var(--color-accent-primary)]/30'
+                      : 'text-[var(--color-text-secondary)] bg-[var(--color-surface)] border-[var(--color-border)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-elevated)] hover:border-[var(--color-accent-primary)]/20'
                   }`}
                 >
                   {item.label}
