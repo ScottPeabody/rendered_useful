@@ -613,6 +613,8 @@ export default function TypingGame() {
         <div className="flex items-center rounded-lg border border-zinc-700 overflow-hidden focus-within:border-indigo-500 transition-colors">
           <input
             type="text"
+            id="custom-topic"
+            name="custom-topic"
             value={customTopic}
             onChange={(e) => setCustomTopic(e.target.value)}
             onKeyDown={(e) => {
@@ -739,9 +741,12 @@ export default function TypingGame() {
         <input
           ref={inputRef}
           type="text"
+          id="typing-input"
+          name="typing-input"
           className="absolute opacity-0 pointer-events-none"
           onKeyDown={handleKeyDown}
           autoFocus
+          aria-label="Typing input field"
         />
 
         {/* Text Display */}
