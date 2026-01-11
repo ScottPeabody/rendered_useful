@@ -735,16 +735,16 @@ export default function TypingGame() {
       <div className="grid grid-cols-4 gap-2 sm:gap-4 mb-8">
         {[
           { label: 'WPM', value: gameState === 'finished' ? finalWpm : wpm, color: 'indigo' },
-          { label: 'Accuracy', value: `${accuracy}%`, color: 'emerald' },
+          { label: 'Acc', value: `${accuracy}%`, color: 'emerald' },
           { label: 'Streak', value: streak, color: 'amber' },
           { label: 'Best', value: maxStreak, color: 'purple' }
         ].map(({ label, value, color }) => (
           <div
             key={label}
-            className={`bg-zinc-800/50 rounded-xl p-2 sm:p-4 border border-zinc-700/50 backdrop-blur-sm overflow-hidden`}
+            className={`bg-zinc-800/50 rounded-xl p-2 sm:p-4 border border-zinc-700/50 backdrop-blur-sm`}
           >
-            <div className={`text-xl sm:text-3xl font-bold text-${color}-400 truncate`}>{value}</div>
-            <div className="text-zinc-500 text-xs sm:text-sm truncate">{label}</div>
+            <div className={`text-lg sm:text-3xl font-bold text-${color}-400`}>{value}</div>
+            <div className="text-zinc-500 text-xs sm:text-sm">{label}</div>
           </div>
         ))}
       </div>
