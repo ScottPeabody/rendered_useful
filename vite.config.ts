@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import mdx from '@mdx-js/rollup'
@@ -8,6 +8,25 @@ import remarkMath from 'remark-math'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeKatex from 'rehype-katex'
 import { resolve } from 'path'
+
+// Plugin to fix relative dynamic imports for SPA routing
+function fixDynamicImports(): Plugin {
+  return {
+    name: 'fix-dynamic-imports',
+    enforce: 'post',
+    generateBundle(_options, bundle) {
+      for (const file of Object.values(bundle)) {
+        if (file.type === 'chunk' && file.code) {
+          // Replace relative dynamic imports with absolute paths
+          file.code = file.code.replace(
+            /import\("\.\/([^"]+)"\)/g,
+            'import("/assets/$1")'
+          )
+        }
+      }
+    }
+  }
+}
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -20,21 +39,13 @@ export default defineConfig({
     }),
     react(),
     tailwindcss(),
+    fixDynamicImports(),
   ],
   build: {
     rollupOptions: {
       output: {
         chunkFileNames: 'assets/[name]-[hash].js',
       }
-    }
-  },
-  experimental: {
-    // Force absolute paths for dynamic imports in production
-    renderBuiltUrl(filename, { hostType }) {
-      if (hostType === 'js') {
-        return { runtime: `window.__vite_base__ + ${JSON.stringify(filename)}` }
-      }
-      return { relative: true }
     }
   },
   resolve: {

@@ -14,9 +14,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous" />
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
     <script>
-      // Set base path for Vite dynamic imports (SPA routing fix)
-      window.__vite_base__ = '/';
-      
       // Handle GitHub Pages SPA redirect before app loads
       (function() {
         var redirect = new URLSearchParams(window.location.search).get('redirect');
