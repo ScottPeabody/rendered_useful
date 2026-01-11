@@ -21,6 +21,44 @@ function useIsMobile() {
   return isMobile
 }
 
+// Hook to calculate cell size based on viewport
+function useCellSize() {
+  const [cellSize, setCellSize] = useState(20)
+  
+  useEffect(() => {
+    const calculate = () => {
+      const vh = window.innerHeight
+      const vw = window.innerWidth
+      const isMobile = vw < 768
+      
+      // Account for header, padding, controls, etc.
+      // Mobile: header ~60px, stats ~50px, controls ~140px, touch controls ~140px, padding ~100px
+      // Desktop: header ~80px, padding ~100px
+      const reservedHeight = isMobile ? 490 : 250
+      const availableHeight = vh - reservedHeight
+      
+      // Calculate cell size based on board height (20 cells)
+      const cellFromHeight = Math.floor(availableHeight / BOARD_HEIGHT)
+      
+      // Also check width constraint (10 cells + side panel on desktop)
+      const availableWidth = isMobile ? vw - 40 : (vw - 300) // side padding + side panel
+      const cellFromWidth = Math.floor(availableWidth / BOARD_WIDTH)
+      
+      // Use the smaller of the two, with min/max bounds
+      const calculated = Math.min(cellFromHeight, cellFromWidth)
+      const bounded = Math.max(14, Math.min(calculated, isMobile ? 20 : 28))
+      
+      setCellSize(bounded)
+    }
+    
+    calculate()
+    window.addEventListener('resize', calculate)
+    return () => window.removeEventListener('resize', calculate)
+  }, [])
+  
+  return cellSize
+}
+
 type Cell = string | null
 type Board = Cell[][]
 
@@ -90,6 +128,7 @@ export default function Tetris() {
   const gameRef = useRef<HTMLDivElement>(null)
   const audioRef = useRef<HTMLAudioElement>(null)
   const isMobile = useIsMobile()
+  const cellSize = useCellSize()
 
   const checkCollision = useCallback((piece: Piece, boardToCheck: Board, offsetX = 0, offsetY = 0): boolean => {
     for (let y = 0; y < piece.shape.length; y++) {
@@ -305,8 +344,12 @@ export default function Tetris() {
         {row.map((cell, x) => (
           <div
             key={x}
-            className="w-5 h-5 sm:w-6 sm:h-6 border border-[var(--color-border-subtle)]"
-            style={{ backgroundColor: cell || 'var(--color-surface)' }}
+            className="border border-[var(--color-border-subtle)]"
+            style={{ 
+              width: cellSize, 
+              height: cellSize,
+              backgroundColor: cell || 'var(--color-surface)' 
+            }}
           />
         ))}
       </div>
@@ -315,6 +358,7 @@ export default function Tetris() {
 
   const renderNextPiece = () => {
     const piece = TETROMINOS[nextPiece]
+    const previewCellSize = Math.max(12, cellSize * 0.7) // Smaller preview cells
     return (
       <div className="flex flex-col items-center">
         {piece.shape.map((row, y) => (
@@ -322,8 +366,12 @@ export default function Tetris() {
             {row.map((cell, x) => (
               <div
                 key={x}
-                className="w-4 h-4 border border-[var(--color-border-subtle)]"
-                style={{ backgroundColor: cell ? piece.color : 'transparent' }}
+                className="border border-[var(--color-border-subtle)]"
+                style={{ 
+                  width: previewCellSize, 
+                  height: previewCellSize,
+                  backgroundColor: cell ? piece.color : 'transparent' 
+                }}
               />
             ))}
           </div>

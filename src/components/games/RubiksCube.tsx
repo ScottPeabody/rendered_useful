@@ -5,9 +5,38 @@ import * as THREE from 'three'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Shuffle, Play, RotateCcw, Pause, Info, X, AlertTriangle } from 'lucide-react'
 
+// Hook to calculate canvas height based on viewport
+function useCanvasHeight() {
+  const [height, setHeight] = useState(280)
+  
+  useEffect(() => {
+    const calculate = () => {
+      const vh = window.innerHeight
+      const vw = window.innerWidth
+      const isMobile = vw < 768
+      
+      // Account for header, controls, move history, padding etc.
+      // Mobile: header ~60px, title ~50px, controls ~200px, padding ~80px
+      // Desktop: header ~80px, title ~60px, controls ~200px, padding ~100px
+      const reservedHeight = isMobile ? 390 : 440
+      const availableHeight = vh - reservedHeight
+      
+      // Bounded between min and max values
+      const bounded = Math.max(200, Math.min(availableHeight, isMobile ? 320 : 450))
+      setHeight(bounded)
+    }
+    
+    calculate()
+    window.addEventListener('resize', calculate)
+    return () => window.removeEventListener('resize', calculate)
+  }, [])
+  
+  return height
+}
+
 // Error boundary for Three.js canvas
-class CanvasErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
-  constructor(props: { children: ReactNode }) {
+class CanvasErrorBoundary extends Component<{ children: ReactNode; height: number }, { hasError: boolean; error: Error | null }> {
+  constructor(props: { children: ReactNode; height: number }) {
     super(props)
     this.state = { hasError: false, error: null }
   }
@@ -19,7 +48,7 @@ class CanvasErrorBoundary extends Component<{ children: ReactNode }, { hasError:
   render() {
     if (this.state.hasError) {
       return (
-        <div className="h-[280px] sm:h-[400px] w-full flex items-center justify-center bg-black/50">
+        <div style={{ height: this.props.height }} className="w-full flex items-center justify-center bg-black/50">
           <div className="text-center p-4 sm:p-6">
             <AlertTriangle className="w-10 h-10 sm:w-12 sm:h-12 text-amber-400 mx-auto mb-3 sm:mb-4" />
             <p className="text-white/70 text-xs sm:text-sm">Failed to load 3D scene</p>
@@ -38,9 +67,9 @@ class CanvasErrorBoundary extends Component<{ children: ReactNode }, { hasError:
 }
 
 // Loading fallback for Suspense
-function CanvasLoader() {
+function CanvasLoader({ height }: { height: number }) {
   return (
-    <div className="h-[280px] sm:h-[400px] w-full flex items-center justify-center bg-black/50">
+    <div style={{ height }} className="w-full flex items-center justify-center bg-black/50">
       <div className="text-center">
         <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-b-2 border-white/50 mx-auto mb-3 sm:mb-4"></div>
         <p className="text-white/50 text-xs sm:text-sm">Loading 3D scene...</p>
@@ -609,6 +638,8 @@ export default function RubiksCube() {
   const [preAnimationCubies, setPreAnimationCubies] = useState<CubieState[] | null>(null)
   // Ref for camera reset function
   const resetCameraRef = useRef<(() => void) | null>(null)
+  // Dynamic canvas height
+  const canvasHeight = useCanvasHeight()
   
   const animationDuration = 200
 
@@ -740,9 +771,9 @@ export default function RubiksCube() {
       </AnimatePresence>
       
       {/* 3D Canvas */}
-      <CanvasErrorBoundary>
-        <Suspense fallback={<CanvasLoader />}>
-          <div className="h-[280px] sm:h-[400px] w-full">
+      <CanvasErrorBoundary height={canvasHeight}>
+        <Suspense fallback={<CanvasLoader height={canvasHeight} />}>
+          <div style={{ height: canvasHeight }} className="w-full">
             <Canvas camera={{ position: [4, 3, 5], fov: 45 }}>
               <CubeScene 
                 cubies={preAnimationCubies || cubies}
