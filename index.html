@@ -16,9 +16,10 @@
     <script>
       // Handle GitHub Pages SPA redirect before app loads
       (function() {
-        var redirect = new URLSearchParams(window.location.search).get('redirect');
+        var redirect = sessionStorage.getItem('spa-redirect');
         if (redirect) {
-          history.replaceState(null, '', decodeURIComponent(redirect));
+          sessionStorage.removeItem('spa-redirect');
+          history.replaceState(null, '', redirect);
         }
       })();
     </script>
