@@ -299,9 +299,82 @@ export default function TypingGame() {
   const [particles, setParticles] = useState<{ id: number; x: number; y: number; color: string }[]>([]);
   const [customTopic, setCustomTopic] = useState('');
   const [committedCustomTopic, setCommittedCustomTopic] = useState('');
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const audioContextRef = useRef<AudioContext | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const textContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Mechanical keyboard sound using Web Audio API (noise-based click)
+  const playTypeSound = useCallback((isCorrect: boolean) => {
+    if (!soundEnabled) return;
+    
+    if (!audioContextRef.current) {
+      audioContextRef.current = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+    }
+    
+    const ctx = audioContextRef.current;
+    
+    if (isCorrect) {
+      // Deep thud sound for correct keystrokes
+      const bufferSize = ctx.sampleRate * 0.12;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      
+      for (let i = 0; i < bufferSize; i++) {
+        const envelope = Math.exp(-i / (bufferSize * 0.35));
+        data[i] = (Math.random() * 2 - 1) * envelope;
+      }
+      
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+      
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.value = 150;
+      
+      const gainNode = ctx.createGain();
+      gainNode.gain.value = 0.18;
+      
+      noise.connect(filter);
+      filter.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      
+      noise.start();
+    } else {
+      // Higher thocky sound for errors
+      const bufferSize = ctx.sampleRate * 0.06;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      
+      for (let i = 0; i < bufferSize; i++) {
+        const envelope = Math.exp(-i / (bufferSize * 0.25));
+        data[i] = (Math.random() * 2 - 1) * envelope;
+      }
+      
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+      
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 500 + Math.random() * 150;
+      filter.Q.value = 0.5;
+      
+      const lowpass = ctx.createBiquadFilter();
+      lowpass.type = 'lowpass';
+      lowpass.frequency.value = 800;
+      
+      const gainNode = ctx.createGain();
+      gainNode.gain.value = 0.18;
+      
+      noise.connect(filter);
+      filter.connect(lowpass);
+      lowpass.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      
+      noise.start();
+    }
+  }, [soundEnabled]);
 
   const initGame = useCallback(async () => {
     setGameState('loading');
@@ -401,6 +474,9 @@ export default function TypingGame() {
 
       const expectedChar = chars[currentIndex].char;
       const isCorrect = e.key === expectedChar;
+      
+      // Play typewriter sound
+      playTypeSound(isCorrect);
       
       // Get position for particles
       const charElements = containerRef.current?.querySelectorAll('.char');
@@ -593,18 +669,31 @@ export default function TypingGame() {
 
       {/* Article/Equation Title */}
       {article && gameState !== 'loading' && (
-        <div className="text-center mb-6">
-          <span className="text-zinc-500 text-sm">
-            {article.isMath ? 'Equation: ' : 'Now typing: '}
-          </span>
-          <a 
-            href={article.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-indigo-400 font-medium hover:text-indigo-300 hover:underline transition-colors"
+        <div className="flex items-center justify-center gap-3 mb-6">
+          <button
+            onClick={() => setSoundEnabled(!soundEnabled)}
+            className={`p-1.5 rounded-md text-sm transition-all duration-200 ${
+              soundEnabled
+                ? 'bg-sky-900/40 text-sky-400 hover:bg-sky-800/50'
+                : 'bg-zinc-800/50 text-zinc-600 hover:text-zinc-500 hover:bg-zinc-800'
+            }`}
+            title={soundEnabled ? 'Sound On' : 'Sound Off'}
           >
-            {article.title} ↗
-          </a>
+            {soundEnabled ? '🔊' : '🔇'}
+          </button>
+          <div>
+            <span className="text-zinc-500 text-sm">
+              {article.isMath ? 'Equation: ' : 'Now typing: '}
+            </span>
+            <a 
+              href={article.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-indigo-400 font-medium hover:text-indigo-300 hover:underline transition-colors"
+            >
+              {article.title} ↗
+            </a>
+          </div>
         </div>
       )}
 
