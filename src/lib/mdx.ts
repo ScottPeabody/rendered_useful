@@ -9,6 +9,15 @@ export interface ArticleFrontmatter {
   featured?: boolean
   readingTime?: number
   coverImage?: string
+  // Theme customization
+  theme?: string // preset name: 'cyberpunk', 'terminal', 'retro', etc.
+  // Layout customization
+  layout?: string // preset name: 'default', 'minimal', 'docs', 'showcase', etc.
+  // Individual layout overrides
+  hideNavbar?: boolean
+  hideFooter?: boolean
+  contentWidth?: 'narrow' | 'default' | 'wide' | 'full'
+  showTableOfContents?: boolean
 }
 
 export interface ProjectFrontmatter {
@@ -24,6 +33,14 @@ export interface ProjectFrontmatter {
   githubUrl?: string
   coverImage?: string
   featured?: boolean
+  // Theme customization
+  theme?: string // preset name
+  // Layout customization  
+  layout?: string // preset name
+  // Individual layout overrides
+  hideNavbar?: boolean
+  hideFooter?: boolean
+  contentWidth?: 'narrow' | 'default' | 'wide' | 'full'
 }
 
 export interface MDXModule<T> {

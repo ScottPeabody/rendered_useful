@@ -2,6 +2,7 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import { Suspense, lazy, useEffect } from 'react'
 import Layout from './components/layout/Layout'
 import LoadingSpinner from './components/ui/LoadingSpinner'
+import { LayoutProvider } from './context/LayoutContext'
 
 const HomePage = lazy(() => import('./pages/HomePage'))
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'))
@@ -29,10 +30,11 @@ function ScrollToTop() {
 
 function App() {
   return (
-    <Layout>
-      <ScrollToTop />
-      <Suspense fallback={<LoadingSpinner />}>
-        <Routes>
+    <LayoutProvider>
+      <Layout>
+        <ScrollToTop />
+        <Suspense fallback={<LoadingSpinner />}>
+          <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/projects/:slug" element={<ProjectPage />} />
@@ -45,9 +47,10 @@ function App() {
           <Route path="/tag/:tag" element={<TagPage />} />
           <Route path="/uses" element={<UsesPage />} />
           <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </Suspense>
-    </Layout>
+          </Routes>
+        </Suspense>
+      </Layout>
+    </LayoutProvider>
   )
 }
 

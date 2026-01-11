@@ -56,7 +56,27 @@ export const articles: Article[] = [
     date: '2026-01-11',
     tags: ['security', 'open-source', 'web-dev', 'opinion'],
     readingTime: 10,
-    featured: false,
+    featured: true,
+  },
+  {
+    slug: 'custom-themes-demo',
+    title: 'Custom Themes System',
+    description: 'Demonstrating the custom theme system that allows articles to completely override the site\'s visual style.',
+    author: 'scott-peabody',
+    date: '2026-01-11',
+    tags: ['features', 'design', 'customization'],
+    readingTime: 3,
+    featured: true,
+  },
+  {
+    slug: 'custom-layouts-demo',
+    title: 'Custom Layouts System',
+    description: 'Demonstrating the custom layout system that allows articles to control page structure and display options.',
+    author: 'scott-peabody',
+    date: '2026-01-11',
+    tags: ['features', 'design', 'customization'],
+    readingTime: 4,
+    featured: true,
   },
 ]
 
