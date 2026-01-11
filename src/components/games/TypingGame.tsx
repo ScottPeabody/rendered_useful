@@ -446,6 +446,104 @@ export default function TypingGame() {
     }, 600);
   };
 
+  // Process a single character input (works for both desktop and mobile)
+  const processChar = useCallback((key: string) => {
+    if (gameState === 'finished' || gameState === 'loading') return;
+    
+    if (gameState === 'idle') {
+      setGameState('playing');
+      setStartTime(Date.now());
+    }
+
+    const expectedChar = chars[currentIndex]?.char;
+    if (!expectedChar) return;
+    
+    const isCorrect = key === expectedChar;
+    
+    // Play typewriter sound
+    playTypeSound(isCorrect);
+    
+    // Get position for particles
+    const charElements = containerRef.current?.querySelectorAll('.char');
+    const currentCharEl = charElements?.[currentIndex] as HTMLElement;
+    if (currentCharEl) {
+      const rect = currentCharEl.getBoundingClientRect();
+      const containerRect = containerRef.current?.getBoundingClientRect();
+      if (containerRect) {
+        spawnParticles(
+          rect.left - containerRect.left + rect.width / 2,
+          rect.top - containerRect.top + rect.height / 2,
+          isCorrect
+        );
+      }
+    }
+    
+    // Auto-scroll: scroll the next character into view
+    const nextCharEl = charElements?.[currentIndex + 1] as HTMLElement;
+    if (nextCharEl && textContainerRef.current) {
+      const textContainer = textContainerRef.current;
+      const nextRect = nextCharEl.getBoundingClientRect();
+      const containerRect = textContainer.getBoundingClientRect();
+      
+      // If next char is below the middle of container, scroll
+      const relativeTop = nextRect.top - containerRect.top;
+      if (relativeTop > containerRect.height * 0.6) {
+        textContainer.scrollBy({
+          top: nextRect.height * 2,
+          behavior: 'smooth'
+        });
+      }
+    }
+
+    const newChars = [...chars];
+    newChars[currentIndex] = {
+      ...newChars[currentIndex],
+      state: isCorrect ? 'correct' : 'incorrect'
+    };
+
+    if (currentIndex + 1 < chars.length) {
+      newChars[currentIndex + 1] = { ...newChars[currentIndex + 1], state: 'current' };
+    }
+
+    setChars(newChars);
+    setCurrentIndex(currentIndex + 1);
+    setTotalTyped(totalTyped + 1);
+
+    if (isCorrect) {
+      setCorrectChars(correctChars + 1);
+      setStreak(streak + 1);
+      setMaxStreak(Math.max(maxStreak, streak + 1));
+    } else {
+      setStreak(0);
+    }
+
+    // Update stats
+    const elapsed = (Date.now() - (startTime || Date.now())) / 1000 / 60;
+    if (elapsed > 0) {
+      const words = (correctChars + (isCorrect ? 1 : 0)) / 5;
+      setWpm(Math.round(words / elapsed));
+    }
+    setAccuracy(Math.round(((correctChars + (isCorrect ? 1 : 0)) / (totalTyped + 1)) * 100));
+
+    // Check if finished
+    if (currentIndex + 1 >= chars.length) {
+      setEndTime(Date.now());
+      setGameState('finished');
+    }
+  }, [gameState, chars, currentIndex, playTypeSound, startTime, correctChars, totalTyped, streak, maxStreak]);
+
+  // Handle backspace
+  const handleBackspace = useCallback(() => {
+    if (currentIndex > 0) {
+      const newChars = [...chars];
+      newChars[currentIndex] = { ...newChars[currentIndex], state: 'pending' };
+      newChars[currentIndex - 1] = { ...newChars[currentIndex - 1], state: 'current' };
+      setChars(newChars);
+      setCurrentIndex(currentIndex - 1);
+      setStreak(0);
+    }
+  }, [chars, currentIndex]);
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (gameState === 'finished') {
       if (e.key === 'Enter') {
@@ -454,98 +552,32 @@ export default function TypingGame() {
       return;
     }
 
-    if (e.key.length === 1 || e.key === 'Backspace') {
-      if (gameState === 'idle') {
-        setGameState('playing');
-        setStartTime(Date.now());
-      }
-
-      if (e.key === 'Backspace') {
-        if (currentIndex > 0) {
-          const newChars = [...chars];
-          newChars[currentIndex] = { ...newChars[currentIndex], state: 'pending' };
-          newChars[currentIndex - 1] = { ...newChars[currentIndex - 1], state: 'current' };
-          setChars(newChars);
-          setCurrentIndex(currentIndex - 1);
-          setStreak(0);
-        }
-        return;
-      }
-
-      const expectedChar = chars[currentIndex].char;
-      const isCorrect = e.key === expectedChar;
-      
-      // Play typewriter sound
-      playTypeSound(isCorrect);
-      
-      // Get position for particles
-      const charElements = containerRef.current?.querySelectorAll('.char');
-      const currentCharEl = charElements?.[currentIndex] as HTMLElement;
-      if (currentCharEl) {
-        const rect = currentCharEl.getBoundingClientRect();
-        const containerRect = containerRef.current?.getBoundingClientRect();
-        if (containerRect) {
-          spawnParticles(
-            rect.left - containerRect.left + rect.width / 2,
-            rect.top - containerRect.top + rect.height / 2,
-            isCorrect
-          );
-        }
-      }
-      
-      // Auto-scroll: scroll the next character into view
-      const nextCharEl = charElements?.[currentIndex + 1] as HTMLElement;
-      if (nextCharEl && textContainerRef.current) {
-        const textContainer = textContainerRef.current;
-        const nextRect = nextCharEl.getBoundingClientRect();
-        const containerRect = textContainer.getBoundingClientRect();
-        
-        // If next char is below the middle of container, scroll
-        const relativeTop = nextRect.top - containerRect.top;
-        if (relativeTop > containerRect.height * 0.6) {
-          textContainer.scrollBy({
-            top: nextRect.height * 2,
-            behavior: 'smooth'
-          });
-        }
-      }
-
-      const newChars = [...chars];
-      newChars[currentIndex] = {
-        ...newChars[currentIndex],
-        state: isCorrect ? 'correct' : 'incorrect'
-      };
-
-      if (currentIndex + 1 < chars.length) {
-        newChars[currentIndex + 1] = { ...newChars[currentIndex + 1], state: 'current' };
-      }
-
-      setChars(newChars);
-      setCurrentIndex(currentIndex + 1);
-      setTotalTyped(totalTyped + 1);
-
-      if (isCorrect) {
-        setCorrectChars(correctChars + 1);
-        setStreak(streak + 1);
-        setMaxStreak(Math.max(maxStreak, streak + 1));
-      } else {
-        setStreak(0);
-      }
-
-      // Update stats
-      const elapsed = (Date.now() - (startTime || Date.now())) / 1000 / 60;
-      if (elapsed > 0) {
-        const words = (correctChars + (isCorrect ? 1 : 0)) / 5;
-        setWpm(Math.round(words / elapsed));
-      }
-      setAccuracy(Math.round(((correctChars + (isCorrect ? 1 : 0)) / (totalTyped + 1)) * 100));
-
-      // Check if finished
-      if (currentIndex + 1 >= chars.length) {
-        setEndTime(Date.now());
-        setGameState('finished');
-      }
+    if (e.key === 'Backspace') {
+      e.preventDefault();
+      handleBackspace();
+      return;
     }
+
+    // For desktop, handle single character keys
+    if (e.key.length === 1) {
+      e.preventDefault();
+      processChar(e.key);
+    }
+  };
+
+  // Handle mobile input via onInput event
+  const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
+    const target = e.target as HTMLInputElement;
+    const value = target.value;
+    
+    if (value.length > 0) {
+      // Process the last character typed
+      const lastChar = value[value.length - 1];
+      processChar(lastChar);
+    }
+    
+    // Clear the input so we can detect the next character
+    target.value = '';
   };
 
   const focusInput = () => {
@@ -737,15 +769,21 @@ export default function TypingGame() {
           />
         ))}
 
-        {/* Hidden Input */}
+        {/* Hidden Input - positioned off-screen but still focusable for mobile keyboards */}
         <input
           ref={inputRef}
           type="text"
           id="typing-input"
           name="typing-input"
-          className="absolute opacity-0 pointer-events-none"
+          className="absolute -left-[9999px] opacity-0"
+          style={{ fontSize: '16px' }} // Prevents iOS zoom on focus
           onKeyDown={handleKeyDown}
+          onInput={handleInput}
           autoFocus
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
           aria-label="Typing input field"
         />
 
