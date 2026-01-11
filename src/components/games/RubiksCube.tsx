@@ -1,9 +1,53 @@
-import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
+import { useState, useCallback, useEffect, useMemo, useRef, Suspense, Component, type ReactNode } from 'react'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { OrbitControls, RoundedBox, Environment } from '@react-three/drei'
 import * as THREE from 'three'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Shuffle, Play, RotateCcw, Pause, Info, X } from 'lucide-react'
+import { Shuffle, Play, RotateCcw, Pause, Info, X, AlertTriangle } from 'lucide-react'
+
+// Error boundary for Three.js canvas
+class CanvasErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
+  constructor(props: { children: ReactNode }) {
+    super(props)
+    this.state = { hasError: false, error: null }
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="h-[400px] w-full flex items-center justify-center bg-black/50">
+          <div className="text-center p-6">
+            <AlertTriangle className="w-12 h-12 text-amber-400 mx-auto mb-4" />
+            <p className="text-white/70 text-sm">Failed to load 3D scene</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-4 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-sm transition-colors"
+            >
+              Reload Page
+            </button>
+          </div>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
+
+// Loading fallback for Suspense
+function CanvasLoader() {
+  return (
+    <div className="h-[400px] w-full flex items-center justify-center bg-black/50">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-white/50 mx-auto mb-4"></div>
+        <p className="text-white/50 text-sm">Loading 3D scene...</p>
+      </div>
+    </div>
+  )
+}
 
 // Face colors - standard Rubik's cube colors
 const COLORS = {
@@ -697,17 +741,21 @@ export default function RubiksCube() {
       </AnimatePresence>
       
       {/* 3D Canvas */}
-      <div className="h-[400px] w-full">
-        <Canvas camera={{ position: [4, 3, 5], fov: 45 }}>
-          <CubeScene 
-            cubies={preAnimationCubies || cubies}
-            animatingMove={currentMove}
-            animationProgress={animationProgress}
-            onFaceMappingChange={setFaceMapping}
-            resetCameraRef={resetCameraRef}
-          />
-        </Canvas>
-      </div>
+      <CanvasErrorBoundary>
+        <Suspense fallback={<CanvasLoader />}>
+          <div className="h-[400px] w-full">
+            <Canvas camera={{ position: [4, 3, 5], fov: 45 }}>
+              <CubeScene 
+                cubies={preAnimationCubies || cubies}
+                animatingMove={currentMove}
+                animationProgress={animationProgress}
+                onFaceMappingChange={setFaceMapping}
+                resetCameraRef={resetCameraRef}
+              />
+            </Canvas>
+          </div>
+        </Suspense>
+      </CanvasErrorBoundary>
       
       {/* Move History */}
       {moveHistory.length > 0 && (
