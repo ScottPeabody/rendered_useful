@@ -11,6 +11,7 @@ import { resolve } from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/',
   plugins: [
     mdx({
       remarkPlugins: [remarkFrontmatter, remarkGfm, remarkMath],
@@ -20,6 +21,22 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        chunkFileNames: 'assets/[name]-[hash].js',
+      }
+    }
+  },
+  experimental: {
+    // Force absolute paths for dynamic imports in production
+    renderBuiltUrl(filename, { hostType }) {
+      if (hostType === 'js') {
+        return { runtime: `window.__vite_base__ + ${JSON.stringify(filename)}` }
+      }
+      return { relative: true }
+    }
+  },
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
