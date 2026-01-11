@@ -1,0 +1,50 @@
+---
+title: "WikiType"
+description: "A typing speed test with Wikipedia articles and LaTeX equations. Practice typing while learning something new with every round."
+date: "2025-01-10"
+author: "Sam Peabody"
+tags: ["react", "typescript", "game", "interactive", "latex"]
+featured: true
+---
+
+import TypingGame from '@/components/games/TypingGame';
+
+<TypingGame />
+
+---
+
+## About This Project
+
+WikiType combines typing practice with random knowledge from Wikipedia—and for the mathematically inclined, a LaTeX mode to practice typing equations.
+
+### Features
+
+- **Topic Categories** — Choose from Physics, Science, History, Technology, Nature, Engineering, Art, or Random
+- **Custom Topics** — Type any topic to search Wikipedia for related articles
+- **Dictionary Mode** — Practice typing words with their definitions from the dictionary
+- **LaTeX Mode** — Practice typing mathematical equations with live KaTeX rendering
+- **Wikipedia Integration** — Fetches article summaries from Wikipedia's API
+- **Real-time Stats** — WPM, accuracy, and streak tracking update as you type
+- **Visual Feedback** — Color-coded characters and particle effects for correct/incorrect keystrokes
+- **Read More** — Link to the full Wikipedia article after each round
+- **Streak System** — Build combos for consecutive correct characters
+
+### How It's Built
+
+<TechStack items={['React', 'TypeScript', 'Tailwind CSS', 'Wikipedia API', 'Dictionary API', 'KaTeX']} />
+
+### Key Implementation Details
+
+The game fetches from Wikipedia's REST API to get article summaries. Topic-specific searches use Wikipedia's MediaWiki API with curated search terms. Text is cleaned up and truncated at sentence boundaries.
+
+LaTeX mode includes 15 famous equations (Euler's Identity, Quadratic Formula, etc.) with live rendering via KaTeX so you can see the equation while typing the syntax.
+
+WPM is calculated as: characters typed correctly divided by 5 (average word length), divided by time in minutes.
+
+### Controls
+
+- **Type** — Match the characters shown
+- **Backspace** — Fix mistakes (resets streak)
+- **Enter** — Load next article/equation after finishing
+- **Topic buttons** — Switch between categories
+- **Click article title** — Open full Wikipedia article

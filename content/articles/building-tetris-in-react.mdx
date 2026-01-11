@@ -1,0 +1,214 @@
+---
+title: "Building Tetris in React with Hooks"
+description: "Learn how to build a fully playable Tetris game using only React hooks – no game engine needed."
+date: "2025-01-08"
+author: "scott-peabody"
+tags: ["react", "games", "typescript", "tutorial"]
+featured: false
+readingTime: 12
+coverImage: "https://images.unsplash.com/photo-1614680376593-902f74cf0d41?w=1200"
+---
+
+import { Callout } from '@/components/mdx'
+import Tetris from '@/components/games/Tetris'
+
+One of the best ways to learn React is to build something fun! In this article, I'll walk through how I built a fully playable **Tetris** game using React hooks. No game engine needed – just plain React, TypeScript, and a bit of CSS.
+
+<Callout type="tip" title="Play Now!">
+  Scroll down to play the game right in this article! Use arrow keys to move, up arrow to rotate, space to hard drop, and P to pause.
+</Callout>
+
+## Why Build a Game?
+
+Games are perfect for learning React because they require you to think about:
+
+- **State Management** - Tracking the game board, current piece, score, and more
+- **Side Effects** - Game loops, keyboard input, timers
+- **Performance** - Rendering efficiently at game speed
+- **User Input** - Handling keyboard events responsively
+
+## The Core Concepts
+
+The game is built around a few key pieces:
+
+### 1. The Game Board
+
+A 2D array representing the 10x20 grid. Each cell is either empty (0) or contains a piece color.
+
+```typescript
+// Create empty board
+const createBoard = (): number[][] => 
+  Array(20).fill(null).map(() => Array(10).fill(0));
+
+// Board is just a 2D array
+// 0 = empty, 1-7 = tetromino colors
+```
+
+### 2. Tetrominos
+
+Each of the 7 classic pieces is defined as a 2D shape array:
+
+```typescript
+const TETROMINOS = {
+  I: [[1, 1, 1, 1]],           // I-piece (cyan)
+  O: [[1, 1], [1, 1]],         // O-piece (yellow)
+  T: [[0, 1, 0], [1, 1, 1]],   // T-piece (purple)
+  S: [[0, 1, 1], [1, 1, 0]],   // S-piece (green)
+  Z: [[1, 1, 0], [0, 1, 1]],   // Z-piece (red)
+  J: [[1, 0, 0], [1, 1, 1]],   // J-piece (blue)
+  L: [[0, 0, 1], [1, 1, 1]],   // L-piece (orange)
+};
+```
+
+### 3. The Game Loop
+
+Using `useEffect` with `setInterval` to move pieces down automatically:
+
+```typescript
+useEffect(() => {
+  if (gameOver || paused) return;
+  
+  const interval = setInterval(() => {
+    moveDown();
+  }, 1000 - (level - 1) * 100); // Faster each level
+  
+  return () => clearInterval(interval);
+}, [gameOver, paused, level, moveDown]);
+```
+
+### 4. Collision Detection
+
+Before moving or rotating a piece, we check if it would collide:
+
+```typescript
+const checkCollision = (
+  piece: number[][],
+  position: { x: number; y: number },
+  board: number[][]
+): boolean => {
+  for (let y = 0; y < piece.length; y++) {
+    for (let x = 0; x < piece[y].length; x++) {
+      if (piece[y][x]) {
+        const newX = position.x + x;
+        const newY = position.y + y;
+        
+        // Check boundaries
+        if (newX < 0 || newX >= 10 || newY >= 20) return true;
+        
+        // Check collision with placed pieces
+        if (newY >= 0 && board[newY][newX]) return true;
+      }
+    }
+  }
+  return false;
+};
+```
+
+### 5. Rotation with Wall Kicks
+
+Rotation can be tricky – we need to handle cases where rotating would push the piece out of bounds:
+
+```typescript
+const rotate = useCallback(() => {
+  const rotated = currentPiece[0].map((_, i) =>
+    currentPiece.map(row => row[i]).reverse()
+  );
+  
+  // Try rotation, with wall kicks if needed
+  let newPos = { ...position };
+  if (checkCollision(rotated, newPos, board)) {
+    // Try shifting left
+    newPos.x -= 1;
+    if (checkCollision(rotated, newPos, board)) {
+      // Try shifting right
+      newPos.x += 2;
+      if (checkCollision(rotated, newPos, board)) {
+        return; // Can't rotate
+      }
+    }
+  }
+  
+  setCurrentPiece(rotated);
+  setPosition(newPos);
+}, [currentPiece, position, board]);
+```
+
+## Play the Game!
+
+Here's the fully working game. Try it out!
+
+<Tetris />
+
+<Callout type="info" title="Controls">
+  - **← →** - Move left/right
+  - **↓** - Soft drop (move down faster)
+  - **↑** - Rotate piece
+  - **Space** - Hard drop (instant drop)
+  - **P** - Pause/Resume
+</Callout>
+
+## Comparing to Other Languages
+
+For fun, here's what the board creation would look like in other languages:
+
+### Rust
+
+```rust
+fn create_board() -> [[u8; 10]; 20] {
+    [[0; 10]; 20]
+}
+
+// With a struct
+struct Tetris {
+    board: [[u8; 10]; 20],
+    score: u32,
+    level: u8,
+}
+
+impl Tetris {
+    fn new() -> Self {
+        Tetris {
+            board: [[0; 10]; 20],
+            score: 0,
+            level: 1,
+        }
+    }
+}
+```
+
+### Python
+
+```python
+def create_board() -> list[list[int]]:
+    return [[0] * 10 for _ in range(20)]
+
+# With a class
+@dataclass
+class Tetris:
+    board: list[list[int]] = field(default_factory=create_board)
+    score: int = 0
+    level: int = 1
+```
+
+### Go
+
+```go
+func createBoard() [20][10]int {
+    var board [20][10]int
+    return board
+}
+
+type Tetris struct {
+    Board [20][10]int
+    Score int
+    Level int
+}
+```
+
+## Key Takeaways
+
+- React hooks are powerful enough for real-time games
+- `useCallback` prevents unnecessary re-renders in game loops
+- `useRef` is great for values that shouldn't trigger re-renders
+- CSS Grid makes game boards easy to render
+- TypeScript helps catch bugs in complex game logic

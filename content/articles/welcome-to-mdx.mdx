@@ -1,0 +1,201 @@
+---
+title: "Writing Articles with MDX"
+description: "A guide to the formatting options and components available when writing articles on rendered_useful."
+author: speabody
+date: 2026-01-10
+tags: [mdx, guide, getting-started]
+readingTime: 4
+featured: true
+---
+
+This article demonstrates the features available when writing content for **rendered_useful**. We use [MDX](https://mdxjs.com), which lets you combine standard Markdown with React components.
+
+---
+
+## Callouts
+
+Use callouts to highlight important information:
+
+<Callout type="info" title="Information">
+  Use info callouts for general notes or context that readers might find helpful.
+</Callout>
+
+<Callout type="tip" title="Tip">
+  Tip callouts are great for best practices or shortcuts.
+</Callout>
+
+<Callout type="warning" title="Warning">
+  Use warning callouts to flag potential issues or things to watch out for.
+</Callout>
+
+<Callout type="success" title="Success">
+  Success callouts work well for confirming correct approaches or celebrating milestones.
+</Callout>
+
+<Callout type="error" title="Error">
+  Error callouts help highlight common mistakes or things to avoid.
+</Callout>
+
+---
+
+## Code Blocks
+
+Code blocks support syntax highlighting for most languages:
+
+```typescript
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+function greetUser(user: User): string {
+  return `Hello, ${user.name}!`;
+}
+```
+
+```jsx
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <button onClick={() => setCount(c => c + 1)}>
+      Count: {count}
+    </button>
+  );
+}
+```
+
+Use `inline code` for short references like variable names or commands.
+
+---
+
+## Images
+
+Add images with captions and sizing options:
+
+<Image 
+  src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800" 
+  alt="Code on a laptop screen"
+  caption="Images support captions and responsive sizing"
+  size="lg"
+/>
+
+---
+
+## Video
+
+Embed YouTube videos or native video files:
+
+<Video 
+  youtube="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+  title="Sample Video"
+  caption="YouTube videos embed automatically"
+/>
+
+---
+
+## Audio
+
+Embed audio files with the Audio component:
+
+<Audio 
+  src="/audio/clair-de-lune.mp3"
+  title="Clair de Lune - Claude Debussy"
+  caption="Audio files emeded automatically"
+/>
+
+---
+
+## React Components
+
+The power of MDX is embedding interactive React components directly in your content. Here's an interactive checklist:
+
+<Todo 
+  title="Getting Started"
+  items={[
+    { text: "Clone the repository", done: true },
+    { text: "Install dependencies", done: true },
+    { text: "Create your first article", done: false },
+    { text: "Submit a pull request", done: false },
+  ]}
+/>
+
+You can also display tech stacks:
+
+<TechStack items={["React", "TypeScript", "Vite", "Tailwind CSS"]} />
+
+Or even embed interactive games and demos. See our [projects](/projects) for examples of embedded React components like Tetris and a 3D Rubik's Cube.
+
+---
+
+## Lists
+
+### Unordered
+
+- First item
+- Second item
+- Third item
+
+### Ordered
+
+1. Step one
+2. Step two
+3. Step three
+
+---
+
+## Text Formatting
+
+Standard Markdown formatting works as expected:
+
+- **Bold text** for emphasis
+- *Italic text* for titles or terms
+- ~~Strikethrough~~ for corrections
+- `inline code` for technical terms
+
+> Blockquotes are useful for highlighting quotes or key takeaways from external sources.
+
+---
+
+## Links
+
+Link to internal pages like the [contribution guide](/contribute) or external resources like [MDX documentation](https://mdxjs.com).
+
+---
+
+## Math & LaTeX
+
+Write mathematical equations using KaTeX. Inline math like $E = mc^2$ works with single dollar signs.
+
+For block equations, use double dollar signs:
+
+$$
+e^{{i\pi}} + 1 = 0
+$$
+
+Maxwell's equation for electromagnetic induction:
+
+$$
+\nabla \times \mathbf{E} = -\frac{\partial \mathbf{B}}{\partial t}
+$$
+
+The Cauchy-Schwarz inequality:
+
+$$
+\left( \sum_{k=1}^n a_k b_k \right)^2 \leq \left( \sum_{k=1}^n a_k^2 \right) \left( \sum_{k=1}^n b_k^2 \right)
+$$
+
+<Callout type="tip" title="Fundamental Theorem of Calculus">
+If $f$ is continuous on $[a, b]$ and $F$ is an antiderivative of $f$, then:
+
+$$
+\int_a^b f(x)\,dx = F(b) - F(a)
+$$
+</Callout>
+
+---
+
+## Getting Started
+
+Ready to write your own article? Check out our [contribution guide](/contribute) for instructions on submitting content.

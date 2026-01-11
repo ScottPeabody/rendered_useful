@@ -1,0 +1,145 @@
+---
+title: "Building rendered_useful: A Modern React Portfolio"
+description: "How I built this open-source portfolio and article platform using React, TypeScript, and Tailwind CSS v4."
+date: "2025-01-05"
+author: "scott-peabody"
+tags: ["react", "typescript", "tailwind", "open-source"]
+featured: true
+readingTime: 8
+coverImage: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200"
+---
+
+import { Callout } from '@/components/mdx'
+
+I built **rendered_useful** as a modern, open-source portfolio and article platform. The goal was to create something that looks great, performs well, and can serve as a starting point for a new a collaborative builder community.
+
+## Why I Built This
+
+I wanted a place to share my projects, experiments, and learnings. Most portfolio templates felt either too minimal or too bloated. I wanted something with a modern design, great developer experience, and the ability to write rich, interactive content. My hopes is that this grows into a community-driven platform for everyone to make whatever things they want and to showcase their work.
+
+<Callout type="info" title="Open Source">
+  This site is a work in progress and will change a lot over time. I will post new articles, projects and features as I build them.
+</Callout>
+
+## Tech Stack
+
+The site is built with a modern React stack focused on developer experience and performance:
+
+- **React 18+** - The foundation, with lazy loading and Suspense
+- **TypeScript** - Type safety throughout
+- **Vite** - Lightning fast development and builds
+- **Tailwind CSS v4** - Modern utility-first styling with CSS variables
+- **Framer Motion** - Smooth animations and page transitions
+- **MDX** - Write content with embedded React components
+
+## Design Decisions
+
+The design follows a "dark mode first" philosophy with glass morphism effects. I used CSS custom properties for theming, which makes it easy to switch between dark and light modes. This will probably change and evolve as I learn and get feedback.
+
+```css
+/* Dark mode colors */
+--color-background: #0a0a0f;
+--color-surface: #12121a;
+--color-accent-primary: #6366f1;
+--color-accent-secondary: #8b5cf6;
+
+/* Glass morphism */
+--color-glass: rgba(255, 255, 255, 0.05);
+--color-glass-border: rgba(255, 255, 255, 0.1);
+```
+
+## Multi-Language Code Examples
+
+One cool thing about MDX with syntax highlighting is support for many languages:
+
+### TypeScript
+
+```typescript
+interface Project {
+  title: string;
+  description: string;
+  tags: string[];
+  techStack: string[];
+}
+
+const projects: Project[] = await fetchProjects();
+```
+
+### Rust
+
+```rust
+use std::collections::HashMap;
+
+fn main() {
+    let mut scores: HashMap<String, i32> = HashMap::new();
+    scores.insert(String::from("Blue"), 10);
+    scores.insert(String::from("Red"), 50);
+    
+    for (key, value) in &scores {
+        println!("{}: {}", key, value);
+    }
+}
+```
+
+### Python
+
+```python
+from dataclasses import dataclass
+from typing import List
+
+@dataclass
+class Project:
+    title: str
+    description: str
+    tags: List[str]
+
+projects = [
+    Project("render_useful", "A portfolio site", ["react", "typescript"])
+]
+```
+
+### Go
+
+```go
+package main
+
+import "fmt"
+
+type Project struct {
+    Title       string
+    Description string
+    Tags        []string
+}
+
+func main() {
+    project := Project{
+        Title:       "render_useful",
+        Description: "A portfolio site",
+        Tags:        []string{"react", "typescript"},
+    }
+    fmt.Printf("Project: %s\n", project.Title)
+}
+```
+
+## Features
+
+- Dark and light mode with system preference detection
+- Command palette (⌘K) for quick navigation
+- Responsive design that works on all devices
+- Tag-based filtering for articles and projects
+- Interactive code playgrounds in articles
+- Author profiles and contributor pages
+
+<Callout type="tip" title="Try It!">
+  Press `⌘K` to open the command palette and search for anything on the site!
+</Callout>
+
+## What's Next
+
+This is just the beginning! I plan to add more projects, write more articles, and continue improving the platform. Some ideas for future features include:
+
+- RSS feed generation
+- Full MDX file loading from the filesystem ✅
+- Embedded games and interactive demos
+- Comments and discussions
+- WebAssembly integration for running Rust/Go in the browser

@@ -1,0 +1,70 @@
+---
+title: "Rubik's Cube"
+description: "An interactive 3D Rubik's Cube with scramble and solve features"
+---
+
+import RubiksCube from '@/components/games/RubiksCube'
+
+<Callout type="info" title="Interactive 3D Puzzle">
+  This is a fully interactive Rubik's Cube built with React Three Fiber. Drag to rotate the view, scroll to zoom, and use the controls below to scramble and solve!
+</Callout>
+
+<RubiksCube />
+
+## Features
+
+- **3D Rendering** - Built with React Three Fiber and Three.js
+- **Smooth Animations** - Face rotations are animated at 60fps
+- **Standard Notation** - Uses official Rubik's cube notation (U, D, F, B, R, L)
+- **Scramble** - Generates random 20-move scrambles
+- **Solve** - Reverses moves to solve the cube
+- **Manual Control** - Execute individual moves with button controls
+
+## Tech Stack
+
+<TechStack 
+  items={['React', 'Three.js', 'React Three Fiber', 'TypeScript', 'Framer Motion']}
+/>
+
+## How It Works
+
+The cube is made up of 26 "cubies" (the center is empty). Each cubie tracks its position and the color of each face. When a move is executed:
+
+1. **Identify affected cubies** - Based on the move (e.g., U affects all cubies where y=1)
+2. **Calculate rotation** - Determine axis and angle based on move notation
+3. **Animate** - Smoothly rotate the affected cubies
+4. **Update state** - Apply the new positions and colors
+
+```typescript
+// Example: Applying a move
+function applyMove(cubies: CubieState[], move: Move): CubieState[] {
+  const affected = getAffectedCubies(cubies, move)
+  return cubies.map(cubie => {
+    if (affected.includes(cubie)) {
+      return rotateCubie(cubie, move)
+    }
+    return cubie
+  })
+}
+```
+
+## Cube Notation
+
+| Move | Description |
+|------|-------------|
+| **U** | Top face clockwise |
+| **U'** | Top face counter-clockwise |
+| **U2** | Top face 180° |
+| **D** | Bottom face clockwise |
+| **F** | Front face clockwise |
+| **B** | Back face clockwise |
+| **R** | Right face clockwise |
+| **L** | Left face clockwise |
+
+## Future Improvements
+
+- Full CFOP solving algorithm
+- Step-by-step solve animation with explanation
+- Custom color schemes
+- Touch controls for mobile
+- Timer mode for speedcubing practice

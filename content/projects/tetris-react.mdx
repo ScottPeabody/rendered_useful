@@ -1,0 +1,82 @@
+---
+title: "Tetris React"
+description: "A fully playable Tetris clone built with React hooks"
+---
+
+import { Callout } from '@/components/mdx'
+import Tetris from '@/components/games/Tetris'
+
+<div className="p-6 rounded-2xl bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 mb-8">
+  <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-2">
+    Play it right here! 🎮
+  </h3>
+  <div className="text-[var(--color-text-secondary)]">
+    This is a fully playable Tetris clone built entirely with React hooks. 
+    No game engine needed – just React, TypeScript, and CSS.
+  </div>
+</div>
+
+<Tetris />
+
+## Controls
+
+- **← →** - Move piece left/right
+- **↓** - Soft drop (faster fall)
+- **↑** - Rotate piece clockwise
+- **Space** - Hard drop (instant drop)
+- **P** - Pause/Resume game
+
+## Features
+
+- All 7 classic Tetromino pieces
+- Piece rotation with collision detection
+- Line clearing with combo scoring
+- Level progression (speed increases)
+- Next piece preview
+- Pause functionality
+- Game over detection
+
+## How It's Built
+
+The game uses React's `useState` for game state, `useEffect` for the game loop and keyboard input, and `useCallback` for memoized game functions. The board is rendered using CSS Grid.
+
+### Core Architecture
+
+```typescript
+// Game state
+const [board, setBoard] = useState<number[][]>(createBoard());
+const [currentPiece, setCurrentPiece] = useState(getRandomPiece());
+const [position, setPosition] = useState({ x: 4, y: 0 });
+const [score, setScore] = useState(0);
+const [level, setLevel] = useState(1);
+const [gameOver, setGameOver] = useState(false);
+const [paused, setPaused] = useState(false);
+```
+
+### Game Loop
+
+```typescript
+useEffect(() => {
+  if (gameOver || paused) return;
+  
+  const interval = setInterval(() => {
+    moveDown();
+  }, Math.max(100, 1000 - (level - 1) * 100));
+  
+  return () => clearInterval(interval);
+}, [gameOver, paused, level, moveDown]);
+```
+
+<Callout type="tip" title="Learn More">
+  Read the [full article](/articles/building-tetris-in-react) for a deep dive into how the game works, including collision detection, rotation, and scoring!
+</Callout>
+
+## Want to Add Features?
+
+Some ideas for extending the game:
+
+- **Ghost piece** - Show where the piece will land
+- **Hold piece** - Save a piece for later
+- **T-spin detection** - Award bonus points for T-spins
+- **Multiplayer** - Use WebSockets for head-to-head play
+- **Sound effects** - Add audio feedback with Web Audio API
