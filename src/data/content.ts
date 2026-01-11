@@ -48,6 +48,16 @@ export const articles: Article[] = [
     featured: true,
     relatedProject: 'tetris-react',
   },
+  {
+    slug: 'the-freedom-security-tradeoff',
+    title: 'The Freedom-Security Tradeoff: Lessons from Social Media for Open Platforms',
+    description: 'Reflecting on what made early social media great, why it changed, and how we can build open platforms that balance freedom with security.',
+    author: 'scott-peabody',
+    date: '2026-01-11',
+    tags: ['security', 'open-source', 'web-dev', 'opinion'],
+    readingTime: 10,
+    featured: false,
+  },
 ]
 
 export const projects: Project[] = [
@@ -111,6 +121,10 @@ export const generateTagInfo = (): TagInfo[] => {
     accessibility: '#22c55e',
     threejs: '#000000',
     game: '#ef4444',
+    security: '#f59e0b',
+    'open-source': '#22d3ee',
+    'web-dev': '#818cf8',
+    opinion: '#f472b6',
   }
   
   return Object.entries(tagCounts)

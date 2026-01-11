@@ -91,7 +91,7 @@ export default function ContributePage() {
               <p className="text-[var(--color-text-secondary)] leading-relaxed">
                 This site is still in its early stages, and there's a lot of room to grow. 
                 Whether you want to contribute content, suggest features, report bugs, or just 
-                share your thoughts — I'd love to hear from you. Feel free to reach out if you 
+                share your thoughts, I'd love to hear from you. Feel free to reach out if you 
                 want to get involved or have any feedback!
               </p>
             </div>

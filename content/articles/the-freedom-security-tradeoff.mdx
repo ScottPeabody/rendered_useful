@@ -1,0 +1,176 @@
+---
+title: "The Freedom-Security Tradeoff: Lessons from Social Media for Open Platforms"
+description: "Reflecting on what made early social media great, why it changed, and how we can build open platforms that balance freedom with security."
+date: "2026-01-11"
+author: "scott-peabody"
+tags: ["security", "open-source", "web-dev", "opinion"]
+featured: false
+readingTime: 10
+---
+
+import { Callout } from '@/components/mdx'
+
+There's a certain magic that's been lost on the internet. If you were around in the early days of social media (the MySpace era, early Facebook, early Twitter) you know what I'm talking about. It felt like a frontier. You could build anything, share anything, connect with anyone. The platforms felt like tools that *you* controlled, not the other way around.
+
+What happened?
+
+## The Golden Age
+
+Early social media was beautifully chaotic. MySpace let you write custom CSS and embed music players. Early Facebook had open APIs that let developers build real applications on top of the platform. Twitter was a simple, open firehose of realtime thoughts. Forums and message boards let communities self-govern with minimal platform intervention.
+
+The common thread? **Trust in users.** Platforms assumed good faith. They gave you tools and got out of the way.
+
+This created an explosion of creativity:
+- Developers built businesses on platform APIs
+- Users customized their spaces to express themselves
+- Communities formed organically around shared interests
+- The barrier between "user" and "creator" was thin
+
+<Callout type="info" title="The Early Web">
+  The early web wasn't just more open, it was more *personal*. Your MySpace page said something about you. Your blogroll connected you to a community. The friction of customization filtered for people who cared.
+</Callout>
+
+## The Lockdown
+
+Then things changed. Slowly at first, then all at once.
+
+The problems were real:
+- **Spam and bots** flooded every open channel
+- **Harassment and abuse** drove users away
+- **Data breaches** exposed millions of users
+- **Misinformation** spread faster than corrections
+- **Supply chain attacks** compromised platform dependencies
+- **Malicious code** was injected through seemingly innocent features
+
+Platforms responded the only way they knew how: **lock it down**.
+
+## The Darker Side: Data Exploitation
+
+But here's what often gets lost in the security narrative: **the platforms themselves became the threat**.
+
+While they locked down features in the name of user safety, they simultaneously built massive surveillance infrastructures. The same companies restricting what users could do were:
+
+- **Harvesting every click, scroll, and pause** to build detailed psychological profiles
+- **Selling access to predatory advertisers** who target vulnerable users: people in debt, struggling with addiction, or going through emotional crises
+- **Optimizing for engagement over wellbeing**, knowing that outrage and anxiety keep people scrolling
+- **Sharing data with third parties** who used it in ways users never consented to (remember Cambridge Analytica?)
+- **Building recommendation algorithms** that push users toward increasingly extreme content
+
+<Callout type="warning" title="The Real Product">
+  "If you're not paying for the product, you are the product." This cliché became horrifyingly literal. Users weren't just the product; their attention, emotions, and vulnerabilities were being auctioned to the highest bidder.
+</Callout>
+
+The lockdowns weren't really about protecting users. They were about protecting the platform's control over the data pipeline. Open APIs threatened their monopoly on user information. Custom features made tracking harder. The "safety" restrictions conveniently also made it harder for users to leave or for competitors to interoperate.
+
+So we ended up with the worst of both worlds: platforms that restricted user freedom while exploiting user data. The creativity and openness disappeared, but the surveillance only intensified.
+
+APIs were restricted or shut down entirely. Custom code was banned. Algorithmic feeds replaced chronological ones (partly for engagement, but also to filter bad content). Verification systems, rate limits, content moderation: all necessary responses to real threats.
+
+But something was lost. The platforms became less like tools and more like walled gardens. Users became content for the algorithm rather than participants in a community.
+
+## The Security Mindset
+
+Here's the uncomfortable truth: **the lockdowns often worked**. Spam decreased. Some forms of abuse became harder. Data was better protected (usually). The platforms became safer for the average user.
+
+But they also became more homogeneous, more controlled, more... boring.
+
+This is the fundamental tension: **freedom and security pull in opposite directions**. Every permission you grant is an attack surface. Every feature is a potential vulnerability. Every open API is an invitation for abuse.
+
+<Callout type="warning" title="The Tradeoff">
+  There's no free lunch in security. Every freedom you give users can be exploited. The question isn't whether to make tradeoffs, it's which ones to make.
+</Callout>
+
+## Applying This to rendered_useful
+
+This isn't just abstract philosophy for me. As I build this site and think about its future, I face the same tensions.
+
+Right now, rendered_useful is simple:
+- Static content from trusted authors
+- No user generated content
+- No authentication system
+- Minimal attack surface
+
+But what happens when we scale? What if we add:
+- User comments and discussions
+- Community-submitted articles
+- Custom user profiles
+- Embedded interactive content from contributors
+
+Every feature is a door. Some of those doors let in creativity and community. Some let in spam, abuse, and security vulnerabilities.
+
+### The Dependency Question
+
+One question that keeps me up at night: **how much should we own versus depend on?**
+
+Look at our current `package.json`. We depend on dozens of packages, each with their own dependencies. Each one is a potential supply chain attack vector. The [left-pad incident](https://www.theregister.com/2016/03/23/npm_left_pad_chaos/), [event-stream malware](https://blog.npmjs.org/post/180565383195/details-about-the-event-stream-incident), and countless other npm supply chain attacks show this isn't theoretical.
+
+Options on the spectrum:
+
+**Own Everything (Maximum Security)**
+- Write every line of code ourselves
+- No external dependencies
+- Complete control, complete responsibility
+- Practically impossible for a small team
+- Miss out on battle tested solutions
+
+**Depend on Everything (Maximum Velocity)**
+- npm install for every problem
+- Fast development, huge attack surface
+- Vulnerable to any compromised dependency
+- Often don't even understand what's in our bundle
+
+**The Middle Ground**
+- Carefully audit critical dependencies
+- Prefer well maintained, widely used packages
+- Understand what you're importing
+- Have a plan for when dependencies go bad
+- Own the code that touches user data directly
+
+<Callout type="tip" title="Practical Approach">
+  You don't need to own everything, but you should *understand* everything in your critical path. If a package handles authentication, user data, or renders user content, read the source.
+</Callout>
+
+## A Path Forward
+
+So is there a way to have the best of both worlds? Can we build platforms that feel open and creative while remaining secure?
+
+I think yes, but it requires being intentional:
+
+### 1. Graduated Trust
+
+Not all users need the same permissions. New accounts get limited capabilities. As users build history and reputation, they earn more freedom. This is how communities like Stack Overflow and Wikipedia work: trust is earned, not assumed.
+
+### 2. Sandboxing Over Prohibition
+
+Instead of banning features entirely, sandbox them. Let users embed custom content, but run it in an iframe with strict CSP. Let users write custom styles, but sanitize them. Give freedom within boundaries.
+
+### 3. Transparency Over Control
+
+Instead of algorithmic black boxes, be transparent about how things work. Let users see why content was filtered. Make the rules clear and consistently enforced. Users accept constraints better when they understand them.
+
+### 4. Community Moderation
+
+Centralized moderation doesn't scale and creates single points of failure (and bias). Distributed moderation, where trusted community members help govern, scales better and aligns incentives.
+
+### 5. Thoughtful Dependencies
+
+For this site specifically:
+- Audit packages before adding them
+- Prefer dependencies with large, active communities
+- Pin versions and review updates
+- Consider vendoring critical code
+- Have fallback plans for when packages are compromised or abandoned
+
+## The Honest Answer
+
+Will this work? I'm not sure yet. But I'm going to go for it.
+
+The goal isn't to recreate the past. It's to go back to that moment before everything went so wrong and try a different path. The early web had something real: genuine connection, creative freedom, communities that actually belonged to their members. That got corrupted, but it doesn't mean it was impossible.
+
+We don't need to accept the false choice between "open platform that exploits you" and "locked down platform that exploits you." There has to be a third option where users have freedom *and* their data stays their own.
+
+I don't have all the answers. I don't know exactly how to scale this without the same problems creeping in. But I'd rather try and learn than accept that the current state of the internet is inevitable.
+
+---
+
+*What do you think? Have you found ways to balance openness with security in your own projects? I'd love to hear about it.*
