@@ -69,7 +69,7 @@ export default function ContributePage() {
           </h1>
 
           <p className="text-xl text-[var(--color-text-secondary)] max-w-2xl mx-auto">
-            This project is open source and community-driven. We'd love your help making it better!
+            This project is open source and community driven. We'd love your help making it better!
           </p>
         </motion.div>
 
