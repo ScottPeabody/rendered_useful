@@ -1,5 +1,5 @@
-import { Routes, Route } from 'react-router-dom'
-import { Suspense, lazy } from 'react'
+import { Routes, Route, useLocation } from 'react-router-dom'
+import { Suspense, lazy, useEffect } from 'react'
 import Layout from './components/layout/Layout'
 import LoadingSpinner from './components/ui/LoadingSpinner'
 
@@ -16,9 +16,21 @@ const TagPage = lazy(() => import('./pages/TagPage'))
 const UsesPage = lazy(() => import('./pages/UsesPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
+// Scroll to top on route change
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+  
+  return null
+}
+
 function App() {
   return (
     <Layout>
+      <ScrollToTop />
       <Suspense fallback={<LoadingSpinner />}>
         <Routes>
           <Route path="/" element={<HomePage />} />
