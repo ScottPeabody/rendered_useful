@@ -50,7 +50,7 @@ export const articles: Article[] = [
   },
   {
     slug: 'the-freedom-security-tradeoff',
-    title: 'The Freedom-Security Tradeoff: Lessons from Social Media for Open Platforms',
+    title: 'Building Open Platforms Without Repeating History',
     description: 'Reflecting on what made early social media great, why it changed, and how we can build open platforms that balance freedom with security.',
     author: 'scott-peabody',
     date: '2026-01-11',
