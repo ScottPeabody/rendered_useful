@@ -9,15 +9,18 @@ import rehypeHighlight from 'rehype-highlight'
 import rehypeKatex from 'rehype-katex'
 import { resolve } from 'path'
 
-// Plugin to fix relative dynamic imports for SPA routing
-function fixDynamicImports(): Plugin {
+/**
+ * Converts relative dynamic imports to absolute paths.
+ * Required for SPAs on static hosts (GitHub Pages) where deep URLs
+ * like /projects/rubiks-cube cause relative imports to resolve incorrectly.
+ */
+function absoluteImports(): Plugin {
   return {
-    name: 'fix-dynamic-imports',
+    name: 'vite-plugin-absolute-imports',
     enforce: 'post',
     generateBundle(_options, bundle) {
       for (const file of Object.values(bundle)) {
         if (file.type === 'chunk' && file.code) {
-          // Replace relative dynamic imports with absolute paths
           file.code = file.code.replace(
             /import\("\.\/([^"]+)"\)/g,
             'import("/assets/$1")'
@@ -39,7 +42,7 @@ export default defineConfig({
     }),
     react(),
     tailwindcss(),
-    fixDynamicImports(),
+    absoluteImports(),
   ],
   build: {
     rollupOptions: {
