@@ -19,13 +19,13 @@ class CanvasErrorBoundary extends Component<{ children: ReactNode }, { hasError:
   render() {
     if (this.state.hasError) {
       return (
-        <div className="h-[400px] w-full flex items-center justify-center bg-black/50">
-          <div className="text-center p-6">
-            <AlertTriangle className="w-12 h-12 text-amber-400 mx-auto mb-4" />
-            <p className="text-white/70 text-sm">Failed to load 3D scene</p>
+        <div className="h-[280px] sm:h-[400px] w-full flex items-center justify-center bg-black/50">
+          <div className="text-center p-4 sm:p-6">
+            <AlertTriangle className="w-10 h-10 sm:w-12 sm:h-12 text-amber-400 mx-auto mb-3 sm:mb-4" />
+            <p className="text-white/70 text-xs sm:text-sm">Failed to load 3D scene</p>
             <button
               onClick={() => window.location.reload()}
-              className="mt-4 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-sm transition-colors"
+              className="mt-3 sm:mt-4 px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-xs sm:text-sm transition-colors"
             >
               Reload Page
             </button>
@@ -40,10 +40,10 @@ class CanvasErrorBoundary extends Component<{ children: ReactNode }, { hasError:
 // Loading fallback for Suspense
 function CanvasLoader() {
   return (
-    <div className="h-[400px] w-full flex items-center justify-center bg-black/50">
+    <div className="h-[280px] sm:h-[400px] w-full flex items-center justify-center bg-black/50">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-white/50 mx-auto mb-4"></div>
-        <p className="text-white/50 text-sm">Loading 3D scene...</p>
+        <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-b-2 border-white/50 mx-auto mb-3 sm:mb-4"></div>
+        <p className="text-white/50 text-xs sm:text-sm">Loading 3D scene...</p>
       </div>
     </div>
   )
@@ -702,22 +702,22 @@ export default function RubiksCube() {
   return (
     <div className="relative w-full rounded-2xl overflow-hidden bg-gradient-to-br from-[#0f0f0f] to-[#1a1a2e] border border-white/10">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-black/20">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-500 via-green-500 to-blue-500 flex items-center justify-center">
-            <div className="w-4 h-4 bg-white rounded-sm" />
+      <div className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3 border-b border-white/10 bg-black/20">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-red-500 via-green-500 to-blue-500 flex items-center justify-center">
+            <div className="w-3 h-3 sm:w-4 sm:h-4 bg-white rounded-sm" />
           </div>
           <div>
-            <h3 className="font-semibold text-white">Rubik's Cube</h3>
-            <p className="text-xs text-white/50">3D Interactive Puzzle</p>
+            <h3 className="font-semibold text-white text-sm sm:text-base">Rubik's Cube</h3>
+            <p className="text-[10px] sm:text-xs text-white/50">3D Interactive Puzzle</p>
           </div>
         </div>
         
         <button
           onClick={() => setShowInfo(!showInfo)}
-          className="p-2 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors"
+          className="p-1.5 sm:p-2 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors"
         >
-          {showInfo ? <X size={18} /> : <Info size={18} />}
+          {showInfo ? <X size={16} className="sm:w-[18px] sm:h-[18px]" /> : <Info size={16} className="sm:w-[18px] sm:h-[18px]" />}
         </button>
       </div>
       
@@ -730,11 +730,10 @@ export default function RubiksCube() {
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden border-b border-white/10 bg-black/30"
           >
-            <div className="p-4 text-sm text-white/70 space-y-2">
-              <p><strong className="text-white">Controls:</strong> Click and drag to rotate the view. Scroll to zoom.</p>
+            <div className="p-3 sm:p-4 text-xs sm:text-sm text-white/70 space-y-1.5 sm:space-y-2">
+              <p><strong className="text-white">Controls:</strong> Drag to rotate view. Pinch/scroll to zoom.</p>
               <p><strong className="text-white">Notation:</strong> U (Up), D (Down), F (Front), B (Back), R (Right), L (Left)</p>
               <p><strong className="text-white">' (Prime):</strong> Counter-clockwise rotation</p>
-              <p><strong className="text-white">2:</strong> Double rotation (180°)</p>
             </div>
           </motion.div>
         )}
@@ -743,7 +742,7 @@ export default function RubiksCube() {
       {/* 3D Canvas */}
       <CanvasErrorBoundary>
         <Suspense fallback={<CanvasLoader />}>
-          <div className="h-[400px] w-full">
+          <div className="h-[280px] sm:h-[400px] w-full">
             <Canvas camera={{ position: [4, 3, 5], fov: 45 }}>
               <CubeScene 
                 cubies={preAnimationCubies || cubies}
@@ -759,19 +758,19 @@ export default function RubiksCube() {
       
       {/* Move History */}
       {moveHistory.length > 0 && (
-        <div className="px-4 py-2 border-t border-white/10 bg-black/20">
-          <div className="flex items-center gap-2 overflow-x-auto pb-1">
-            <span className="text-sm text-white/50 font-semibold px-3 py-1 bg-white/10 rounded-lg shrink-0">Moves</span>
+        <div className="px-3 sm:px-4 py-1.5 sm:py-2 border-t border-white/10 bg-black/20">
+          <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1">
+            <span className="text-xs sm:text-sm text-white/50 font-semibold px-2 sm:px-3 py-0.5 sm:py-1 bg-white/10 rounded-lg shrink-0">Moves</span>
             {moveHistory.map((move, i) => (
               <span 
                 key={i} 
-                className="px-2 py-0.5 rounded bg-white/10 text-xs text-white/70 font-mono"
+                className="px-1.5 sm:px-2 py-0.5 rounded bg-white/10 text-[10px] sm:text-xs text-white/70 font-mono"
               >
                 {move}
               </span>
             ))}
             {currentMove && (
-              <span className="px-2 py-0.5 rounded bg-blue-500/30 text-xs text-blue-400 font-mono animate-pulse">
+              <span className="px-1.5 sm:px-2 py-0.5 rounded bg-blue-500/30 text-[10px] sm:text-xs text-blue-400 font-mono animate-pulse">
                 {currentMove}
               </span>
             )}
@@ -780,27 +779,27 @@ export default function RubiksCube() {
       )}
       
       {/* Controls */}
-      <div className="p-4 border-t border-white/10 bg-black/30 space-y-4">
+      <div className="p-3 sm:p-4 border-t border-white/10 bg-black/30 space-y-3 sm:space-y-4">
         {/* Main Actions */}
-        <div className="flex items-center justify-center gap-3 flex-wrap">
+        <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
           <button
             onClick={handleScramble}
             disabled={isPlaying}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium text-sm hover:from-purple-500 hover:to-pink-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium text-xs sm:text-sm hover:from-purple-500 hover:to-pink-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
           >
-            <Shuffle size={18} />
+            <Shuffle size={16} className="sm:w-[18px] sm:h-[18px]" />
             Scramble
           </button>
           
           {(isPlaying || moveQueue.length > 0) && (
             <button
               onClick={togglePlayPause}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 text-white font-medium text-sm hover:bg-white/20 transition-all"
+              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-white/10 text-white font-medium text-xs sm:text-sm hover:bg-white/20 transition-all"
             >
-              {isPlaying ? <Pause size={18} /> : <Play size={18} />}
+              {isPlaying ? <Pause size={16} className="sm:w-[18px] sm:h-[18px]" /> : <Play size={16} className="sm:w-[18px] sm:h-[18px]" />}
               {isPlaying ? 'Pause' : 'Resume'}
               {moveQueue.length > 0 && (
-                <span className="px-2 py-0.5 rounded bg-white/10 text-xs font-mono">
+                <span className="px-1.5 sm:px-2 py-0.5 rounded bg-white/10 text-[10px] sm:text-xs font-mono">
                   {moveQueue.length}
                 </span>
               )}
@@ -810,27 +809,28 @@ export default function RubiksCube() {
           <button
             onClick={handleSolve}
             disabled={isPlaying || moveHistory.length === 0}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium text-sm hover:from-green-500 hover:to-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium text-xs sm:text-sm hover:from-green-500 hover:to-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
           >
-            <RotateCcw size={18} />
-            Undo All
+            <RotateCcw size={16} className="sm:w-[18px] sm:h-[18px]" />
+            <span className="hidden xs:inline">Undo All</span>
+            <span className="xs:hidden">Undo</span>
           </button>
           
           <button
             onClick={handleReset}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 text-white font-medium text-sm hover:bg-white/20 transition-all"
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-white/10 text-white font-medium text-xs sm:text-sm hover:bg-white/20 transition-all"
           >
-            <RotateCcw size={18} />
+            <RotateCcw size={16} className="sm:w-[18px] sm:h-[18px]" />
             Reset
           </button>
         </div>
         
         {/* Manual Move Buttons - Camera-relative controls */}
-        <div className="space-y-3">
-          <p className="text-sm text-white/70 text-center font-semibold tracking-wide">Rotate a Face</p>
+        <div className="space-y-2 sm:space-y-3">
+          <p className="text-xs sm:text-sm text-white/70 text-center font-semibold tracking-wide">Rotate a Face</p>
           
           {/* Face controls - uniform grid layout */}
-          <div className="grid grid-cols-3 gap-2 max-w-md mx-auto">
+          <div className="grid grid-cols-3 gap-1.5 sm:gap-2 max-w-sm sm:max-w-md mx-auto">
             {[
               { direction: 'left', label: 'L', invert: true },
               { direction: 'right', label: 'R', invert: false },
@@ -853,28 +853,28 @@ export default function RubiksCube() {
               const ccwMove = invert ? physicalFace as Move : `${physicalFace}'` as Move
               const cwMove = invert ? `${physicalFace}'` as Move : physicalFace as Move
               return (
-                <div key={direction} className="flex items-center h-12 rounded-lg bg-white/5 border border-white/10 overflow-hidden">
+                <div key={direction} className="flex items-center h-10 sm:h-12 rounded-lg bg-white/5 border border-white/10 overflow-hidden">
                   {/* CCW button */}
                   <button
                     onClick={() => executeMove(ccwMove)}
                     disabled={isPlaying}
-                    className="w-10 h-full bg-slate-700 hover:bg-slate-600 text-white text-lg flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    className="w-8 sm:w-10 h-full bg-slate-700 hover:bg-slate-600 text-white text-base sm:text-lg flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                     title={`${physicalFace}' (counter-clockwise)`}
                   >
                     ↺
                   </button>
                   
                   {/* Face label with color */}
-                  <div className="flex-1 h-full flex items-center justify-center gap-2 px-2">
-                    <div className={`w-5 h-5 rounded ${color} shadow-sm shrink-0`} />
-                    <span className="text-sm text-white font-bold">{label}</span>
+                  <div className="flex-1 h-full flex items-center justify-center gap-1.5 sm:gap-2 px-1.5 sm:px-2">
+                    <div className={`w-4 sm:w-5 h-4 sm:h-5 rounded ${color} shadow-sm shrink-0`} />
+                    <span className="text-xs sm:text-sm text-white font-bold">{label}</span>
                   </div>
                   
                   {/* CW button */}
                   <button
                     onClick={() => executeMove(cwMove)}
                     disabled={isPlaying}
-                    className="w-10 h-full bg-blue-600 hover:bg-blue-500 text-white text-lg flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    className="w-8 sm:w-10 h-full bg-blue-600 hover:bg-blue-500 text-white text-base sm:text-lg flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                     title={`${physicalFace} (clockwise)`}
                   >
                     ↻
@@ -885,7 +885,7 @@ export default function RubiksCube() {
           </div>
           
           <div className="flex justify-center">
-            <span className="text-sm text-white/70 font-semibold px-4 py-1.5 bg-white/10 rounded-lg">
+            <span className="text-xs sm:text-sm text-white/70 font-semibold px-3 sm:px-4 py-1 sm:py-1.5 bg-white/10 rounded-lg">
               ↺ CCW · ↻ CW
             </span>
           </div>
@@ -893,7 +893,7 @@ export default function RubiksCube() {
       </div>
       
       {/* Status Bar */}
-      <div className="px-4 py-2 border-t border-white/10 bg-black/40 flex items-center justify-between text-xs">
+      <div className="px-3 sm:px-4 py-1.5 sm:py-2 border-t border-white/10 bg-black/40 flex items-center justify-between text-[10px] sm:text-xs">
         <span className="text-white/40">
           {isSolving 
             ? 'Reversing moves...' 
