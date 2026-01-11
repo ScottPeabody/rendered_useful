@@ -309,7 +309,7 @@ export default function HomePage() {
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Button
-                href="https://github.com/render-useful/render-useful"
+                href="https://github.com/ScottPeabody/rendered_useful"
                 variant="secondary"
                 size="lg"
               >

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Search, Moon, Sun, Command } from 'lucide-react'
+import { Menu, X, Search, Moon, Sun, Command, Github } from 'lucide-react'
 import { useTheme } from '../../context/ThemeContext'
 import { useSearchStore } from '../../store'
 
@@ -93,6 +93,17 @@ export default function Navbar() {
                 <Command size={10} />K
               </kbd>
             </button>
+
+            {/* GitHub Link */}
+            <a
+              href="https://github.com/ScottPeabody/rendered_useful"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 rounded-lg text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)] transition-all"
+              aria-label="View on GitHub"
+            >
+              <Github size={20} />
+            </a>
 
             {/* Theme Toggle */}
             <button

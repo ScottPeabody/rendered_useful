@@ -33,8 +33,8 @@ Thank you for your interest in contributing! This document outlines how to submi
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/speabody/render_useful.git
-cd render_useful
+git clone https://github.com/ScottPeabody/rendered_useful.git
+cd rendered_useful
 ```
 
 ### 2. Install Dependencies

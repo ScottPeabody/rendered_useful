@@ -15,7 +15,7 @@ const footerLinks = {
     { label: 'RSS Feed', href: '/rss.xml' },
   ],
   social: [
-    { label: 'GitHub', href: 'https://github.com/render-useful', icon: Github },
+    { label: 'GitHub', href: 'https://github.com/ScottPeabody/rendered_useful', icon: Github },
     { label: 'Twitter', href: 'https://twitter.com/render_useful', icon: Twitter },
     { label: 'RSS', href: '/rss.xml', icon: Rss },
   ],

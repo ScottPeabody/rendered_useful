@@ -36,7 +36,7 @@ export default function AboutPage() {
           </h1>
 
           <p className="text-xl text-[var(--color-text-secondary)] max-w-2xl mx-auto mb-8">
-            An open source, community-driven platform where developers share knowledge, 
+            An open source, community driven platform where developers share knowledge, 
             build projects, and grow together.
           </p>
 
@@ -197,7 +197,7 @@ export default function AboutPage() {
             or help improve the codebase. Everyone is welcome.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
-            <Button href="https://github.com/ScottPeabody/render_useful" icon={<Github size={18} />}>
+            <Button href="https://github.com/ScottPeabody/rendered_useful" icon={<Github size={18} />}>
               View on GitHub
             </Button>
             <Button to="/contributors" variant="outline" icon={<Users size={18} />}>

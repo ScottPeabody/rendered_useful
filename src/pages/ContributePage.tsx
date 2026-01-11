@@ -73,7 +73,7 @@ export default function ContributePage() {
           </p>
         </motion.div>
 
-        {/* Early Stage Notice */}
+        {/* Early Stage Notice */}g
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -206,7 +206,7 @@ export default function ContributePage() {
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Button
-                href="https://github.com/ScottPeabody/render_useful"
+                href="https://github.com/ScottPeabody/rendered_useful"
                 icon={<Github size={20} />}
               >
                 View on GitHub

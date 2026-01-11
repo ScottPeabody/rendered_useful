@@ -122,7 +122,7 @@ export default function ContributorsPage() {
             <Button to="/contribute">
               Contribution Guide
             </Button>
-            <Button href="https://github.com/render-useful/render-useful" variant="outline">
+            <Button href="https://github.com/ScottPeabody/rendered_useful" variant="outline">
               View GitHub
             </Button>
           </div>
