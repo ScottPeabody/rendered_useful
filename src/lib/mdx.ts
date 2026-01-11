@@ -9,6 +9,10 @@ export interface ArticleFrontmatter {
   featured?: boolean
   readingTime?: number
   coverImage?: string
+  // Theme customization
+  theme?: string // preset name: 'cyberpunk', 'terminal', 'retro', etc.
+  hideNavbar?: boolean
+  hideFooter?: boolean
 }
 
 export interface ProjectFrontmatter {
@@ -24,6 +28,10 @@ export interface ProjectFrontmatter {
   githubUrl?: string
   coverImage?: string
   featured?: boolean
+  // Theme customization
+  theme?: string // preset name
+  hideNavbar?: boolean
+  hideFooter?: boolean
 }
 
 export interface MDXModule<T> {

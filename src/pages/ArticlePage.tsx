@@ -7,7 +7,8 @@ import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import MDXContentProvider from '../components/MDXContentProvider'
 import { getArticle, getAuthor, getProject, getArticlesByTag } from '../data/content'
-import { loadArticle, hasArticleMDX } from '../lib/mdx'
+import { loadArticle, hasArticleMDX, type ArticleFrontmatter } from '../lib/mdx'
+import { useArticleTheme } from '../hooks/useArticleTheme'
 import NotFoundPage from './NotFoundPage'
 
 export default function ArticlePage() {
@@ -16,12 +17,16 @@ export default function ArticlePage() {
   const author = article ? getAuthor(article.author) : undefined
   const relatedProject = article?.relatedProject ? getProject(article.relatedProject) : undefined
   
-  // State for MDX content
+  // State for MDX content and frontmatter
   const [MDXContent, setMDXContent] = useState<ComponentType | null>(null)
+  const [frontmatter, setFrontmatter] = useState<ArticleFrontmatter | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   
   // Check if this article has MDX content
   const hasMDX = slug ? hasArticleMDX(slug) : false
+  
+  // Apply custom theme from frontmatter
+  useArticleTheme({ theme: frontmatter?.theme })
   
   // Load MDX content if available
   useEffect(() => {
@@ -34,6 +39,7 @@ export default function ArticlePage() {
     loadArticle(slug).then((result) => {
       if (result) {
         setMDXContent(() => result.Content)
+        setFrontmatter(result.frontmatter)
       }
       setIsLoading(false)
     })

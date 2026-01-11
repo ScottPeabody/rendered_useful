@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import mdx from '@mdx-js/rollup'
 import remarkGfm from 'remark-gfm'
 import remarkFrontmatter from 'remark-frontmatter'
+import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
 import remarkMath from 'remark-math'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeKatex from 'rehype-katex'
@@ -36,7 +37,7 @@ export default defineConfig({
   base: '/',
   plugins: [
     mdx({
-      remarkPlugins: [remarkFrontmatter, remarkGfm, remarkMath],
+      remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter, remarkGfm, remarkMath],
       rehypePlugins: [rehypeHighlight, rehypeKatex],
       providerImportSource: '@mdx-js/react',
     }),

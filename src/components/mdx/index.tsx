@@ -5,9 +5,10 @@ import Image from './Image'
 import Video from './Video'
 import Audio from './Audio'
 import Todo from './Todo'
+import ThemeSelector from './ThemeSelector'
 
  
-export { Callout, TechStack, Image, Video, Audio, Todo }
+export { Callout, TechStack, Image, Video, Audio, Todo, ThemeSelector }
 
 interface MDXProps {
   children?: ReactNode
