@@ -11,8 +11,13 @@ export interface ArticleFrontmatter {
   coverImage?: string
   // Theme customization
   theme?: string // preset name: 'cyberpunk', 'terminal', 'retro', etc.
+  // Layout customization
+  layout?: string // preset name: 'default', 'minimal', 'docs', 'showcase', etc.
+  // Individual layout overrides
   hideNavbar?: boolean
   hideFooter?: boolean
+  contentWidth?: 'narrow' | 'default' | 'wide' | 'full'
+  showTableOfContents?: boolean
 }
 
 export interface ProjectFrontmatter {
@@ -30,8 +35,12 @@ export interface ProjectFrontmatter {
   featured?: boolean
   // Theme customization
   theme?: string // preset name
+  // Layout customization  
+  layout?: string // preset name
+  // Individual layout overrides
   hideNavbar?: boolean
   hideFooter?: boolean
+  contentWidth?: 'narrow' | 'default' | 'wide' | 'full'
 }
 
 export interface MDXModule<T> {

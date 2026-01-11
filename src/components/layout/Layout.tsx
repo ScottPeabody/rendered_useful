@@ -3,15 +3,20 @@ import { motion } from 'framer-motion'
 import Navbar from './Navbar'
 import Footer from './Footer'
 import CommandPalette from '../ui/CommandPalette'
+import { useLayoutContext } from '../../hooks/useLayoutContext'
 
 interface LayoutProps {
   children: ReactNode
 }
 
 export default function Layout({ children }: LayoutProps) {
+  const layoutContext = useLayoutContext()
+  const hideNavbar = layoutContext?.layoutOptions.hideNavbar ?? false
+  const hideFooter = layoutContext?.layoutOptions.hideFooter ?? false
+
   return (
     <div className="min-h-screen flex flex-col bg-[var(--color-background)]">
-      <Navbar />
+      {!hideNavbar && <Navbar />}
       <motion.main
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -20,7 +25,7 @@ export default function Layout({ children }: LayoutProps) {
       >
         {children}
       </motion.main>
-      <Footer />
+      {!hideFooter && <Footer />}
       <CommandPalette />
     </div>
   )

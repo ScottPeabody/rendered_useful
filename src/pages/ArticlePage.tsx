@@ -9,6 +9,8 @@ import MDXContentProvider from '../components/MDXContentProvider'
 import { getArticle, getAuthor, getProject, getArticlesByTag } from '../data/content'
 import { loadArticle, hasArticleMDX, type ArticleFrontmatter } from '../lib/mdx'
 import { useArticleTheme } from '../hooks/useArticleTheme'
+import { getContentWidthClass, getSpacingClass } from '../layouts'
+import { useLayoutContext } from '../hooks/useLayoutContext'
 import NotFoundPage from './NotFoundPage'
 
 export default function ArticlePage() {
@@ -22,11 +24,22 @@ export default function ArticlePage() {
   const [frontmatter, setFrontmatter] = useState<ArticleFrontmatter | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   
+  // Get layout from global context
+  const layoutContext = useLayoutContext()
+  const layoutOptions = layoutContext?.layoutOptions
+  
   // Check if this article has MDX content
   const hasMDX = slug ? hasArticleMDX(slug) : false
   
   // Apply custom theme from frontmatter
   useArticleTheme({ theme: frontmatter?.theme })
+  
+  // Reset layout when leaving page or changing articles
+  useEffect(() => {
+    return () => {
+      layoutContext?.setLayoutOverride(null)
+    }
+  }, [slug]) // eslint-disable-line react-hooks/exhaustive-deps
   
   // Load MDX content if available
   useEffect(() => {
@@ -49,49 +62,179 @@ export default function ArticlePage() {
     return <NotFoundPage />
   }
 
-  // Get related articles based on tags
-  const relatedArticles = article.tags
-    .flatMap((tag) => getArticlesByTag(tag))
-    .filter((a) => a.slug !== article.slug)
-    .filter((a, index, self) => self.findIndex((x) => x.slug === a.slug) === index)
-    .slice(0, 2)
+  // Get related articles based on tags (only if layout shows them)
+  const relatedArticles = layoutOptions?.showRelatedArticles
+    ? article.tags
+        .flatMap((tag) => getArticlesByTag(tag))
+        .filter((a) => a.slug !== article.slug)
+        .filter((a, index, self) => self.findIndex((x) => x.slug === a.slug) === index)
+        .slice(0, 2)
+    : []
 
-  return (
-    <div className="pt-24 pb-16">
-      <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Back Link */}
-        <Link
-          to="/articles"
-          className="inline-flex items-center gap-2 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] mb-8 transition-colors"
+  // Content width and spacing classes
+  const widthClass = getContentWidthClass(layoutOptions?.contentWidth || 'default')
+  const spacingClass = getSpacingClass(layoutOptions?.verticalSpacing || 'default')
+
+  // Header style
+  const headerStyle = layoutOptions?.headerStyle || 'default'
+
+  // Render different header structures based on style
+  const renderHeader = () => {
+    if (!(layoutOptions?.showHeader ?? true)) return null
+
+    // Hero header - full width with gradient background
+    if (headerStyle === 'hero') {
+      return (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="relative -mx-4 sm:-mx-6 lg:-mx-8 mb-16 py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-[var(--color-accent-primary)]/10 via-[var(--color-surface)] to-[var(--color-accent-secondary)]/10 border-b border-[var(--color-border)]"
         >
-          <ArrowLeft size={16} />
-          Back to Articles
-        </Link>
+          <div className="max-w-4xl mx-auto text-center">
+            {(layoutOptions?.showTags ?? true) && (
+              <div className="flex flex-wrap gap-2 mb-6 justify-center">
+                {article.tags.map((tag) => (
+                  <Tag key={tag} name={tag} />
+                ))}
+              </div>
+            )}
+            
+            <h1 className="text-5xl md:text-7xl font-black text-[var(--color-text-primary)] leading-tight mb-8">
+              {article.title}
+            </h1>
+            
+            <p className="text-2xl md:text-3xl text-[var(--color-text-secondary)] max-w-3xl mx-auto mb-12 font-light">
+              {article.description}
+            </p>
+            
+            {((layoutOptions?.showAuthor ?? true) || (layoutOptions?.showDate ?? true)) && (
+              <div className="flex items-center justify-center gap-8">
+                {(layoutOptions?.showAuthor ?? true) && author && (
+                  <Link to={`/author/${author.slug}`} className="flex items-center gap-3 group">
+                    <img
+                      src={author.avatar}
+                      alt={author.name}
+                      className="w-14 h-14 rounded-full ring-4 ring-white/50 group-hover:ring-[var(--color-accent-primary)] transition-all"
+                    />
+                    <div className="text-left">
+                      <p className="font-semibold text-[var(--color-text-primary)]">{author.name}</p>
+                      <p className="text-sm text-[var(--color-text-muted)]">{author.role || 'Contributor'}</p>
+                    </div>
+                  </Link>
+                )}
+                {(layoutOptions?.showDate ?? true) && (
+                  <div className="flex items-center gap-2 text-[var(--color-text-muted)]">
+                    <Calendar size={18} />
+                    <span>{new Date(article.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                  </div>
+                )}
+                {(layoutOptions?.showReadingTime ?? true) && (
+                  <div className="flex items-center gap-2 text-[var(--color-text-muted)]">
+                    <Clock size={18} />
+                    <span>{article.readingTime} min read</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </motion.div>
+      )
+    }
 
-        {/* Header */}
+    // Minimal header - just title and date, very clean
+    if (headerStyle === 'minimal') {
+      return (
+        <motion.header
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-12 border-b border-[var(--color-border)] pb-6"
+        >
+          <h1 className="text-3xl font-semibold text-[var(--color-text-primary)] mb-3">
+            {article.title}
+          </h1>
+          {(layoutOptions?.showDate ?? true) && (
+            <p className="text-sm text-[var(--color-text-muted)]">
+              {new Date(article.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+              {(layoutOptions?.showReadingTime ?? true) && ` · ${article.readingTime} min read`}
+            </p>
+          )}
+        </motion.header>
+      )
+    }
+
+    // Centered header - elegant typography
+    if (headerStyle === 'centered') {
+      return (
         <motion.header
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
+          className="mb-16 text-center"
         >
-          {/* Tags */}
+          {(layoutOptions?.showTags ?? true) && (
+            <div className="flex flex-wrap gap-2 mb-6 justify-center">
+              {article.tags.map((tag) => (
+                <Tag key={tag} name={tag} />
+              ))}
+            </div>
+          )}
+          
+          <h1 className="text-4xl md:text-5xl font-serif font-normal text-[var(--color-text-primary)] leading-tight mb-6 tracking-tight">
+            {article.title}
+          </h1>
+          
+          <p className="text-xl text-[var(--color-text-secondary)] max-w-2xl mx-auto mb-8 italic">
+            {article.description}
+          </p>
+          
+          <div className="flex items-center justify-center gap-4 text-sm text-[var(--color-text-muted)]">
+            {(layoutOptions?.showAuthor ?? true) && author && (
+              <>
+                <span>By {author.name}</span>
+                <span>·</span>
+              </>
+            )}
+            {(layoutOptions?.showDate ?? true) && (
+              <span>{new Date(article.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+            )}
+            {(layoutOptions?.showReadingTime ?? true) && (
+              <>
+                <span>·</span>
+                <span>{article.readingTime} min read</span>
+              </>
+            )}
+          </div>
+          
+          <div className="mt-8 w-24 h-px bg-[var(--color-border)] mx-auto" />
+        </motion.header>
+      )
+    }
+
+    // Default header
+    return (
+      <motion.header
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-12"
+      >
+        {(layoutOptions?.showTags ?? true) && (
           <div className="flex flex-wrap gap-2 mb-4">
             {article.tags.map((tag) => (
               <Tag key={tag} name={tag} />
             ))}
           </div>
+        )}
 
-          <h1 className="text-4xl md:text-5xl font-bold text-[var(--color-text-primary)] mb-6 leading-tight">
-            {article.title}
-          </h1>
+        <h1 className="text-4xl md:text-5xl font-bold text-[var(--color-text-primary)] leading-tight mb-6">
+          {article.title}
+        </h1>
 
-          <p className="text-xl text-[var(--color-text-secondary)] mb-8">
-            {article.description}
-          </p>
+        <p className="text-xl text-[var(--color-text-secondary)] mb-8">
+          {article.description}
+        </p>
 
-          {/* Meta */}
-          <div className="flex flex-wrap items-center justify-between gap-4 pb-8 border-b border-[var(--color-border)]">
-            {author && (
+        {((layoutOptions?.showAuthor ?? true) || (layoutOptions?.showDate ?? true) || (layoutOptions?.showReadingTime ?? true)) && (
+          <div className="flex flex-wrap items-center gap-4 pb-8 border-b border-[var(--color-border)] justify-between">
+            {(layoutOptions?.showAuthor ?? true) && author && (
               <Link
                 to={`/author/${author.slug}`}
                 className="flex items-center gap-3 group"
@@ -101,7 +244,7 @@ export default function ArticlePage() {
                   alt={author.name}
                   className="w-12 h-12 rounded-full ring-2 ring-[var(--color-border)] group-hover:ring-[var(--color-accent-primary)] transition-all"
                 />
-                <div>
+                <div className="text-left">
                   <p className="font-medium text-[var(--color-text-primary)] group-hover:text-[var(--color-accent-primary)] transition-colors">
                     {author.name}
                   </p>
@@ -113,28 +256,60 @@ export default function ArticlePage() {
             )}
 
             <div className="flex items-center gap-6 text-sm text-[var(--color-text-muted)]">
-              <span className="flex items-center gap-2">
-                <Calendar size={16} />
-                {new Date(article.date).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
-              </span>
-              <span className="flex items-center gap-2">
-                <Clock size={16} />
-                {article.readingTime} min read
-              </span>
+              {(layoutOptions?.showDate ?? true) && (
+                <span className="flex items-center gap-2">
+                  <Calendar size={16} />
+                  {new Date(article.date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                </span>
+              )}
+              {(layoutOptions?.showReadingTime ?? true) && (
+                <span className="flex items-center gap-2">
+                  <Clock size={16} />
+                  {article.readingTime} min read
+                </span>
+              )}
             </div>
           </div>
-        </motion.header>
+        )}
+      </motion.header>
+    )
+  }
+
+  // Adjust top padding based on header style (hero has its own padding)
+  const topPadding = headerStyle === 'hero' ? 'pt-8' : 'pt-24'
+
+  return (
+    <div className={`${topPadding} pb-16 ${spacingClass}`}>
+      <article className={`${widthClass} mx-auto px-4 sm:px-6 lg:px-8`}>
+        {/* Back Link */}
+        {(layoutOptions?.showBackLink ?? true) && headerStyle !== 'hero' && (
+          <Link
+            to="/articles"
+            className="inline-flex items-center gap-2 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] mb-8 transition-colors"
+          >
+            <ArrowLeft size={16} />
+            Back to Articles
+          </Link>
+        )}
+
+        {/* Header - rendered using the function above */}
+        {renderHeader()}
 
         {/* Article Content */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="prose max-w-none"
+          className={`prose max-w-none ${
+            headerStyle === 'centered' ? 'prose-lg mx-auto' : ''
+          } ${
+            layoutOptions?.contentWidth === 'narrow' ? 'prose-sm md:prose-base' : 
+            layoutOptions?.contentWidth === 'wide' ? 'prose-lg' : ''
+          }`}
         >
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
@@ -156,7 +331,7 @@ export default function ArticlePage() {
         </motion.div>
 
         {/* Related Project */}
-        {relatedProject && (
+        {(layoutOptions?.showRelatedArticles ?? true) && relatedProject && (
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -224,7 +399,7 @@ export default function ArticlePage() {
         )}
 
         {/* Author Bio */}
-        {author && (
+        {(layoutOptions?.showAuthorCard ?? true) && author && (
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

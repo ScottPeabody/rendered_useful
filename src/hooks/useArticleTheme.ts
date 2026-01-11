@@ -20,9 +20,6 @@ export function useArticleTheme({ theme, customVariables }: UseArticleThemeOptio
     const preset = theme ? getTheme(theme) : undefined
     const variables = customVariables || preset?.variables
 
-    // Debug logging
-    console.log('[useArticleTheme] Theme:', theme, 'Preset found:', !!preset)
-
     if (!variables && !preset?.forcedMode) {
       return
     }

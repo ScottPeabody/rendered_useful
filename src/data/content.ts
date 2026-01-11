@@ -68,6 +68,16 @@ export const articles: Article[] = [
     readingTime: 3,
     featured: true,
   },
+  {
+    slug: 'custom-layouts-demo',
+    title: 'Custom Layouts System',
+    description: 'Demonstrating the custom layout system that allows articles to control page structure and display options.',
+    author: 'scott-peabody',
+    date: '2026-01-11',
+    tags: ['features', 'design', 'customization'],
+    readingTime: 4,
+    featured: true,
+  },
 ]
 
 export const projects: Project[] = [
