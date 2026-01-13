@@ -20,6 +20,7 @@ export interface Article {
   author: string // author slug
   date: string
   tags: string[]
+  communities?: string[] // community slugs
   readingTime: number
   coverImage?: string
   relatedProject?: string // project slug
@@ -34,6 +35,7 @@ export interface Project {
   author: string // author slug
   date: string
   tags: string[]
+  communities?: string[] // community slugs
   coverImage?: string
   demoUrl?: string
   githubUrl?: string
@@ -47,4 +49,21 @@ export interface TagInfo {
   name: string
   count: number
   color?: string
+}
+
+export interface Community {
+  slug: string
+  name: string
+  description: string
+  icon: string  // emoji or icon name
+  color: string // hex color
+  createdDate: string
+}
+
+export interface CommunityInfo {
+  slug: string
+  name: string
+  count: number
+  color: string
+  icon: string
 }

@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, FileText, Folder, User, Hash, ArrowRight, Command } from 'lucide-react'
+import { Search, FileText, Folder, User, Hash, ArrowRight, Command, Users } from 'lucide-react'
 import { useSearchStore } from '../../store'
-import { articles, projects, authors, tags } from '../../data/content'
+import { articles, projects, authors, tags, communities } from '../../data/content'
 
 interface SearchItem {
-  type: 'article' | 'project' | 'author' | 'tag'
+  type: 'article' | 'project' | 'author' | 'tag' | 'community'
   title: string
   description?: string
   slug: string
@@ -47,6 +47,13 @@ export default function CommandPalette() {
       description: `${t.count} items`,
       slug: `/tag/${t.name}`,
       icon: Hash,
+    })),
+    ...communities.map((c) => ({
+      type: 'community' as const,
+      title: c.name,
+      description: c.description,
+      slug: `/community/${c.slug}`,
+      icon: Users,
     })),
   ], [])
 
@@ -108,6 +115,7 @@ export default function CommandPalette() {
     project: 'Project',
     author: 'Author',
     tag: 'Tag',
+    community: 'Community',
   }
 
   const typeColors = {
@@ -115,6 +123,7 @@ export default function CommandPalette() {
     project: 'text-[var(--color-accent-tertiary)]',
     author: 'text-[var(--color-accent-secondary)]',
     tag: 'text-[var(--color-accent-success)]',
+    community: 'text-purple-400',
   }
 
   return (
