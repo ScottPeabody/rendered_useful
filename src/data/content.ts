@@ -1,4 +1,47 @@
-import type { Author, Article, Project, TagInfo } from '../types'
+import type { Author, Article, Project, TagInfo, Community, CommunityInfo } from '../types'
+
+export const communities: Community[] = [
+  {
+    slug: 'rendered-useful',
+    name: 'rendered_useful',
+    description: 'The official community for rendered_useful platform development, features, and meta discussions.',
+    icon: '🏠',
+    color: '#8b5cf6',
+    createdDate: '2026-01-10',
+  },
+  {
+    slug: 'gamedev',
+    name: 'Game Development',
+    description: 'For anyone building games - from simple browser games to complex 3D experiences. Share progress, get feedback, and learn together.',
+    icon: '🎮',
+    color: '#ef4444',
+    createdDate: '2026-01-10',
+  },
+  {
+    slug: 'opensource',
+    name: 'Open Source',
+    description: 'Contributors and maintainers of open source projects. Discuss best practices, share your projects, and find collaborators.',
+    icon: '🌐',
+    color: '#22d3ee',
+    createdDate: '2026-01-10',
+  },
+  {
+    slug: 'learners',
+    name: 'Learners',
+    description: 'A supportive space for people learning new skills. Share your journey, ask questions, and celebrate progress.',
+    icon: '📚',
+    color: '#10b981',
+    createdDate: '2026-01-10',
+  },
+  {
+    slug: 'creative-coding',
+    name: 'Creative Coding',
+    description: 'Where code meets art. Generative art, interactive experiences, visualizations, and creative experiments.',
+    icon: '🎨',
+    color: '#f472b6',
+    createdDate: '2026-01-10',
+  },
+]
 
 export const authors: Author[] = [
   {
@@ -23,6 +66,7 @@ export const articles: Article[] = [
     author: 'scott-peabody',
     date: '2026-01-10',
     tags: ['mdx', 'guide', 'getting-started'],
+    communities: ['rendered-useful', 'learners'],
     readingTime: 4,
     featured: true,
   },
@@ -33,6 +77,7 @@ export const articles: Article[] = [
     author: 'scott-peabody',
     date: '2026-01-10',
     tags: ['react', 'typescript', 'tailwind', 'web-dev', 'design'],
+    communities: ['rendered-useful', 'opensource'],
     readingTime: 8,
     featured: true,
     relatedProject: 'render-useful',
@@ -44,6 +89,7 @@ export const articles: Article[] = [
     author: 'scott-peabody',
     date: '2026-01-10',
     tags: ['react', 'typescript', 'gamedev', 'tutorial'],
+    communities: ['gamedev', 'learners'],
     readingTime: 12,
     featured: true,
     relatedProject: 'tetris-react',
@@ -55,8 +101,53 @@ export const articles: Article[] = [
     author: 'scott-peabody',
     date: '2026-01-11',
     tags: ['security', 'open-source', 'web-dev', 'opinion'],
+    communities: ['opensource', 'rendered-useful'],
     readingTime: 10,
-    featured: false,
+    featured: true,
+  },
+  {
+    slug: 'custom-themes-demo',
+    title: 'Custom Themes System',
+    description: 'Demonstrating the custom theme system that allows articles to completely override the site\'s visual style.',
+    author: 'scott-peabody',
+    date: '2026-01-11',
+    tags: ['features', 'design', 'customization'],
+    communities: ['rendered-useful'],
+    readingTime: 3,
+    featured: true,
+  },
+  {
+    slug: 'custom-layouts-demo',
+    title: 'Custom Layouts System',
+    description: 'Demonstrating the custom layout system that allows articles to control page structure and display options.',
+    author: 'scott-peabody',
+    date: '2026-01-11',
+    tags: ['features', 'design', 'customization'],
+    communities: ['rendered-useful'],
+    readingTime: 4,
+    featured: true,
+  },
+  {
+    slug: 'themes-and-layouts-guide',
+    title: 'Themes & Layouts Guide',
+    description: 'A complete guide to customizing the look and feel of your articles with themes and layouts.',
+    author: 'scott-peabody',
+    date: '2026-01-11',
+    tags: ['documentation', 'customization', 'mdx'],
+    communities: ['rendered-useful', 'learners'],
+    readingTime: 3,
+    featured: true,
+  },
+  {
+    slug: 'tagging-system-guide',
+    title: 'Tags, Search & Communities',
+    description: 'How tags and communities work in rendered_useful—organizing content, connecting creators, and making everything discoverable.',
+    author: 'scott-peabody',
+    date: '2026-01-12',
+    tags: ['features', 'documentation', 'design', 'open-source'],
+    communities: ['rendered-useful'],
+    readingTime: 8,
+    featured: true,
   },
 ]
 
@@ -68,6 +159,7 @@ export const projects: Project[] = [
     author: 'scott-peabody',
     date: '2026-01-10',
     tags: ['react', 'typescript', 'gamedev', 'game'],
+    communities: ['gamedev', 'opensource'],
     techStack: ['React', 'TypeScript', 'Tailwind CSS'],
     type: 'game',
     status: 'completed',
@@ -80,6 +172,7 @@ export const projects: Project[] = [
     author: 'scott-peabody',
     date: '2026-01-10',
     tags: ['react', 'typescript', 'threejs', 'gamedev', 'game'],
+    communities: ['gamedev', 'creative-coding', 'opensource'],
     techStack: ['React', 'Three.js', 'React Three Fiber', 'Drei', 'TypeScript'],
     type: 'game',
     status: 'completed',
@@ -92,6 +185,7 @@ export const projects: Project[] = [
     author: 'scott-peabody',
     date: '2026-01-10',
     tags: ['react', 'typescript', 'gamedev', 'game'],
+    communities: ['gamedev', 'learners', 'opensource'],
     techStack: ['React', 'TypeScript', 'Tailwind CSS', 'Wikipedia API'],
     type: 'game',
     status: 'completed',
@@ -170,3 +264,35 @@ export const getRecentArticles = (count: number = 5): Article[] =>
 
 export const getRecentProjects = (count: number = 5): Project[] =>
   [...projects].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, count)
+
+// Community helpers
+export const generateCommunityInfo = (): CommunityInfo[] => {
+  const communityCounts: Record<string, number> = {}
+  
+  ;[...articles, ...projects].forEach((item) => {
+    item.communities?.forEach((community) => {
+      communityCounts[community] = (communityCounts[community] || 0) + 1
+    })
+  })
+  
+  return communities
+    .map((c) => ({
+      slug: c.slug,
+      name: c.name,
+      count: communityCounts[c.slug] || 0,
+      color: c.color,
+      icon: c.icon,
+    }))
+    .sort((a, b) => b.count - a.count)
+}
+
+export const communityInfo = generateCommunityInfo()
+
+export const getCommunity = (slug: string): Community | undefined =>
+  communities.find((c) => c.slug === slug)
+
+export const getArticlesByCommunity = (communitySlug: string): Article[] =>
+  articles.filter((a) => a.communities?.includes(communitySlug))
+
+export const getProjectsByCommunity = (communitySlug: string): Project[] =>
+  projects.filter((p) => p.communities?.includes(communitySlug))
