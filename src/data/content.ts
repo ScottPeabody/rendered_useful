@@ -130,7 +130,7 @@ export const articles: Article[] = [
   {
     slug: 'tagging-system-guide',
     title: 'Tags, Search & Communities',
-    description: 'How tags and communities work in rendered_useful—organizing content, connecting creators, and making everything discoverable.',
+    description: 'How tags and communities work in rendered_useful: organizing content, connecting creators, and making everything discoverable.',
     author: 'scott-peabody',
     date: '2026-01-12',
     tags: ['features', 'documentation', 'design', 'open-source'],
