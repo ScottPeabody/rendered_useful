@@ -7,7 +7,8 @@ import Tag from '../components/ui/Tag'
 import { TechStack } from '../components/mdx'
 import MDXContentProvider from '../components/MDXContentProvider'
 import { getProject, getAuthor, getArticlesByTag } from '../data/content'
-import { loadProject, hasProjectMDX } from '../lib/mdx'
+import { loadProject, hasProjectMDX, type ProjectFrontmatter } from '../lib/mdx'
+import { useArticleTheme } from '../hooks/useArticleTheme'
 import Card from '../components/ui/Card'
 import NotFoundPage from './NotFoundPage'
 
@@ -16,12 +17,16 @@ export default function ProjectPage() {
   const project = slug ? getProject(slug) : undefined
   const author = project ? getAuthor(project.author) : undefined
   
-  // State for MDX content
+  // State for MDX content and frontmatter
   const [MDXContent, setMDXContent] = useState<ComponentType | null>(null)
+  const [frontmatter, setFrontmatter] = useState<ProjectFrontmatter | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   
   // Check if this project has MDX content
   const hasMDX = slug ? hasProjectMDX(slug) : false
+  
+  // Apply custom theme from frontmatter
+  useArticleTheme({ theme: frontmatter?.theme })
   
   // Load MDX content if available
   useEffect(() => {
@@ -34,6 +39,7 @@ export default function ProjectPage() {
     loadProject(slug).then((result) => {
       if (result) {
         setMDXContent(() => result.Content)
+        setFrontmatter(result.frontmatter)
       }
       setIsLoading(false)
     })

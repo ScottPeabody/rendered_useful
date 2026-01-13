@@ -128,17 +128,6 @@ export const articles: Article[] = [
     featured: true,
   },
   {
-    slug: 'themes-and-layouts-guide',
-    title: 'Themes & Layouts Guide',
-    description: 'A complete guide to customizing the look and feel of your articles with themes and layouts.',
-    author: 'scott-peabody',
-    date: '2026-01-11',
-    tags: ['documentation', 'customization', 'mdx'],
-    communities: ['rendered-useful', 'learners'],
-    readingTime: 3,
-    featured: true,
-  },
-  {
     slug: 'tagging-system-guide',
     title: 'Tags, Search & Communities',
     description: 'How tags and communities work in rendered_useful—organizing content, connecting creators, and making everything discoverable.',

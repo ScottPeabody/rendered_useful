@@ -1,0 +1,90 @@
+---
+title: "Custom Themes System"
+description: "Demonstrating the custom theme system that allows articles to completely override the site's visual style."
+date: "2026-01-11"
+author: "scott-peabody"
+tags: ["features", "design", "customization"]
+readingTime: 3
+---
+
+import { Callout, ThemeSelector } from '@/components/mdx'
+
+# Try the Themes Live!
+
+Click any theme below to see the entire page transform in real-time:
+
+<ThemeSelector defaultTheme="cyberpunk" />
+
+<Callout type="info" title="Theme Override">
+  Each theme completely overrides the site's CSS variables, transforming colors, fonts, and shadows.
+</Callout>
+
+## Available Themes
+
+We currently have these theme presets:
+
+- **cyberpunk** - Neon pink and cyan on dark purple
+- **terminal** - Classic green-on-black hacker aesthetic
+- **retro** - Warm oranges and browns, vintage feel
+- **ocean** - Deep sea blues and teals
+- **paper** - Clean light mode for comfortable reading
+- **sunset** - Warm pinks and oranges gradient
+
+## How It Works
+
+In your MDX frontmatter, just add:
+
+```yaml
+---
+theme: "cyberpunk"
+---
+```
+
+The theme system:
+1. Reads the theme name from frontmatter
+2. Looks up the preset's CSS variables
+3. Applies them to the document root
+4. Automatically restores the original theme when you leave the page
+
+## Try Other Themes
+
+Check out the same content with different themes:
+- This page uses `cyberpunk`
+- The Tetris project could use `terminal`
+- A photography article might use `paper` for clean readability
+
+<Callout type="tip" title="Safe by Design">
+  Authors choose from predefined themes rather than writing arbitrary CSS. This keeps the site secure while enabling full visual customization.
+</Callout>
+
+## Technical Details
+
+Themes override CSS custom properties:
+
+```css
+--color-background
+--color-surface
+--color-text-primary
+--color-accent-primary
+--font-display
+/* ... and more */
+```
+
+The `useArticleTheme` hook handles applying and cleaning up theme variables, ensuring the site returns to normal when you navigate away.
+
+## Future Plans
+
+Currently, themes are **page-scoped** - they only apply while you're on this article and reset when you navigate away. This is intentional for now.
+
+We're exploring a more comprehensive theming system:
+
+- **Global user preference** - Let users pick a preferred theme from their settings
+- **Per-page overrides** - Authors can still customize individual articles/projects
+- **Override permissions** - Users could choose whether to allow page-specific themes or stick with their preference
+- **Transition animations** - Smooth visual transitions when themes change
+
+The goal is to balance author creativity with user control - letting writers create immersive themed experiences while respecting reader preferences.
+
+---
+
+*Navigate away from this page to see the theme restore to the default!*

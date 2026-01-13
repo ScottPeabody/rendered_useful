@@ -1,0 +1,116 @@
+---
+title: "Custom Layouts System"
+description: "Demonstrating the custom layout system that allows articles to control page structure and display options."
+date: "2026-01-11"
+author: "scott-peabody"
+tags: ["features", "design", "customization"]
+readingTime: 4
+---
+
+import { Callout, LayoutSelector, ThemeSelector } from '@/components/mdx'
+
+# Page Layout Customization
+
+Just like themes control visual styling, layouts control the **structure** of your page. Try the layout selector below to see how different presets change the page options:
+
+<LayoutSelector defaultLayout="default" />
+
+<Callout type="info" title="Safe Customization">
+  Layouts use predefined presets - authors choose from options rather than writing arbitrary HTML. This keeps pages consistent while enabling flexibility.
+</Callout>
+
+## Available Layouts
+
+### Default
+The standard article layout with all features enabled - author info, reading time, tags, related articles, and author card.
+
+### Minimal  
+A clean, distraction-free reading experience. Hides most metadata and uses narrow content width with relaxed spacing. Perfect for long-form essays.
+
+### Documentation
+Technical docs style with a table of contents sidebar. Wide content area and minimal header. Great for tutorials and guides.
+
+### Showcase
+Full-width layout with hero-style header. Ideal for visual projects, portfolios, and image-heavy content.
+
+### Immersive
+Maximum focus - hides the navbar and footer entirely. Use sparingly for special interactive experiences.
+
+### Centered
+Elegant centered layout with narrow width. Nice for poetry, announcements, or content that benefits from extra whitespace.
+
+## How It Works
+
+In your MDX frontmatter:
+
+```yaml
+---
+layout: "minimal"
+---
+```
+
+Or combine with individual overrides:
+
+```yaml
+---
+layout: "docs"
+showTableOfContents: true
+contentWidth: "wide"
+hideFooter: true
+---
+```
+
+## Layout Options
+
+Each layout preset controls these options:
+
+| Option | Values | Description |
+|--------|--------|-------------|
+| `contentWidth` | narrow, default, wide, full | Content column width |
+| `headerStyle` | default, minimal, hero, centered | Header presentation |
+| `showAuthor` | true/false | Display author name |
+| `showDate` | true/false | Display publish date |
+| `showReadingTime` | true/false | Display reading time |
+| `showTags` | true/false | Display tags |
+| `showTableOfContents` | true/false | Show TOC sidebar |
+| `showRelatedArticles` | true/false | Related content section |
+| `showAuthorCard` | true/false | Author bio card |
+| `hideNavbar` | true/false | Hide site navigation |
+| `hideFooter` | true/false | Hide site footer |
+| `verticalSpacing` | compact, default, relaxed | Content spacing |
+
+## Combining Themes and Layouts
+
+The real power comes from combining themes with layouts:
+
+<ThemeSelector />
+
+```yaml
+---
+theme: "terminal"
+layout: "immersive"
+---
+```
+
+This creates a fully customized reading experience while staying within safe, predefined boundaries.
+
+<Callout type="tip" title="Best Practices">
+  - Use **minimal** for essays and personal posts
+  - Use **docs** for tutorials and technical content
+  - Use **showcase** for visual portfolios
+  - Use **immersive** sparingly for special interactive content
+  - Always test on mobile - some layouts work better on certain screen sizes
+</Callout>
+
+## Future Enhancements
+
+We're planning to add:
+
+- **Custom header images** - Hero images for showcase layouts
+- **Sidebar widgets** - Custom sidebar content for docs layout
+- **Multi-column layouts** - Side-by-side content areas
+- **Responsive layout switching** - Different layouts for mobile vs desktop
+
+---
+
+*The layout system is still evolving - feedback welcome!*
