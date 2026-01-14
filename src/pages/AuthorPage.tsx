@@ -4,6 +4,7 @@ import { ArrowLeft, MapPin, Calendar, Github, Twitter, Globe, Linkedin, BookOpen
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
 import { getAuthor, getArticlesByAuthor, getProjectsByAuthor } from '../data/content'
+import { formatDate } from '../lib/time'
 import NotFoundPage from './NotFoundPage'
 
 export default function AuthorPage() {
@@ -75,7 +76,7 @@ export default function AuthorPage() {
               )}
               <span className="flex items-center gap-1">
                 <Calendar size={16} />
-                Joined {new Date(author.joinedDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                Joined {formatDate(author.joinedDate, { format: 'monthYear' })}
               </span>
               <span className="flex items-center gap-1">
                 <BookOpen size={16} />

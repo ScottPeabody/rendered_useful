@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { ExternalLink, Github, Calendar, Clock } from 'lucide-react'
 import Tag from './Tag'
 import { getAuthor } from '../../data/content'
+import { formatDate } from '../../lib/time'
 
 interface CardProps {
   contentType: 'article' | 'project'
@@ -110,7 +111,7 @@ export default function Card({
                   <span>{author.name}</span>
                 </Link>
               )}
-              {readingTime && (
+              {readingTime !== undefined && readingTime > 0 && (
                 <span className="flex items-center gap-1">
                   <Clock size={12} />
                   {readingTime} min
@@ -118,7 +119,7 @@ export default function Card({
               )}
               <span className="flex items-center gap-1">
                 <Calendar size={12} />
-                {new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                {formatDate(date, { format: 'monthDay' })}
               </span>
             </div>
 
@@ -249,7 +250,7 @@ export default function Card({
 
           {/* Meta Info */}
           <div className="flex items-center gap-3 text-xs text-[var(--color-text-muted)]">
-            {readingTime && (
+            {readingTime !== undefined && readingTime > 0 && (
               <span className="flex items-center gap-1">
                 <Clock size={12} />
                 {readingTime} min

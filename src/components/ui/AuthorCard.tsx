@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { MapPin, Calendar, Github, Twitter, Globe, Linkedin } from 'lucide-react'
 import type { Author } from '../../types'
+import { formatDate } from '../../lib/time'
 
 interface AuthorCardProps {
   author: Author
@@ -71,7 +72,7 @@ export default function AuthorCard({
           )}
           <span className="flex items-center gap-1">
             <Calendar size={12} />
-            Joined {new Date(author.joinedDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+            Joined {formatDate(author.joinedDate, { format: 'monthYear' })}
           </span>
         </div>
 

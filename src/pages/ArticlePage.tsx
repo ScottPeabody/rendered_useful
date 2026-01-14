@@ -1,12 +1,15 @@
 import { useParams, Link } from 'react-router-dom'
 import { useState, useEffect, type ComponentType } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Calendar, Clock, Share2, Bookmark } from 'lucide-react'
+import { ArrowLeft, Calendar, Clock, Share2, Bookmark, AlertTriangle } from 'lucide-react'
 import Tag from '../components/ui/Tag'
 import Button from '../components/ui/Button'
+import { formatDate } from '../lib/time'
 import Card from '../components/ui/Card'
+import SeriesNavigation from '../components/ui/SeriesNavigation'
+import VersionSelector from '../components/ui/VersionSelector'
 import MDXContentProvider from '../components/MDXContentProvider'
-import { getArticle, getAuthor, getProject, getArticlesByTag } from '../data/content'
+import { getArticle, getAuthor, getProject, getArticlesByTag, getArticleVersionInfo, getLatestArticleVersion } from '../data/content'
 import { loadArticle, hasArticleMDX, type ArticleFrontmatter } from '../lib/mdx'
 import { useArticleTheme } from '../hooks/useArticleTheme'
 import { getContentWidthClass, getSpacingClass } from '../layouts'
@@ -18,6 +21,12 @@ export default function ArticlePage() {
   const article = slug ? getArticle(slug) : undefined
   const author = article ? getAuthor(article.author) : undefined
   const relatedProject = article?.relatedProject ? getProject(article.relatedProject) : undefined
+  
+  // Version support
+  const versionInfo = slug ? getArticleVersionInfo(slug) : []
+  const latestVersion = slug ? getLatestArticleVersion(slug) : undefined
+  const isLatestVersion = !latestVersion || article?.slug === latestVersion.slug
+  const hasVersions = versionInfo.length > 1
   
   // State for MDX content and frontmatter
   const [MDXContent, setMDXContent] = useState<ComponentType | null>(null)
@@ -125,7 +134,7 @@ export default function ArticlePage() {
                 {(layoutOptions?.showDate ?? true) && (
                   <div className="flex items-center gap-2 text-[var(--color-text-muted)]">
                     <Calendar size={18} />
-                    <span>{new Date(article.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                    <span>{formatDate(article.date)}</span>
                   </div>
                 )}
                 {(layoutOptions?.showReadingTime ?? true) && (
@@ -154,7 +163,7 @@ export default function ArticlePage() {
           </h1>
           {(layoutOptions?.showDate ?? true) && (
             <p className="text-sm text-[var(--color-text-muted)]">
-              {new Date(article.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+              {formatDate(article.date)}
               {(layoutOptions?.showReadingTime ?? true) && ` · ${article.readingTime} min read`}
             </p>
           )}
@@ -194,7 +203,7 @@ export default function ArticlePage() {
               </>
             )}
             {(layoutOptions?.showDate ?? true) && (
-              <span>{new Date(article.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+              <span>{formatDate(article.date)}</span>
             )}
             {(layoutOptions?.showReadingTime ?? true) && (
               <>
@@ -216,6 +225,25 @@ export default function ArticlePage() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-12"
       >
+        {/* Older version banner */}
+        {hasVersions && !isLatestVersion && latestVersion && (
+          <div className="flex items-center gap-3 p-4 mb-6 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300">
+            <AlertTriangle size={20} />
+            <div className="flex-1">
+              <p className="font-medium">You're viewing an older version</p>
+              <p className="text-sm opacity-80">
+                This is version {article.version || 'unknown'}. 
+                <Link 
+                  to={`/articles/${latestVersion.slug}`}
+                  className="underline hover:no-underline ml-1"
+                >
+                  View the latest version →
+                </Link>
+              </p>
+            </div>
+          </div>
+        )}
+
         {(layoutOptions?.showTags ?? true) && (
           <div className="flex flex-wrap gap-2 mb-4">
             {article.tags.map((tag) => (
@@ -259,11 +287,7 @@ export default function ArticlePage() {
               {(layoutOptions?.showDate ?? true) && (
                 <span className="flex items-center gap-2">
                   <Calendar size={16} />
-                  {new Date(article.date).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
+                  {formatDate(article.date)}
                 </span>
               )}
               {(layoutOptions?.showReadingTime ?? true) && (
@@ -271,6 +295,10 @@ export default function ArticlePage() {
                   <Clock size={16} />
                   {article.readingTime} min read
                 </span>
+              )}
+              {/* Version selector */}
+              {hasVersions && (
+                <VersionSelector versions={versionInfo} basePath="/articles" />
               )}
             </div>
           </div>
@@ -329,6 +357,20 @@ export default function ArticlePage() {
             </div>
           )}
         </motion.div>
+
+        {/* Series Navigation */}
+        {article.series && slug && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+          >
+            <SeriesNavigation
+              seriesSlug={article.series}
+              currentSlug={slug}
+            />
+          </motion.div>
+        )}
 
         {/* Related Project */}
         {(layoutOptions?.showRelatedArticles ?? true) && relatedProject && (

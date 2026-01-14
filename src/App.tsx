@@ -16,6 +16,8 @@ const AuthorPage = lazy(() => import('./pages/AuthorPage'))
 const TagPage = lazy(() => import('./pages/TagPage'))
 const CommunitiesPage = lazy(() => import('./pages/CommunitiesPage'))
 const CommunityPage = lazy(() => import('./pages/CommunityPage'))
+const SeriesPage = lazy(() => import('./pages/SeriesPage'))
+const EventsPage = lazy(() => import('./pages/EventsPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
 // Scroll to top on route change
@@ -48,6 +50,10 @@ function App() {
           <Route path="/tag/:tag" element={<TagPage />} />
           <Route path="/communities" element={<CommunitiesPage />} />
           <Route path="/community/:slug" element={<CommunityPage />} />
+          <Route path="/series" element={<SeriesPage />} />
+          <Route path="/series/:slug" element={<SeriesPage />} />
+          <Route path="/events" element={<EventsPage />} />
+          <Route path="/events/:slug" element={<EventsPage />} />
           <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Suspense>

@@ -1,12 +1,14 @@
 import { useParams, Link } from 'react-router-dom'
 import { useState, useEffect, type ComponentType } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, ExternalLink, Github, Calendar } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Github, Calendar, AlertTriangle } from 'lucide-react'
 import Button from '../components/ui/Button'
 import Tag from '../components/ui/Tag'
+import VersionSelector from '../components/ui/VersionSelector'
+import { formatDate } from '../lib/time'
 import { TechStack } from '../components/mdx'
 import MDXContentProvider from '../components/MDXContentProvider'
-import { getProject, getAuthor, getArticlesByTag } from '../data/content'
+import { getProject, getAuthor, getArticlesByTag, getProjectVersionInfo, getLatestProjectVersion } from '../data/content'
 import { loadProject, hasProjectMDX, type ProjectFrontmatter } from '../lib/mdx'
 import { useArticleTheme } from '../hooks/useArticleTheme'
 import Card from '../components/ui/Card'
@@ -16,6 +18,12 @@ export default function ProjectPage() {
   const { slug } = useParams<{ slug: string }>()
   const project = slug ? getProject(slug) : undefined
   const author = project ? getAuthor(project.author) : undefined
+  
+  // Version support
+  const versionInfo = slug ? getProjectVersionInfo(slug) : []
+  const latestVersion = slug ? getLatestProjectVersion(slug) : undefined
+  const isLatestVersion = !latestVersion || project?.slug === latestVersion.slug
+  const hasVersions = versionInfo.length > 1
   
   // State for MDX content and frontmatter
   const [MDXContent, setMDXContent] = useState<ComponentType | null>(null)
@@ -74,6 +82,25 @@ export default function ProjectPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
+          {/* Older version banner */}
+          {hasVersions && !isLatestVersion && latestVersion && (
+            <div className="flex items-center gap-3 p-4 mb-6 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300">
+              <AlertTriangle size={20} />
+              <div className="flex-1">
+                <p className="font-medium">You're viewing an older version</p>
+                <p className="text-sm opacity-80">
+                  This is version {project.version || 'unknown'}. 
+                  <Link 
+                    to={`/projects/${latestVersion.slug}`}
+                    className="underline hover:no-underline ml-1"
+                  >
+                    View the latest version →
+                  </Link>
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Status Badge */}
           <div className="flex items-center gap-3 mb-4">
             <span className={`px-3 py-1 text-xs font-medium rounded-full ${
@@ -117,12 +144,12 @@ export default function ProjectPage() {
             )}
             <span className="flex items-center gap-2">
               <Calendar size={16} />
-              {new Date(project.date).toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-              })}
+              {formatDate(project.date)}
             </span>
+            {/* Version selector */}
+            {hasVersions && (
+              <VersionSelector versions={versionInfo} basePath="/projects" />
+            )}
           </div>
 
           {/* Actions */}

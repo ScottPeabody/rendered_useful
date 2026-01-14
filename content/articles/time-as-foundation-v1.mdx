@@ -1,0 +1,157 @@
+---
+title: "Time as a Foundation"
+description: "Why time needs to be more than a sort field. Exploring series, events, and temporal collections as building blocks for how content connects and evolves."
+date: "2026-01-13"
+author: "scott-peabody"
+tags: ["architecture", "design", "vision", "open-source"]
+communities: ["rendered-useful"]
+readingTime: 6
+featured: false
+---
+
+# Time as a Foundation (v1.0)
+
+<Callout type="warning" title="You're viewing an older version">
+This is the original version of this article, before the Versions feature was implemented. Check out the [latest version](/articles/time-as-foundation) to see how versioning works!
+</Callout>
+
+Every piece of content on rendered_useful has a date. Right now, that date does one thing: it sorts.
+
+But time is so much more than chronological order. Time creates relationships between content. Time bounds events. Time tells stories.
+
+If I want this platform to support real creative work, not just display it, time needs to be a first-class concept from the beginning.
+
+---
+
+## The Problem with Dates as Metadata
+
+Most content platforms treat time as metadata. A published date. Maybe an updated date. It gets stored, displayed, and used for sorting. That's it.
+
+This works fine for standalone content. But creative work rarely exists in isolation.
+
+- A tutorial series unfolds over weeks
+- A game jam has a start and end date
+- A build log documents progress over months
+- A challenge like Inktober spans exactly 31 days
+
+When time is just metadata, you can't express any of this. You end up with workarounds: naming conventions ("Part 1", "Part 2"), manual linking, or external organization.
+
+I want time to be structural, not decorative.
+
+---
+
+## Time Creates Relationships
+
+Think about how time connects content:
+
+### Sequential (Series)
+
+Content that builds on itself. Order matters. Each piece assumes you've seen what came before.
+
+```
+Part 1 → Part 2 → Part 3 → Part 4
+```
+
+Examples:
+- A multi-part tutorial
+- A story told in chapters
+- A project build log
+- A course or learning path
+
+### Bounded (Events)
+
+Content created within a specific window. The container has a start and end. Submissions belong to the event.
+
+```
+┌─────────────────────────────────┐
+│  Game Jam: Jan 15-22            │
+│  ┌────┐ ┌────┐ ┌────┐ ┌────┐    │
+│  │ P1 │ │ P2 │ │ P3 │ │ P4 │    │
+│  └────┘ └────┘ └────┘ └────┘    │
+└─────────────────────────────────┘
+```
+
+Examples:
+- Game jams and hackathons
+- Writing challenges (NaNoWriMo, Inktober)
+- Seasonal collections
+- Limited-time collaborations
+
+### Versioned (Evolution)
+
+The same thing, changed over time. Not a sequence to follow, but a history to explore.
+
+```
+v1.0 ──► v1.1 ──► v2.0 ──► v2.1
+```
+
+Examples:
+- Project releases
+- Living documents that get updated
+- Ideas that evolve through iteration
+- Designs that go through revisions
+
+---
+
+## What This Enables
+
+If time is structural, interesting things become possible:
+
+### Series Navigation
+
+Imagine reading part 3 of a tutorial. Instead of hunting for the next article, navigation is built in:
+
+```
+← Part 2: Setting Up State    Part 4: Adding Polish →
+
+Series: Building Tetris in React (3 of 5)
+```
+
+The reader knows where they are. They can jump to any part. The series has a shape.
+
+### Event Pages
+
+A game jam isn't just a tag. It's a bounded collection with:
+- Start and end dates
+- A description and rules
+- All submissions automatically collected
+- A community it belongs to
+- Maybe a theme or constraints
+
+When the jam ends, it becomes an archive. A snapshot of what was created during that window.
+
+---
+
+## The Roadmap
+
+Here's what I'm planning to build:
+
+| Feature | Status | Description |
+|---------|--------|-------------|
+| **Series** | 🔨 Building | Ordered collections with navigation |
+| **Events** | 📋 Planned | Time-bounded containers (jams, challenges) |
+| **Versions** | 📋 Planned | Track evolution of content over time |
+
+This article itself will eventually demonstrate versions, once that feature is built. Stay tuned!
+
+---
+
+## Why This Matters
+
+I keep coming back to the same idea: rendered_useful should support real creative work, not just showcase it.
+
+Real creative work happens over time. Projects evolve. Things unfold. Events bring people together around deadlines. Challenges create shared moments.
+
+If time is just a sort field, none of that is possible in the platform itself. It has to happen elsewhere.
+
+But if time is structural, if series and events and versions are first-class concepts, then the platform can actually support how creative work happens.
+
+That's the goal. Start with the foundation, build up from there.
+
+---
+
+<Callout type="info" title="This is Exploration">
+I'm thinking out loud here. The specific implementations will change. But the core idea, time as structure not just metadata, feels right.
+
+If you have thoughts on how time-based features should work, let me know.
+</Callout>

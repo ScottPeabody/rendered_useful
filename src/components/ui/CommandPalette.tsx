@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, FileText, Folder, User, Hash, ArrowRight, Command, Users } from 'lucide-react'
+import { Search, FileText, Folder, User, Hash, ArrowRight, Command, Users, List, Calendar } from 'lucide-react'
 import { useSearchStore } from '../../store'
-import { articles, projects, authors, tags, communities } from '../../data/content'
+import { articles, projects, authors, tags, communities, getAllSeries, getAllEvents } from '../../data/content'
 
 interface SearchItem {
-  type: 'article' | 'project' | 'author' | 'tag' | 'community'
+  type: 'article' | 'project' | 'author' | 'tag' | 'community' | 'series' | 'event'
   title: string
   description?: string
   slug: string
@@ -54,6 +54,20 @@ export default function CommandPalette() {
       description: c.description,
       slug: `/community/${c.slug}`,
       icon: Users,
+    })),
+    ...getAllSeries().map((s) => ({
+      type: 'series' as const,
+      title: s.title,
+      description: `${s.itemCount} parts - ${s.description}`,
+      slug: `/series/${s.slug}`,
+      icon: List,
+    })),
+    ...getAllEvents().map((e) => ({
+      type: 'event' as const,
+      title: e.title,
+      description: `${e.status} - ${e.description}`,
+      slug: `/events/${e.slug}`,
+      icon: Calendar,
     })),
   ], [])
 
@@ -116,6 +130,8 @@ export default function CommandPalette() {
     author: 'Author',
     tag: 'Tag',
     community: 'Community',
+    series: 'Series',
+    event: 'Event',
   }
 
   const typeColors = {
@@ -124,6 +140,8 @@ export default function CommandPalette() {
     author: 'text-[var(--color-accent-secondary)]',
     tag: 'text-[var(--color-accent-success)]',
     community: 'text-purple-400',
+    series: 'text-orange-400',
+    event: 'text-cyan-400',
   }
 
   return (
