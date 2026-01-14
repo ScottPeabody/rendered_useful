@@ -1,0 +1,325 @@
+---
+title: "Time as a Foundation"
+description: "Why time needs to be more than a sort field. Exploring series, events, versions, and temporal collections as building blocks for how content connects and evolves."
+date: "2026-01-13"
+author: "scott-peabody"
+tags: ["architecture", "design", "vision", "open-source"]
+communities: ["rendered-useful"]
+readingTime: 7
+featured: true
+---
+
+# Time as a Foundation
+
+Every piece of content on rendered_useful has a date. But time is so much more than chronological order. Time creates relationships between content. Time bounds events. Time tells stories.
+
+If I want this platform to support real creative work, not just display it, time needs to be a first-class concept from the beginning.
+
+**And now it is.** Series, Events, and Versions are live. This article explains the philosophy behind them and shows you how they work.
+
+<Callout type="success" title="Try It Now">
+This article is part of a **series** and tagged with an **event**. Look at the bottom of this page for series navigation. And notice the version selector in the header? Click it to see <a href="/articles/time-as-foundation-v1" target="_blank">version 1.0</a> of this article, written before versions were implemented.
+</Callout>
+
+---
+
+## The Problem with Dates as Metadata
+
+Most content platforms treat time as metadata. A published date. Maybe an updated date. It gets stored, displayed, and used for sorting. That's it.
+
+This works fine for standalone content. But creative work rarely exists in isolation.
+
+- A tutorial series unfolds over weeks
+- A game jam has a start and end date
+- A build log documents progress over months
+- A challenge like Inktober spans exactly 31 days
+
+When time is just metadata, you can't express any of this. You end up with workarounds: naming conventions ("Part 1", "Part 2"), manual linking, or external organization.
+
+I want time to be structural, not decorative.
+
+---
+
+## Time Creates Relationships
+
+Think about how time connects content:
+
+### Sequential (Series)
+
+Content that builds on itself. Order matters. Each piece assumes you've seen what came before.
+
+<Mermaid chart={`
+flowchart LR
+    P1[Part 1] --> P2[Part 2] --> P3[Part 3] --> P4[Part 4]
+`} />
+
+**This is now live.** Check out the <a href="/series" target="_blank">Series page</a> to browse all series, or see <a href="/series/platform-foundations" target="_blank">Platform Foundations</a> (the series this article belongs to).
+
+Examples:
+- A multi-part tutorial
+- A story told in chapters
+- A project build log
+- A course or learning path
+
+### Bounded (Events)
+
+Content created within a specific window. The container has a start and end. Submissions belong to the event.
+
+<Mermaid chart={`
+flowchart TB
+    subgraph Event["🎮 Game Jam: Jan 15-22"]
+        direction LR
+        P1[Project 1]
+        P2[Project 2]
+        P3[Project 3]
+        P4[Project 4]
+    end
+`} />
+
+**This is now live.** Check out the <a href="/events" target="_blank">Events page</a> to see all events, or visit the <a href="/events/preliminary-foundations-hackathon" target="_blank">Preliminary Foundations Hackathon</a> that this article is part of.
+
+Examples:
+- Game jams and hackathons
+- Writing challenges (NaNoWriMo, Inktober)
+- Seasonal collections
+- Limited-time collaborations
+
+### Versioned (Evolution)
+
+The same thing, changed over time. Not a sequence to follow, but a history to explore.
+
+<Mermaid chart={`
+flowchart LR
+    v1["v1.0<br/>Jan 1"] --> v11["v1.1<br/>Jan 5"] --> v2["v2.0<br/>Jan 10"] --> v21["v2.1<br/>Jan 15"]
+`} />
+
+**This is now live.** Look at the header of this article—you'll see a version selector showing "v2.0". Click it to switch between versions. Try <a href="/articles/time-as-foundation-v1" target="_blank">version 1.0</a> to see how this article looked before versions were implemented.
+
+Examples:
+- Project releases
+- Living documents that get updated
+- Ideas that evolve through iteration
+- Designs that go through revisions
+
+---
+
+## How Series Work
+
+A series is an ordered collection of content. Each piece knows its position through simple frontmatter:
+
+```yaml
+---
+title: "Time as a Foundation"
+series: "platform-foundations"
+seriesOrder: 2
+---
+```
+
+That's it. The platform handles the rest:
+- **Navigation** appears automatically (← Previous / Next →)
+- **Series info** shows your position ("2 of 2" or "2 of 2+" for ongoing series)
+- **Series pages** collect all parts with descriptions
+
+Series have a status: `ongoing`, `completed`, or `paused`. This tells readers whether to expect more.
+
+<Callout type="info" title="See It In Action">
+Scroll to the bottom of this article to see the series navigation. Or visit <a href="/series/platform-foundations" target="_blank">Platform Foundations</a> to see the series overview.
+</Callout>
+
+---
+
+## How Events Work
+
+An event is a time-bounded container. It has dates, not just an order.
+
+```typescript
+{
+  slug: 'preliminary-foundations-hackathon',
+  title: 'Preliminary Foundations Hackathon',
+  startDate: '2026-01-13',
+  endDate: '2026-01-20',
+  communities: ['rendered-useful', 'opensource'],
+  metadata: {
+    theme: { value: 'Foundations', display: 'hero' },
+    goals: { value: '...', display: 'markdown' },
+  }
+}
+```
+
+Content tags itself as part of an event:
+
+```yaml
+---
+title: "Time as a Foundation"
+event: "preliminary-foundations-hackathon"
+---
+```
+
+The event page automatically:
+- Shows **status** (Upcoming / Live Now / Ended)
+- Displays **date range** with countdown or time remaining
+- Collects **all submissions** tagged with that event
+- Renders **custom metadata** (themes, rules, goals) with flexible display options
+
+<Callout type="info" title="See It In Action">
+Visit the <a href="/events/preliminary-foundations-hackathon" target="_blank">Preliminary Foundations Hackathon</a> to see events in action.
+</Callout>
+
+---
+
+## How Versions Work
+
+Versions let content evolve while preserving history. Add version fields to any article, project, or event:
+
+```yaml
+---
+title: "Time as a Foundation"
+version: "2.0"
+versionGroup: "time-as-foundation"
+versionNote: "Added Versions section"
+---
+```
+
+The `versionGroup` connects different versions of the same content. The platform:
+- Shows a **version selector** dropdown when multiple versions exist
+- Defaults to the **latest version** (newest date)
+- Displays an **"older version" banner** with a link to latest when viewing old versions
+- Tracks **version notes** so readers know what changed
+
+<Callout type="info" title="See It In Action">
+Click the version selector in this article's header. Switch to <a href="/articles/time-as-foundation-v1" target="_blank">v1.0</a> and you'll see the older version banner prompting you to view the latest.
+</Callout>
+
+---
+
+## How Time Works Today
+
+Before building series and events, I needed to get the basics right. Dates are now handled properly:
+
+**Storage**: All dates are stored in UTC (ISO 8601 format). This ensures consistency regardless of where content was created or where the server is located.
+
+**Display**: Dates are rendered in the user's local timezone using the browser's `Intl` API. If you're in Tokyo, you see Tokyo time. If you're in New York, you see New York time.
+
+```typescript
+// Parse a UTC date string
+export function parseUTCDate(dateString: string): Date {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+    return new Date(dateString + 'T00:00:00Z')
+  }
+  return new Date(dateString)
+}
+
+// Format for display in user's timezone
+export function formatDate(dateString: string, options = {}): string {
+  const date = parseUTCDate(dateString)
+  return date.toLocaleDateString(undefined, formatOptions)
+}
+```
+
+The `undefined` locale lets the browser use the user's preferred language and date format automatically.
+
+This also includes utilities for:
+- Relative time ("2 days ago", "in 3 hours")
+- Date comparison for sorting
+- Range checking for events
+- Timezone detection
+
+Small foundation, but it matters. Every feature that involves time will build on this.
+
+---
+
+## Connecting Time to Communities
+
+Time and communities intersect naturally:
+
+- A **Game Development** community might host recurring game jams
+- A **Learners** community might run study groups with start/end dates
+- A **Writers** community might coordinate NaNoWriMo participation
+
+Events belong to communities. Series can too. Activity feeds show what's happening in your communities over time.
+
+This is where things get interesting. Time isn't just about individual content. It's about collective activity.
+
+---
+
+## The Model
+
+Here's how time works structurally in rendered_useful:
+
+<Mermaid chart={`
+flowchart LR
+    subgraph Series["📚 Series"]
+        S["Platform<br/>Foundations"]
+    end
+    
+    subgraph Event["🎯 Event"]
+        E["Hackathon<br/>Jan 13-20"]
+    end
+    
+    subgraph Content["📄 Content"]
+        A1["Article 1<br/>(date)"]
+        A2["Article 2<br/>(latest date)"]
+        P1["Project<br/>(date)"]
+    end
+    
+    subgraph Versions["🔄 Versions of Article 2"]
+        V1["v1.0<br/>Jan 13"]
+        V2["v2.0<br/>Jan 15 ✓"]
+    end
+    
+    S -->|"1st"| A1
+    S -->|"2nd"| A2
+    E -.-> A1
+    E -.-> A2
+    E -.-> P1
+    A2 --> V1
+    A2 --> V2
+    
+    style Content fill:#1e1e2e,stroke:#8b5cf6,stroke-width:2px
+    style Series fill:#1e1e2e,stroke:#22d3ee,stroke-width:2px
+    style Event fill:#1e1e2e,stroke:#f59e0b,stroke-width:2px
+    style Versions fill:#1e1e2e,stroke:#10b981,stroke-width:2px
+`} />
+
+| Concept | Time Relationship | Key Properties | Status |
+|---------|-------------------|----------------|--------|
+| **Content** | Point in time | `date` | ✅ Live |
+| **Series** | Ordered sequence | `series`, `seriesOrder`, `status` | ✅ Live |
+| **Event** | Bounded window | `startDate`, `endDate`, `metadata` | ✅ Live |
+| **Version** | Evolution | `version`, `versionGroup`, `versionNote` | ✅ Live |
+
+Each layer builds on the one before:
+1. Content has a date
+2. Series orders content by time
+3. Events bound content to a window of time
+4. Versions allow time variance for a single source
+
+---
+
+## Why This Matters
+
+I keep coming back to the same idea: rendered_useful should support real creative work, not just showcase it.
+
+Real creative work happens over time. Projects evolve. Things unfold. Events bring people together around deadlines. Challenges create shared moments.
+
+If time is just a sort field, none of that is possible in the platform itself. It has to happen elsewhere.
+
+But if time is structural—if series and events and versions are first-class concepts—then the platform can actually support how creative work happens.
+
+That was the goal. And now it's real.
+
+---
+
+## Future Exploration
+
+One question I'm still thinking about: can you have a *series of events* or an *event of series*? Right now, Series and Events are independent concepts—content can belong to both, but they don't nest inside each other.
+
+There's something interesting there. A recurring game jam could be a series of events. A tutorial series created during a hackathon could be an event containing a series. I'm not sure what makes sense yet, and there are other foundational things I need to address before expanding the time foundation further. But it's on my mind.
+
+---
+
+<Callout type="success" title="Explore the Features">
+- <a href="/series" target="_blank">Browse all Series →</a>
+- <a href="/events" target="_blank">Browse all Events →</a>
+- <a href="/articles/time-as-foundation-v1" target="_blank">View v1.0 of this article →</a>
+</Callout>

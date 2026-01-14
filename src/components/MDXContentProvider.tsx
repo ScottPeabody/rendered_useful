@@ -1,6 +1,6 @@
 import { MDXProvider } from '@mdx-js/react'
 import type { ReactNode, ComponentType, HTMLAttributes, ImgHTMLAttributes, AnchorHTMLAttributes, TableHTMLAttributes } from 'react'
-import { Callout, TechStack, Image, Video, Audio, Todo } from './mdx'
+import { Callout, TechStack, Image, Video, Audio, Todo, Mermaid } from './mdx'
 import RubiksCube from './games/RubiksCube'
 
 type MDXComponentProps = HTMLAttributes<HTMLElement>
@@ -17,6 +17,7 @@ const mdxComponents: Record<string, ComponentType<any>> = {
   Video,
   Audio,
   Todo,
+  Mermaid,
   RubiksCube,
 
   h1: (props: MDXComponentProps) => (

@@ -7,9 +7,10 @@ import Audio from './Audio'
 import Todo from './Todo'
 import ThemeSelector from './ThemeSelector'
 import LayoutSelector from './LayoutSelector'
+import Mermaid from './Mermaid'
 
  
-export { Callout, TechStack, Image, Video, Audio, Todo, ThemeSelector, LayoutSelector }
+export { Callout, TechStack, Image, Video, Audio, Todo, ThemeSelector, LayoutSelector, Mermaid }
 
 interface MDXProps {
   children?: ReactNode

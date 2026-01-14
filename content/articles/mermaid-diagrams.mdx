@@ -1,0 +1,142 @@
+---
+title: "Adding Mermaid Diagrams to MDX"
+description: "How I added Mermaid diagram support to rendered_useful for visualizing concepts, flows, and relationships in articles."
+date: "2026-01-13"
+author: "scott-peabody"
+tags: ["features", "mdx", "documentation"]
+communities: ["rendered-useful"]
+readingTime: 3
+---
+
+# Adding Mermaid Diagrams to MDX
+
+While writing about [time as a foundation](/articles/time-as-foundation-v2), I needed a way to visualize relationships between concepts. ASCII art works, but it's tedious and limited. I wanted something that could render flowcharts, sequences, and diagrams from simple text.
+
+Enter [Mermaid](https://mermaid.js.org/).
+
+---
+
+## What is Mermaid?
+
+Mermaid is a JavaScript library that renders diagrams from text definitions. Instead of drawing boxes and arrows manually, you write a simple syntax and Mermaid generates the visualization.
+
+```
+flowchart LR
+    A[Start] --> B[Process] --> C[End]
+```
+
+Becomes:
+
+<Mermaid chart={`
+flowchart LR
+    A[Start] --> B[Process] --> C[End]
+`} />
+
+---
+
+## How to Use It
+
+In any MDX article, use the `Mermaid` component with a `chart` prop:
+
+```jsx
+<Mermaid chart={\`
+flowchart TD
+    A[Input] --> B{Decision}
+    B -->|Yes| C[Action 1]
+    B -->|No| D[Action 2]
+\`} />
+```
+
+<Mermaid chart={`
+flowchart TD
+    A[Input] --> B{Decision}
+    B -->|Yes| C[Action 1]
+    B -->|No| D[Action 2]
+`} />
+
+---
+
+## Diagram Types
+
+Mermaid supports many diagram types. Here are a few useful ones:
+
+### Flowcharts
+
+Great for showing processes and relationships.
+
+<Mermaid chart={`
+flowchart LR
+    subgraph Frontend
+        React --> Components
+    end
+    subgraph Backend
+        API --> Database
+    end
+    Components --> API
+`} />
+
+### Sequence Diagrams
+
+Perfect for showing interactions over time.
+
+<Mermaid chart={`
+sequenceDiagram
+    User->>App: Click button
+    App->>API: Fetch data
+    API-->>App: Return JSON
+    App-->>User: Display result
+`} />
+
+### State Diagrams
+
+Useful for showing state machines and transitions.
+
+<Mermaid chart={`
+stateDiagram-v2
+    [*] --> Draft
+    Draft --> Review
+    Review --> Published
+    Review --> Draft
+    Published --> [*]
+`} />
+
+---
+
+## Theming
+
+The Mermaid component is configured to match the site's dark theme with purple accents. The styling is defined in the component itself:
+
+```typescript
+theme: 'base',
+themeVariables: {
+  primaryColor: '#8b5cf6',      // Purple
+  primaryTextColor: '#f8fafc',
+  primaryBorderColor: '#a78bfa',
+  lineColor: '#64748b',
+  // ...
+}
+```
+
+This keeps diagrams visually consistent with the rest of the site.
+
+---
+
+## Try It
+
+If you're contributing to rendered_useful, feel free to use Mermaid diagrams in your articles. The component is available globally in MDX files:
+
+```jsx
+<Mermaid chart={`
+flowchart LR
+    You -->|write| Diagram
+    Diagram -->|renders| Visual
+`} />
+```
+
+<Mermaid chart={`
+flowchart LR
+    You -->|write| Diagram
+    Diagram -->|renders| Visual
+`} />
+
+Check out [Time as a Foundation](/articles/time-as-foundation-v2) to see Mermaid diagrams used to explain series, events, and versions.
