@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Search, Moon, Sun, Command, Github } from 'lucide-react'
+import { Menu, X, Search, Moon, Sun, Command, Github, ChevronDown, Lightbulb, Languages, MapPin } from 'lucide-react'
 import { useTheme } from '../../context/ThemeContext'
 import { useSearchStore } from '../../store'
 import { useLayoutContext } from '../../hooks/useLayoutContext'
@@ -13,6 +13,15 @@ const navItems = [
   { label: 'Series', href: '/series' },
   { label: 'Events', href: '/events' },
   { label: 'Communities', href: '/communities' },
+]
+
+const spaceItems = [
+  { label: 'Concepts', href: '/concepts', icon: Lightbulb, description: 'Explore the landscape of ideas' },
+  { label: 'Languages', href: '/languages', icon: Languages, description: 'Navigate linguistic space' },
+  { label: 'Locations', href: '/locations', icon: MapPin, description: 'Physical and virtual places' },
+]
+
+const moreItems = [
   { label: 'Contributors', href: '/contributors' },
   { label: 'About', href: '/about' },
 ]
@@ -20,6 +29,8 @@ const navItems = [
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isSpaceDropdownOpen, setIsSpaceDropdownOpen] = useState(false)
+  const spaceDropdownRef = useRef<HTMLDivElement>(null)
   const { resolvedTheme, toggleTheme } = useTheme()
   const { openSearch } = useSearchStore()
   const location = useLocation()
@@ -39,7 +50,19 @@ export default function Navbar() {
   // Close mobile menu on route change
   useEffect(() => {
     setIsMobileMenuOpen(false) // eslint-disable-line react-hooks/set-state-in-effect
+    setIsSpaceDropdownOpen(false)
   }, [location])
+
+  // Close space dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (spaceDropdownRef.current && !spaceDropdownRef.current.contains(event.target as Node)) {
+        setIsSpaceDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   // Keyboard shortcut for search
   useEffect(() => {
@@ -86,6 +109,8 @@ export default function Navbar() {
     ? navItems.filter(item => ['/', '/articles', '/projects'].includes(item.href))
     : navItems
 
+  const isSpaceActive = spaceItems.some(item => location.pathname.startsWith(item.href))
+
   return (
     <header className={getHeaderClasses()}>
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -106,7 +131,79 @@ export default function Navbar() {
               <Link
                 key={item.href}
                 to={item.href}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                  location.pathname === item.href
+                    ? 'text-[var(--color-accent-primary)] bg-[var(--color-accent-primary)]/10'
+                    : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]'
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
+
+            {/* Space Dropdown */}
+            {navbarStyle !== 'minimal' && (
+              <div ref={spaceDropdownRef} className="relative">
+                <button
+                  onClick={() => setIsSpaceDropdownOpen(!isSpaceDropdownOpen)}
+                  className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                    isSpaceActive
+                      ? 'text-[var(--color-accent-primary)] bg-[var(--color-accent-primary)]/10'
+                      : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]'
+                  }`}
+                >
+                  Space
+                  <ChevronDown size={14} className={`transition-transform ${isSpaceDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                <AnimatePresence>
+                  {isSpaceDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute top-full left-0 mt-2 w-64 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-lg overflow-hidden z-50"
+                    >
+                      <div className="p-2">
+                        {spaceItems.map((item) => (
+                          <Link
+                            key={item.href}
+                            to={item.href}
+                            className={`flex items-start gap-3 p-3 rounded-lg transition-all ${
+                              location.pathname.startsWith(item.href)
+                                ? 'bg-[var(--color-accent-primary)]/10'
+                                : 'hover:bg-[var(--color-surface-elevated)]'
+                            }`}
+                          >
+                            <item.icon size={20} className="text-[var(--color-accent-primary)] mt-0.5 flex-shrink-0" />
+                            <div>
+                              <div className={`font-medium ${
+                                location.pathname.startsWith(item.href)
+                                  ? 'text-[var(--color-accent-primary)]'
+                                  : 'text-[var(--color-text-primary)]'
+                              }`}>
+                                {item.label}
+                              </div>
+                              <div className="text-xs text-[var(--color-text-muted)]">
+                                {item.description}
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
+
+            {/* More items */}
+            {navbarStyle !== 'minimal' && moreItems.map((item) => (
+              <Link
+                key={item.href}
+                to={item.href}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                   location.pathname === item.href
                     ? 'text-[var(--color-accent-primary)] bg-[var(--color-accent-primary)]/10'
                     : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]'
@@ -187,6 +284,44 @@ export default function Navbar() {
                   {item.label}
                 </Link>
               ))}
+              
+              {/* Space Section */}
+              <div className="pt-2 border-t border-[var(--color-border)]">
+                <div className="px-4 py-2 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">
+                  Space
+                </div>
+                {spaceItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    to={item.href}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all border ${
+                      location.pathname.startsWith(item.href)
+                        ? 'text-[var(--color-accent-primary)] bg-[var(--color-accent-primary)]/15 border-[var(--color-accent-primary)]/30'
+                        : 'text-[var(--color-text-secondary)] bg-[var(--color-surface)] border-[var(--color-border)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-elevated)] hover:border-[var(--color-accent-primary)]/20'
+                    }`}
+                  >
+                    <item.icon size={18} />
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+
+              {/* More items */}
+              <div className="pt-2 border-t border-[var(--color-border)]">
+                {moreItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    to={item.href}
+                    className={`block px-4 py-3 rounded-xl font-medium transition-all border ${
+                      location.pathname === item.href
+                        ? 'text-[var(--color-accent-primary)] bg-[var(--color-accent-primary)]/15 border-[var(--color-accent-primary)]/30'
+                        : 'text-[var(--color-text-secondary)] bg-[var(--color-surface)] border-[var(--color-border)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-elevated)] hover:border-[var(--color-accent-primary)]/20'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
             </div>
           </motion.div>
         )}
