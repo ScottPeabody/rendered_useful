@@ -1,0 +1,283 @@
+---
+title: "Space as Foundation"
+description: "A deep exploration of what space means for content: physical geography, virtual places, conceptual landscapes, and the role of language in shaping the spaces we inhabit. Now implemented."
+date: "2026-01-14"
+author: "scott-peabody"
+tags: ["architecture", "design", "vision", "exploration", "philosophy"]
+communities: ["rendered-useful"]
+concepts: ["platform-architecture", "content-systems"]
+languages: ["english", "typescript", "mdx"]
+locations: ["the-web", "github"]
+readingTime: 12
+---
+
+# Space as Foundation
+
+Time tells us *when*. But *where* is more complicated than it first appears.
+
+When I started thinking about space as a foundation for this platform, I expected it to be simpler than time. A location is a location, right? Latitude, longitude, maybe a city name. Done.
+
+But the more I pulled at this thread, the more it unraveled into something far more interesting. Space isn't one thing. It's at least four different things, and they interact in ways that matter for how we create and share knowledge.
+
+---
+
+## Physical Space: More Than Coordinates
+
+The obvious starting point is physical location. Where are you sitting right now? What city? What country?
+
+But even "physical space" is more than geography. It's the *conditions* that geography creates.
+
+- **Infrastructure**: Reliable power? Fast internet? These aren't universal.
+- **Time zones**: Who's awake when you're working? Who can you collaborate with synchronously?
+- **Economics**: What does $100/month for hosting mean to you? What's your cost of living?
+- **Climate**: Do you work from home because it's convenient, or because it's 45°C outside?
+- **Community density**: Are there 10,000 developers in your city or 10?
+
+These conditions shape what people build. They shape *how* people think about building.
+
+A React tutorial written by someone in San Francisco unconsciously assumes certain things: fast npm installs, stable connections, access to the latest hardware. These assumptions aren't wrong, but they're not universal either.
+
+When I read something, knowing *where* it comes from helps me understand what assumptions might be embedded in it. Not to dismiss it, but to translate it into my own context.
+
+### Place vs Location
+
+There's a distinction philosophers make between *space* and *place*. Space is abstract, geometric, measurable. Place is lived, meaningful, personal.
+
+Your favorite hangout is a *location* (coordinates, address). But it's also a *place* (where you feel safe, where you do your best thinking, where the afternoon light hits just right).
+
+Place is where meaning lives.
+
+---
+
+## Virtual Space: Why Some Places Feel Like Places
+
+Here's something strange: some online spaces feel like *places*, and others don't.
+
+A busy online chatroom feels like a neighborhood bar. You recognize the regulars. There are inside jokes. You have your usual spot (a channel you hang out in). Leaving feels like stepping outside.
+
+X feels like a stadium. You're in a crowd, shouting. You might be heard, you might not, and place is often curated by algorithms.
+
+What makes the difference?
+
+### The Architecture of Virtual Places
+
+I think it comes down to a few things:
+
+**Boundaries**: A Discord server has walls. You're either in or out. The boundary creates an inside, and insides feel like places.
+
+**Persistence**: The messages stay. When you come back, the conversation has continued without you, but you can catch up. There's continuity.
+
+**Scale**: Small enough to recognize people. Large enough that there's always something happening. The sweet spot feels like a village to some and a stadium to others.
+
+**Shared artifacts**: Inside jokes, pinned messages, custom emoji. Things that only make sense *here*. They're like the decorations on the walls of your favorite bar.
+
+**Rituals**: Weekly events, the way people say hello. Patterns that make the space feel inhabited.
+
+When these elements combine, a URL or feed stops being an address and starts being a place.
+
+---
+
+## Conceptual Space: The Landscape of Ideas
+
+Now we get abstract.
+
+Ideas don't exist in physical space, but they exist in *relationship* to each other. Some ideas are close together. Others are far apart. Some cluster into neighborhoods.
+
+This is conceptual space.
+
+When you're learning something new, you navigate conceptual space. You start somewhere familiar and move toward the unknown. Good teachers give you a map. Bad ones drop you in the middle of nowhere.
+
+### Tags as Coordinates
+
+This platform uses tags as a way to position content in conceptual space. An article tagged `react` and `typescript` sits at a particular location in the landscape of ideas.
+
+But tags are crude coordinates. They tell you *what* something is about, not how ideas within it relate.
+
+Tags give you *topics*. They don't give you *topology*.
+
+### Adjacent Possibles
+
+Stuart Kauffman coined the term "adjacent possible" to describe the space of what's achievable from where you currently are. In biology, it's the set of mutations that are one step away. In ideas, it's the thoughts you can reach from your current understanding.
+
+Good content platforms should help you navigate the adjacent possible. Given what you know, what could you learn next? Given what you've built, what could you build next?
+
+This requires understanding conceptual space, not just tagging topics.
+
+---
+
+## Language as Space
+
+Here's where it gets really interesting.
+
+Language isn't just a tool for describing space. Language *is* a space.
+
+Every language carves up reality differently. The concepts that have words, the distinctions that are easy to express, the metaphors that feel natural. These shape thought.
+
+Japanese has a word, *komorebi*, for sunlight filtering through leaves. English doesn't. This doesn't mean English speakers can't perceive the phenomenon, but Japanese speakers have it *available* as a concept, ready to use.
+
+Programming languages do this too. Haskell makes certain patterns of thought easy and others hard. The language you think in shapes what you can easily think and who you can easily communicate with.
+
+### The Borders of Language Communities
+
+Languages create communities with fuzzy borders.
+
+If you write in English, you can reach billions of people. But you're also locked out of conversations happening in Mandarin, Spanish, Portuguese, Hindi. Entire worlds of knowledge and creation that you can't access.
+
+Even within a language, there can be different dialects. Each is its own space with its own inhabitants.
+
+When we talk about "space" in the context of a content platform, we usually mean geography. But linguistic space might matter more. Who can read what you write? Whose writing can you read?
+
+### Translation as Bridge
+
+If language creates borders, translation builds bridges.
+
+This happens literally (translating an article from Japanese to English) and conceptually (explaining a Haskell concept in terms a JavaScript developer can understand).
+
+Both are acts of moving ideas across linguistic space.
+
+Good technical writers are translators. They take ideas from one space (expert knowledge) and translate them into another (beginner understanding). The idea is the same; the expression changes.
+
+---
+
+## How These Spaces Connect
+
+These four types of space aren't separate. They interact and shape each other.
+
+**Physical → Cultural**: Where you live shapes what languages you speak, what communities you encounter, what problems feel urgent.
+
+**Cultural → Conceptual**: The ideas available to you depend on the languages and communities you have access to.
+
+**Conceptual → Virtual**: The virtual spaces you inhabit reflect your conceptual interests such as a forum populated by people navigating a particular region of conceptual space.
+
+**Virtual → Physical**: Online communities sometimes crystallize into physical meetups. The virtual becomes embodied.
+
+It's a loop:
+
+Each type of space influences the others.
+
+---
+
+## What This Means for a Platform
+
+If space is this multi-layered, what does that mean for building something?
+
+### The Naive Approach (and Its Limits)
+
+The obvious implementation is to add a location field:
+
+```typescript
+interface Content {
+  // ... existing fields
+  location?: string  // "Austin, TX"
+}
+```
+
+This captures physical space, crudely. But it misses virtual space, conceptual space, and linguistic space entirely. This gap then has to be filled filled by how users interpret and use the platform within the constraints given.
+
+It also flattens *place* into *location*.
+
+### Richer Possibilities
+
+What if the platform understood:
+
+**Physical context**: Not just where you are, but what conditions that creates. Time zone, approximate cost of living index, community density.
+
+**Virtual context**: Which online spaces does this content belong to? What servers, forums, communities is it part of?
+
+**Conceptual position**: Not just tags, but relationships. What's prerequisite to this? What does this unlock? What's adjacent?
+
+**Linguistic space**: What language is this in? What programming languages? What level of jargon? Who can read this?
+
+These are dimensions that *exist*, and that shape how knowledge is created and shared.
+
+---
+
+## What We Built
+
+Based on this exploration, we implemented three new dimensions for organizing content:
+
+### [Concepts](/concepts) - Conceptual Space
+
+Concepts represent nodes in the landscape of ideas. Unlike tags (which just label), concepts can have:
+
+- **Related concepts**: Ideas that are adjacent in conceptual space
+- **Prerequisites**: Concepts needed to understand this one
+- **Rich metadata**: Icons, colors, descriptions
+
+This enables navigation of the adjacent possible. Given what you know, what could you learn next?
+
+### [Languages](/languages) - Linguistic Space
+
+Languages capture both natural and programming languages:
+
+- **Natural languages**: English, Japanese, Spanish. The human languages content is written in.
+- **Programming languages**: TypeScript, Rust, Python. The code languages used.
+- **Markup languages**: MDX, HTML. The formats content is written in.
+
+Each language has a family (Romance, C-family, etc.) helping show relationships.
+
+### [Locations](/locations) - Physical & Virtual Space
+
+Locations represent where content comes from or is relevant to:
+
+- **Physical locations**: Cities, countries, regions. Where creators live and work.
+- **Virtual locations**: Discord, GitHub, the web. Online spaces where communities gather.
+- **Hierarchies**: San Francisco is in the United States. Locations can have parents.
+
+---
+
+## Using Space in Your Content
+
+You can tag your articles and projects with concepts, languages, and locations:
+
+```yaml
+---
+title: "My Article"
+concepts: ["state-management", "reactivity"]
+languages: ["typescript", "english"]
+locations: ["san-francisco", "github"]
+---
+```
+
+These tags let readers discover content through multiple dimensions:
+- "Show me everything about game development"
+- "What's written in Rust?"
+- "What's coming from Tokyo?"
+
+---
+
+## What's Next: Translation
+
+Of the four types of space, **language** has the most unexplored potential.
+
+This platform is currently English-default. Not by policy, but by accident. The interface is in English. Most content is in English. There's no concept of translation.
+
+But knowledge creation happens in every language. The foundation we've laid with the Languages system opens the door to:
+
+- **Content in multiple languages**: The same article available in English and Japanese
+- **Translation as a first-class concept**: Not just duplication, but linked versions
+- **Code as a bridge**: Programming languages that transcend natural language barriers
+
+This is bigger than we can tackle now. But the groundwork is laid.
+
+---
+
+## The Foundation So Far
+
+| Dimension | Implementation | What It Enables |
+|-----------|---------------|-----------------|
+| **Time** | Series, Events, Versions | Temporal organization |
+| **Space: Concepts** | [/concepts](/concepts) | Navigate ideas |
+| **Space: Languages** | [/languages](/languages) | Linguistic discovery |
+| **Space: Locations** | [/locations](/locations) | Geographic context |
+
+Each dimension adds ways to connect, discover, and organize. Together, they form a multi-dimensional space for knowledge.
+
+---
+
+<Callout type="info" title="Foundation Complete">
+Space is now implemented as a foundation alongside Time. Explore the new dimensions:
+- [Concepts](/concepts) - The landscape of ideas
+- [Languages](/languages) - Natural and programming languages
+- [Locations](/locations) - Physical and virtual places
+</Callout>

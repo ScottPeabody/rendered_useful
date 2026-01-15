@@ -1,5 +1,255 @@
-import type { Author, Article, Project, TagInfo, Community, CommunityInfo, Series, SeriesInfo, Event, EventInfo, VersionInfo, Versionable } from '../types'
+import type { Author, Article, Project, TagInfo, Community, CommunityInfo, Series, SeriesInfo, Event, EventInfo, VersionInfo, Versionable, Concept, ConceptInfo, Language, LanguageInfo, Location, LocationInfo } from '../types'
 import { compareDates, getEventStatus } from '../lib/time'
+
+// ============================================
+// SPACE FOUNDATION: Concepts, Languages, Locations
+// ============================================
+
+// Concepts - nodes in conceptual space
+export const concepts: Concept[] = [
+  {
+    slug: 'state-management',
+    name: 'State Management',
+    description: 'Patterns and techniques for managing application state, from local component state to global stores.',
+    icon: '🔄',
+    color: '#8b5cf6',
+    related: ['reactivity', 'data-flow'],
+    prerequisites: ['programming-basics'],
+  },
+  {
+    slug: 'reactivity',
+    name: 'Reactivity',
+    description: 'Systems that automatically update when their dependencies change. The foundation of modern UI frameworks.',
+    icon: '⚡',
+    color: '#f59e0b',
+    related: ['state-management', 'data-flow'],
+  },
+  {
+    slug: 'data-flow',
+    name: 'Data Flow',
+    description: 'How data moves through an application. Unidirectional, bidirectional, and event-driven patterns.',
+    icon: '🌊',
+    color: '#06b6d4',
+    related: ['state-management', 'reactivity'],
+  },
+  {
+    slug: 'game-development',
+    name: 'Game Development',
+    description: 'The art and science of creating interactive games. Encompasses design, programming, art, and sound.',
+    icon: '🎮',
+    color: '#ef4444',
+    related: ['game-loops', 'collision-detection', '3d-graphics'],
+  },
+  {
+    slug: 'game-loops',
+    name: 'Game Loops',
+    description: 'The heartbeat of a game - the cycle of input, update, and render that runs every frame.',
+    icon: '🔁',
+    color: '#22c55e',
+    prerequisites: ['game-development'],
+    related: ['collision-detection'],
+  },
+  {
+    slug: 'collision-detection',
+    name: 'Collision Detection',
+    description: 'Determining when game objects intersect. From simple bounding boxes to complex physics systems.',
+    icon: '💥',
+    color: '#f472b6',
+    prerequisites: ['game-loops'],
+  },
+  {
+    slug: '3d-graphics',
+    name: '3D Graphics',
+    description: 'Rendering three-dimensional scenes. Meshes, textures, lighting, cameras, and shaders.',
+    icon: '🎲',
+    color: '#a855f7',
+    related: ['game-development'],
+  },
+  {
+    slug: 'platform-architecture',
+    name: 'Platform Architecture',
+    description: 'Designing systems that support communities, content, and connections. The foundation of rendered_useful.',
+    icon: '🏗️',
+    color: '#8b5cf6',
+    related: ['content-systems', 'open-platforms'],
+  },
+  {
+    slug: 'content-systems',
+    name: 'Content Systems',
+    description: 'How content is structured, versioned, and connected. MDX, metadata, and relationships.',
+    icon: '📝',
+    color: '#10b981',
+    related: ['platform-architecture'],
+  },
+  {
+    slug: 'open-platforms',
+    name: 'Open Platforms',
+    description: 'Building platforms that balance openness with safety. Moderation, federation, and community governance.',
+    icon: '🌐',
+    color: '#22d3ee',
+    related: ['platform-architecture'],
+  },
+]
+
+// Languages - linguistic space (natural and programming)
+export const languages: Language[] = [
+  // Programming languages
+  {
+    slug: 'typescript',
+    name: 'TypeScript',
+    description: 'JavaScript with static types. The language of choice for large-scale web applications.',
+    type: 'programming',
+    icon: '🔷',
+    color: '#3178c6',
+    family: 'C-family',
+  },
+  {
+    slug: 'javascript',
+    name: 'JavaScript',
+    description: 'The language of the web. Runs everywhere, from browsers to servers to IoT devices.',
+    type: 'programming',
+    icon: '🟨',
+    color: '#f7df1e',
+    family: 'C-family',
+  },
+  {
+    slug: 'rust',
+    name: 'Rust',
+    description: 'Systems programming with safety guarantees. Memory safe without garbage collection.',
+    type: 'programming',
+    icon: '🦀',
+    color: '#dea584',
+    family: 'Systems',
+  },
+  {
+    slug: 'python',
+    name: 'Python',
+    description: 'Readable, versatile, and beginner-friendly. From scripts to machine learning.',
+    type: 'programming',
+    icon: '🐍',
+    color: '#3776ab',
+    family: 'Dynamic',
+  },
+  // Natural languages
+  {
+    slug: 'english',
+    name: 'English',
+    description: 'The current lingua franca of technology and this platform. But not the only language that matters.',
+    type: 'natural',
+    icon: '🇬🇧',
+    color: '#1e40af',
+    family: 'Germanic',
+  },
+  {
+    slug: 'japanese',
+    name: '日本語',
+    description: 'Japanese. A rich language with unique concepts like komorebi (sunlight through leaves).',
+    type: 'natural',
+    icon: '🇯🇵',
+    color: '#dc2626',
+    family: 'Japonic',
+  },
+  {
+    slug: 'spanish',
+    name: 'Español',
+    description: 'Spanish. Spoken by over 500 million people. A bridge to Latin America and Spain.',
+    type: 'natural',
+    icon: '🇪🇸',
+    color: '#fbbf24',
+    family: 'Romance',
+  },
+  // Markup languages
+  {
+    slug: 'mdx',
+    name: 'MDX',
+    description: 'Markdown with JSX. Write content with embedded React components.',
+    type: 'markup',
+    icon: '📄',
+    color: '#f9ac00',
+    family: 'Markdown',
+  },
+]
+
+// Locations - physical and virtual space
+export const locations: Location[] = [
+  // Physical locations
+  {
+    slug: 'united-states',
+    name: 'United States',
+    description: 'A large tech ecosystem spanning multiple time zones and cultures.',
+    type: 'physical',
+    icon: '🇺🇸',
+    color: '#3b82f6',
+    timezone: 'America/New_York',
+  },
+  {
+    slug: 'san-francisco',
+    name: 'San Francisco',
+    description: 'Historic center of tech innovation. Silicon Valley adjacent.',
+    type: 'physical',
+    parent: 'united-states',
+    icon: '🌉',
+    color: '#f97316',
+    coordinates: [37.7749, -122.4194],
+    timezone: 'America/Los_Angeles',
+  },
+  {
+    slug: 'austin',
+    name: 'Austin',
+    description: 'Growing tech hub in Texas. Music, BBQ, and startups.',
+    type: 'physical',
+    parent: 'united-states',
+    icon: '🤠',
+    color: '#84cc16',
+    coordinates: [30.2672, -97.7431],
+    timezone: 'America/Chicago',
+  },
+  {
+    slug: 'tokyo',
+    name: 'Tokyo',
+    description: 'Japan\'s tech capital. Gaming, anime, and cutting-edge innovation.',
+    type: 'physical',
+    icon: '🗼',
+    color: '#dc2626',
+    coordinates: [35.6762, 139.6503],
+    timezone: 'Asia/Tokyo',
+  },
+  {
+    slug: 'lagos',
+    name: 'Lagos',
+    description: 'Nigeria\'s tech hub. A rapidly growing ecosystem with unique challenges and solutions.',
+    type: 'physical',
+    icon: '🌍',
+    color: '#22c55e',
+    coordinates: [6.5244, 3.3792],
+    timezone: 'Africa/Lagos',
+  },
+  // Virtual locations
+  {
+    slug: 'discord',
+    name: 'Discord',
+    description: 'Voice and text chat platform. Home to countless developer communities.',
+    type: 'virtual',
+    icon: '💬',
+    color: '#5865f2',
+  },
+  {
+    slug: 'github',
+    name: 'GitHub',
+    description: 'The world\'s largest code hosting platform. Where open source lives.',
+    type: 'virtual',
+    icon: '🐙',
+    color: '#333333',
+  },
+  {
+    slug: 'the-web',
+    name: 'The Web',
+    description: 'The global information space. Where this platform exists.',
+    type: 'virtual',
+    icon: '🌐',
+    color: '#06b6d4',
+  },
+]
 
 // Events definitions (game jams, hackathons, challenges)
 export const events: Event[] = [
@@ -121,6 +371,8 @@ export const articles: Article[] = [
     communities: ['rendered-useful', 'learners'],
     readingTime: 4,
     featured: true,
+    concepts: ['content-systems'],
+    languages: ['mdx', 'english'],
   },
   {
     slug: 'building-render-useful',
@@ -133,6 +385,9 @@ export const articles: Article[] = [
     readingTime: 8,
     featured: true,
     relatedProject: 'render-useful',
+    concepts: ['platform-architecture', 'content-systems'],
+    languages: ['typescript', 'english'],
+    locations: ['github', 'the-web'],
   },
   {
     slug: 'building-tetris-in-react',
@@ -145,6 +400,8 @@ export const articles: Article[] = [
     readingTime: 12,
     featured: true,
     relatedProject: 'tetris-react',
+    concepts: ['game-development', 'game-loops', 'collision-detection', 'state-management'],
+    languages: ['typescript', 'english'],
   },
   {
     slug: 'building-open-platforms',
@@ -156,6 +413,8 @@ export const articles: Article[] = [
     communities: ['opensource', 'rendered-useful'],
     readingTime: 10,
     featured: true,
+    concepts: ['open-platforms', 'platform-architecture'],
+    languages: ['english'],
   },
   {
     slug: 'custom-themes-demo',
@@ -192,6 +451,9 @@ export const articles: Article[] = [
     event: 'preliminary-foundations-hackathon',
     readingTime: 8,
     featured: true,
+    concepts: ['platform-architecture', 'content-systems'],
+    languages: ['english'],
+    locations: ['the-web'],
   },
   // Current version - includes Versions feature
   {
@@ -210,6 +472,9 @@ export const articles: Article[] = [
     version: '2.0',
     versionGroup: 'time-as-foundation',
     versionNote: 'Added Versions section',
+    concepts: ['platform-architecture', 'content-systems'],
+    languages: ['english', 'typescript'],
+    locations: ['the-web'],
   },
   // Original version - before Versions feature
   {
@@ -241,6 +506,26 @@ export const articles: Article[] = [
     event: 'preliminary-foundations-hackathon',
     readingTime: 3,
     featured: false,
+    concepts: ['content-systems'],
+    languages: ['javascript', 'mdx', 'english'],
+    locations: ['the-web'],
+  },
+  // Exploration article on space/location concepts
+  {
+    slug: 'space-as-context',
+    title: 'Space as Foundation',
+    description: 'A deep exploration of what space means for content: physical geography, virtual places, conceptual landscapes, and the role of language in shaping the spaces we inhabit. Now implemented.',
+    author: 'scott-peabody',
+    date: '2026-01-14',
+    tags: ['architecture', 'design', 'vision', 'exploration', 'philosophy'],
+    communities: ['rendered-useful'],
+    readingTime: 12,
+    featured: false,
+    series: 'platform-foundations',
+    seriesOrder: 3,
+    concepts: ['platform-architecture', 'content-systems'],
+    languages: ['english', 'typescript', 'mdx'],
+    locations: ['united-states', 'the-web', 'github'],
   },
 ]
 
@@ -257,6 +542,9 @@ export const projects: Project[] = [
     type: 'game',
     status: 'completed',
     featured: true,
+    concepts: ['game-development', 'game-loops', 'collision-detection', 'state-management'],
+    languages: ['typescript'],
+    locations: ['github', 'the-web'],
   },
   {
     slug: 'rubiks-cube',
@@ -270,6 +558,9 @@ export const projects: Project[] = [
     type: 'game',
     status: 'completed',
     featured: true,
+    concepts: ['game-development', '3d-graphics'],
+    languages: ['typescript'],
+    locations: ['github', 'the-web'],
   },
   {
     slug: 'typing-game',
@@ -283,6 +574,9 @@ export const projects: Project[] = [
     type: 'game',
     status: 'completed',
     featured: true,
+    concepts: ['game-development'],
+    languages: ['typescript', 'english'],
+    locations: ['github', 'the-web'],
   },
 ]
 
@@ -698,3 +992,196 @@ export const getEventVersionInfo = (slug: string): VersionInfo[] => {
     isCurrent: item.slug === slug,
   }))
 }
+
+// ============================================
+// SPACE FOUNDATION HELPERS
+// ============================================
+
+// Concept helpers
+export const getConcept = (slug: string): Concept | undefined =>
+  concepts.find((c) => c.slug === slug)
+
+export const getAllConcepts = (): Concept[] => concepts
+
+export const getConceptInfo = (slug: string): ConceptInfo | undefined => {
+  const concept = concepts.find((c) => c.slug === slug)
+  if (!concept) return undefined
+
+  const latestArticles = filterLatestArticles(articles)
+  const latestProjects = filterLatestProjects(projects)
+
+  const conceptArticles = latestArticles
+    .filter((a) => a.concepts?.includes(slug))
+    .map((a) => ({
+      slug: a.slug,
+      title: a.title,
+      description: a.description,
+      date: a.date,
+      type: 'article' as const,
+      author: a.author,
+    }))
+
+  const conceptProjects = latestProjects
+    .filter((p) => p.concepts?.includes(slug))
+    .map((p) => ({
+      slug: p.slug,
+      title: p.title,
+      description: p.description,
+      date: p.date,
+      type: 'project' as const,
+      author: p.author,
+    }))
+
+  const items = [...conceptArticles, ...conceptProjects].sort((a, b) => compareDates(a.date, b.date))
+
+  return {
+    slug: concept.slug,
+    name: concept.name,
+    description: concept.description,
+    icon: concept.icon,
+    color: concept.color,
+    related: concept.related,
+    prerequisites: concept.prerequisites,
+    itemCount: items.length,
+    items,
+  }
+}
+
+export const getAllConceptInfo = (): ConceptInfo[] =>
+  concepts.map((c) => getConceptInfo(c.slug)!).filter(Boolean)
+
+export const getArticlesByConcept = (conceptSlug: string): Article[] =>
+  filterLatestArticles(articles.filter((a) => a.concepts?.includes(conceptSlug)))
+
+export const getProjectsByConcept = (conceptSlug: string): Project[] =>
+  filterLatestProjects(projects.filter((p) => p.concepts?.includes(conceptSlug)))
+
+// Language helpers
+export const getLanguage = (slug: string): Language | undefined =>
+  languages.find((l) => l.slug === slug)
+
+export const getAllLanguages = (): Language[] => languages
+
+export const getProgrammingLanguages = (): Language[] =>
+  languages.filter((l) => l.type === 'programming')
+
+export const getNaturalLanguages = (): Language[] =>
+  languages.filter((l) => l.type === 'natural')
+
+export const getLanguageInfo = (slug: string): LanguageInfo | undefined => {
+  const language = languages.find((l) => l.slug === slug)
+  if (!language) return undefined
+
+  const latestArticles = filterLatestArticles(articles)
+  const latestProjects = filterLatestProjects(projects)
+
+  const languageArticles = latestArticles
+    .filter((a) => a.languages?.includes(slug))
+    .map((a) => ({
+      slug: a.slug,
+      title: a.title,
+      description: a.description,
+      date: a.date,
+      type: 'article' as const,
+      author: a.author,
+    }))
+
+  const languageProjects = latestProjects
+    .filter((p) => p.languages?.includes(slug))
+    .map((p) => ({
+      slug: p.slug,
+      title: p.title,
+      description: p.description,
+      date: p.date,
+      type: 'project' as const,
+      author: p.author,
+    }))
+
+  const items = [...languageArticles, ...languageProjects].sort((a, b) => compareDates(a.date, b.date))
+
+  return {
+    slug: language.slug,
+    name: language.name,
+    description: language.description,
+    type: language.type,
+    icon: language.icon,
+    color: language.color,
+    family: language.family,
+    itemCount: items.length,
+    items,
+  }
+}
+
+export const getAllLanguageInfo = (): LanguageInfo[] =>
+  languages.map((l) => getLanguageInfo(l.slug)!).filter(Boolean)
+
+export const getArticlesByLanguage = (languageSlug: string): Article[] =>
+  filterLatestArticles(articles.filter((a) => a.languages?.includes(languageSlug)))
+
+export const getProjectsByLanguage = (languageSlug: string): Project[] =>
+  filterLatestProjects(projects.filter((p) => p.languages?.includes(languageSlug)))
+
+// Location helpers
+export const getLocation = (slug: string): Location | undefined =>
+  locations.find((l) => l.slug === slug)
+
+export const getAllLocations = (): Location[] => locations
+
+export const getPhysicalLocations = (): Location[] =>
+  locations.filter((l) => l.type === 'physical')
+
+export const getVirtualLocations = (): Location[] =>
+  locations.filter((l) => l.type === 'virtual')
+
+export const getLocationInfo = (slug: string): LocationInfo | undefined => {
+  const location = locations.find((l) => l.slug === slug)
+  if (!location) return undefined
+
+  const latestArticles = filterLatestArticles(articles)
+  const latestProjects = filterLatestProjects(projects)
+
+  const locationArticles = latestArticles
+    .filter((a) => a.locations?.includes(slug))
+    .map((a) => ({
+      slug: a.slug,
+      title: a.title,
+      description: a.description,
+      date: a.date,
+      type: 'article' as const,
+      author: a.author,
+    }))
+
+  const locationProjects = latestProjects
+    .filter((p) => p.locations?.includes(slug))
+    .map((p) => ({
+      slug: p.slug,
+      title: p.title,
+      description: p.description,
+      date: p.date,
+      type: 'project' as const,
+      author: p.author,
+    }))
+
+  const items = [...locationArticles, ...locationProjects].sort((a, b) => compareDates(a.date, b.date))
+
+  return {
+    slug: location.slug,
+    name: location.name,
+    description: location.description,
+    type: location.type,
+    parent: location.parent,
+    icon: location.icon,
+    color: location.color,
+    itemCount: items.length,
+    items,
+  }
+}
+
+export const getAllLocationInfo = (): LocationInfo[] =>
+  locations.map((l) => getLocationInfo(l.slug)!).filter(Boolean)
+
+export const getArticlesByLocation = (locationSlug: string): Article[] =>
+  filterLatestArticles(articles.filter((a) => a.locations?.includes(locationSlug)))
+
+export const getProjectsByLocation = (locationSlug: string): Project[] =>
+  filterLatestProjects(projects.filter((p) => p.locations?.includes(locationSlug)))
