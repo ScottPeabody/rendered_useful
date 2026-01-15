@@ -1,7 +1,7 @@
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, MapPin, ChevronRight, Globe, Monitor, Sparkles } from 'lucide-react'
-import { getAllLocationInfo, getLocationInfo, getLocation } from '../data/content'
+import { ArrowLeft, MapPin, ChevronRight, Globe, Monitor, Sparkles, History } from 'lucide-react'
+import { getAllLocationInfo, getLocationInfo, getLocation, getLocationVersions } from '../data/content'
 import NotFoundPage from './NotFoundPage'
 
 const typeIcons = {
@@ -27,6 +27,10 @@ function LocationDetailView({ slug }: { slug: string }) {
 
   const TypeIcon = typeIcons[location.type]
   const parentLocation = location.parent ? getLocation(location.parent) : null
+
+  // Get other versions if this location is part of a version group
+  const versions = location.versionGroup ? getLocationVersions(location.versionGroup) : []
+  const hasMultipleVersions = versions.length > 1
 
   return (
     <div className="pt-24 pb-16">
@@ -76,9 +80,16 @@ function LocationDetailView({ slug }: { slug: string }) {
               <h1 className="text-4xl font-bold text-[var(--color-text-primary)]">
                 {locationInfo.name}
               </h1>
-              <span className="text-sm text-[var(--color-text-muted)]">
-                {locationInfo.itemCount} {locationInfo.itemCount === 1 ? 'item' : 'items'}
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-[var(--color-text-muted)]">
+                  {locationInfo.itemCount} {locationInfo.itemCount === 1 ? 'item' : 'items'}
+                </span>
+                {location.version && (
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--color-accent-primary)]/10 text-[var(--color-accent-primary)]">
+                    {location.version}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
           
@@ -86,10 +97,49 @@ function LocationDetailView({ slug }: { slug: string }) {
             {locationInfo.description}
           </p>
 
+          {location.versionNote && (
+            <p className="mt-2 text-sm text-[var(--color-text-muted)] italic">
+              {location.versionNote}
+            </p>
+          )}
+
           {location.timezone && (
             <p className="mt-2 text-sm text-[var(--color-text-muted)]">
               Timezone: {location.timezone}
             </p>
+          )}
+
+          {/* Version history */}
+          {hasMultipleVersions && (
+            <div className="mt-6 p-4 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)]">
+              <h3 className="text-sm font-medium text-[var(--color-text-muted)] mb-3 flex items-center gap-2">
+                <History size={16} />
+                Version History
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {versions.map((v) => {
+                  const isActive = v.slug === slug
+                  return (
+                    <Link
+                      key={v.slug}
+                      to={`/locations/${v.slug}`}
+                      className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                        isActive
+                          ? 'bg-[var(--color-accent-primary)]'
+                          : 'bg-[var(--color-surface-elevated)] border border-[var(--color-border)] hover:border-[var(--color-accent-primary)]/50'
+                      }`}
+                    >
+                      <span className={isActive ? 'text-white font-medium' : 'text-gray-200 hover:text-white'}>
+                        {v.version || v.name}
+                      </span>
+                      <span className={`ml-2 ${isActive ? 'text-white/70' : 'text-gray-400'}`}>
+                        {v.date.slice(0, 4)}
+                      </span>
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
           )}
         </motion.div>
 

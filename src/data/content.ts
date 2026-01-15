@@ -7,19 +7,53 @@ import { compareDates, getEventStatus } from '../lib/time'
 
 // Concepts - nodes in conceptual space
 export const concepts: Concept[] = [
+  // Current state management (latest)
   {
     slug: 'state-management',
     name: 'State Management',
     description: 'Patterns and techniques for managing application state, from local component state to global stores.',
+    date: '2026-01-14',
     icon: '🔄',
     color: '#8b5cf6',
     related: ['reactivity', 'data-flow'],
     prerequisites: ['programming-basics'],
+    versionGroup: 'state-management',
+    version: 'Modern',
+    versionNote: 'Signals, atoms, and fine-grained reactivity',
+  },
+  // Historical version: Redux era
+  {
+    slug: 'state-management-redux-era',
+    name: 'State Management',
+    description: 'Centralized stores with actions and reducers. Single source of truth, time-travel debugging, but significant boilerplate.',
+    date: '2016-06-01',
+    icon: '🔄',
+    color: '#764abc',
+    related: ['reactivity', 'data-flow'],
+    prerequisites: ['programming-basics'],
+    versionGroup: 'state-management',
+    version: 'Redux Era',
+    versionNote: 'Flux architecture, immutable updates, middleware patterns',
+  },
+  // Historical version: Hooks era
+  {
+    slug: 'state-management-hooks-era',
+    name: 'State Management',
+    description: 'React hooks and context API. useState, useReducer, and custom hooks for state logic.',
+    date: '2019-02-06',
+    icon: '🔄',
+    color: '#61dafb',
+    related: ['reactivity', 'data-flow'],
+    prerequisites: ['programming-basics'],
+    versionGroup: 'state-management',
+    version: 'Hooks Era',
+    versionNote: 'React 16.8 hooks, composition over inheritance',
   },
   {
     slug: 'reactivity',
     name: 'Reactivity',
     description: 'Systems that automatically update when their dependencies change. The foundation of modern UI frameworks.',
+    date: '2026-01-14',
     icon: '⚡',
     color: '#f59e0b',
     related: ['state-management', 'data-flow'],
@@ -28,6 +62,7 @@ export const concepts: Concept[] = [
     slug: 'data-flow',
     name: 'Data Flow',
     description: 'How data moves through an application. Unidirectional, bidirectional, and event-driven patterns.',
+    date: '2026-01-14',
     icon: '🌊',
     color: '#06b6d4',
     related: ['state-management', 'reactivity'],
@@ -36,6 +71,7 @@ export const concepts: Concept[] = [
     slug: 'game-development',
     name: 'Game Development',
     description: 'The art and science of creating interactive games. Encompasses design, programming, art, and sound.',
+    date: '2026-01-14',
     icon: '🎮',
     color: '#ef4444',
     related: ['game-loops', 'collision-detection', '3d-graphics'],
@@ -44,6 +80,7 @@ export const concepts: Concept[] = [
     slug: 'game-loops',
     name: 'Game Loops',
     description: 'The heartbeat of a game - the cycle of input, update, and render that runs every frame.',
+    date: '2026-01-14',
     icon: '🔁',
     color: '#22c55e',
     prerequisites: ['game-development'],
@@ -53,6 +90,7 @@ export const concepts: Concept[] = [
     slug: 'collision-detection',
     name: 'Collision Detection',
     description: 'Determining when game objects intersect. From simple bounding boxes to complex physics systems.',
+    date: '2026-01-14',
     icon: '💥',
     color: '#f472b6',
     prerequisites: ['game-loops'],
@@ -61,6 +99,7 @@ export const concepts: Concept[] = [
     slug: '3d-graphics',
     name: '3D Graphics',
     description: 'Rendering three-dimensional scenes. Meshes, textures, lighting, cameras, and shaders.',
+    date: '2026-01-14',
     icon: '🎲',
     color: '#a855f7',
     related: ['game-development'],
@@ -69,6 +108,7 @@ export const concepts: Concept[] = [
     slug: 'platform-architecture',
     name: 'Platform Architecture',
     description: 'Designing systems that support communities, content, and connections. The foundation of rendered_useful.',
+    date: '2026-01-14',
     icon: '🏗️',
     color: '#8b5cf6',
     related: ['content-systems', 'open-platforms'],
@@ -77,6 +117,7 @@ export const concepts: Concept[] = [
     slug: 'content-systems',
     name: 'Content Systems',
     description: 'How content is structured, versioned, and connected. MDX, metadata, and relationships.',
+    date: '2026-01-14',
     icon: '📝',
     color: '#10b981',
     related: ['platform-architecture'],
@@ -85,28 +126,76 @@ export const concepts: Concept[] = [
     slug: 'open-platforms',
     name: 'Open Platforms',
     description: 'Building platforms that balance openness with safety. Moderation, federation, and community governance.',
+    date: '2026-01-14',
     icon: '🌐',
     color: '#22d3ee',
     related: ['platform-architecture'],
+  },
+  {
+    slug: 'space-as-context',
+    name: 'Space as Context',
+    description: 'Understanding how physical, virtual, conceptual, and linguistic spaces shape the meaning and relevance of content.',
+    date: '2026-01-14',
+    icon: '🌍',
+    color: '#3b82f6',
+    related: ['platform-architecture', 'content-systems'],
+  },
+  {
+    slug: 'version-control',
+    name: 'Version Control',
+    description: 'Tracking changes over time. From git commits to content versions to conceptual evolution.',
+    date: '2026-01-14',
+    icon: '📜',
+    color: '#f97316',
+    related: ['temporal-modeling', 'content-systems'],
+  },
+  {
+    slug: 'temporal-modeling',
+    name: 'Temporal Modeling',
+    description: 'Representing time in data systems. When things happened, how they evolved, and why timing matters.',
+    date: '2026-01-14',
+    icon: '⏳',
+    color: '#ec4899',
+    related: ['version-control', 'content-systems'],
   },
 ]
 
 // Languages - linguistic space (natural and programming)
 export const languages: Language[] = [
   // Programming languages
+  // Current TypeScript (latest)
   {
     slug: 'typescript',
     name: 'TypeScript',
     description: 'JavaScript with static types. The language of choice for large-scale web applications.',
+    date: '2026-01-14',
     type: 'programming',
     icon: '🔷',
     color: '#3178c6',
     family: 'C-family',
+    versionGroup: 'typescript',
+    version: '5.x',
+    versionNote: 'Decorators, const type parameters, satisfies operator',
+  },
+  // Historical version: TypeScript 4.x
+  {
+    slug: 'typescript-4',
+    name: 'TypeScript',
+    description: 'TypeScript with variadic tuple types, labeled tuples, and class property inference.',
+    date: '2020-08-20',
+    type: 'programming',
+    icon: '🔷',
+    color: '#235a97',
+    family: 'C-family',
+    versionGroup: 'typescript',
+    version: '4.x',
+    versionNote: 'Variadic tuples, labeled tuples, short-circuiting assignment',
   },
   {
     slug: 'javascript',
     name: 'JavaScript',
     description: 'The language of the web. Runs everywhere, from browsers to servers to IoT devices.',
+    date: '2026-01-14',
     type: 'programming',
     icon: '🟨',
     color: '#f7df1e',
@@ -116,6 +205,7 @@ export const languages: Language[] = [
     slug: 'rust',
     name: 'Rust',
     description: 'Systems programming with safety guarantees. Memory safe without garbage collection.',
+    date: '2026-01-14',
     type: 'programming',
     icon: '🦀',
     color: '#dea584',
@@ -125,6 +215,7 @@ export const languages: Language[] = [
     slug: 'python',
     name: 'Python',
     description: 'Readable, versatile, and beginner-friendly. From scripts to machine learning.',
+    date: '2026-01-14',
     type: 'programming',
     icon: '🐍',
     color: '#3776ab',
@@ -135,6 +226,7 @@ export const languages: Language[] = [
     slug: 'english',
     name: 'English',
     description: 'The current lingua franca of technology and this platform. But not the only language that matters.',
+    date: '2026-01-14',
     type: 'natural',
     icon: '🇬🇧',
     color: '#1e40af',
@@ -144,6 +236,7 @@ export const languages: Language[] = [
     slug: 'japanese',
     name: '日本語',
     description: 'Japanese. A rich language with unique concepts like komorebi (sunlight through leaves).',
+    date: '2026-01-14',
     type: 'natural',
     icon: '🇯🇵',
     color: '#dc2626',
@@ -153,6 +246,7 @@ export const languages: Language[] = [
     slug: 'spanish',
     name: 'Español',
     description: 'Spanish. Spoken by over 500 million people. A bridge to Latin America and Spain.',
+    date: '2026-01-14',
     type: 'natural',
     icon: '🇪🇸',
     color: '#fbbf24',
@@ -163,6 +257,7 @@ export const languages: Language[] = [
     slug: 'mdx',
     name: 'MDX',
     description: 'Markdown with JSX. Write content with embedded React components.',
+    date: '2026-01-14',
     type: 'markup',
     icon: '📄',
     color: '#f9ac00',
@@ -177,6 +272,7 @@ export const locations: Location[] = [
     slug: 'united-states',
     name: 'United States',
     description: 'A large tech ecosystem spanning multiple time zones and cultures.',
+    date: '2026-01-14',
     type: 'physical',
     icon: '🇺🇸',
     color: '#3b82f6',
@@ -186,6 +282,7 @@ export const locations: Location[] = [
     slug: 'san-francisco',
     name: 'San Francisco',
     description: 'Historic center of tech innovation. Silicon Valley adjacent.',
+    date: '2026-01-14',
     type: 'physical',
     parent: 'united-states',
     icon: '🌉',
@@ -197,6 +294,7 @@ export const locations: Location[] = [
     slug: 'austin',
     name: 'Austin',
     description: 'Growing tech hub in Texas. Music, BBQ, and startups.',
+    date: '2026-01-14',
     type: 'physical',
     parent: 'united-states',
     icon: '🤠',
@@ -208,6 +306,7 @@ export const locations: Location[] = [
     slug: 'tokyo',
     name: 'Tokyo',
     description: 'Japan\'s tech capital. Gaming, anime, and cutting-edge innovation.',
+    date: '2026-01-14',
     type: 'physical',
     icon: '🗼',
     color: '#dc2626',
@@ -218,6 +317,7 @@ export const locations: Location[] = [
     slug: 'lagos',
     name: 'Lagos',
     description: 'Nigeria\'s tech hub. A rapidly growing ecosystem with unique challenges and solutions.',
+    date: '2026-01-14',
     type: 'physical',
     icon: '🌍',
     color: '#22c55e',
@@ -229,6 +329,7 @@ export const locations: Location[] = [
     slug: 'discord',
     name: 'Discord',
     description: 'Voice and text chat platform. Home to countless developer communities.',
+    date: '2026-01-14',
     type: 'virtual',
     icon: '💬',
     color: '#5865f2',
@@ -237,17 +338,50 @@ export const locations: Location[] = [
     slug: 'github',
     name: 'GitHub',
     description: 'The world\'s largest code hosting platform. Where open source lives.',
+    date: '2026-01-14',
     type: 'virtual',
     icon: '🐙',
     color: '#333333',
   },
+  // The Web - versioned history from 1991 to present
+  // Web 3.0 / Semantic Web (current - machine-readable web)
   {
     slug: 'the-web',
     name: 'The Web',
-    description: 'The global information space. Where this platform exists.',
+    description: 'The Semantic Web: machine-readable data with RDF, OWL, and linked data. AI integration, decentralized apps, and the data web.',
+    date: '2026-01-14',
     type: 'virtual',
     icon: '🌐',
-    color: '#06b6d4',
+    color: '#8b5cf6',
+    versionGroup: 'the-web',
+    version: '3.0',
+    versionNote: 'Semantic Web, linked data, machine-readable, AI-powered',
+  },
+  // Web 2.0 - The Social/Participatory Web (2004-present)
+  {
+    slug: 'the-web-2',
+    name: 'The Web',
+    description: 'The participatory web. User-generated content, social networks, blogs, wikis, AJAX. "The Web as Platform" - coined by Tim O\'Reilly in 2004.',
+    date: '2004-10-05',
+    type: 'virtual',
+    icon: '🌐',
+    color: '#22c55e',
+    versionGroup: 'the-web',
+    version: '2.0',
+    versionNote: 'Social media, user-generated content, AJAX, rich web apps',
+  },
+  // Web 1.0 - The Read-Only Web (1991-2004)
+  {
+    slug: 'the-web-1',
+    name: 'The Web',
+    description: 'The read-only web. Static HTML pages, hyperlinks, and directories. Content creators were few; most users were consumers. GeoCities, Tripod, guestbooks.',
+    date: '1991-08-06',
+    type: 'virtual',
+    icon: '🌐',
+    color: '#6b7280',
+    versionGroup: 'the-web',
+    version: '1.0',
+    versionNote: 'Static HTML, hyperlinks, GeoCities, read-only content',
   },
 ]
 
@@ -526,6 +660,23 @@ export const articles: Article[] = [
     concepts: ['platform-architecture', 'content-systems'],
     languages: ['english', 'typescript', 'mdx'],
     locations: ['united-states', 'the-web', 'github'],
+  },
+  // Versioning space dimensions article
+  {
+    slug: 'versioning-space-dimensions',
+    title: 'Versioning Space: Capturing How Concepts, Languages, and Locations Change',
+    description: 'Exploring how to model the evolution of conceptual, linguistic, and physical spaces over time, because space isn\'t static, it transforms.',
+    author: 'scott-peabody',
+    date: '2026-01-14',
+    tags: ['architecture', 'typescript', 'philosophy', 'foundations'],
+    communities: ['rendered-useful'],
+    readingTime: 8,
+    featured: false,
+    series: 'platform-foundations',
+    seriesOrder: 4,
+    concepts: ['space-as-context', 'version-control', 'temporal-modeling'],
+    languages: ['typescript', 'mdx'],
+    locations: ['github', 'the-web'],
   },
 ]
 
@@ -997,6 +1148,104 @@ export const getEventVersionInfo = (slug: string): VersionInfo[] => {
 // SPACE FOUNDATION HELPERS
 // ============================================
 
+// ============================================================================
+// VERSIONING HELPERS FOR SPACE DIMENSIONS
+// ============================================================================
+
+// Concept versioning helpers
+export const getConceptVersions = (versionGroup: string): Concept[] =>
+  concepts
+    .filter((c) => c.versionGroup === versionGroup)
+    .sort((a, b) => compareDates(a.date, b.date))
+
+export const getLatestConcept = (versionGroup: string): Concept | undefined => {
+  const versions = getConceptVersions(versionGroup)
+  return versions[0] // compareDates sorts newest first
+}
+
+export const filterLatestConcepts = (conceptList: Concept[] = concepts): Concept[] => {
+  const latestByGroup = new Map<string, Concept>()
+  const standalones: Concept[] = []
+
+  for (const concept of conceptList) {
+    if (concept.versionGroup) {
+      const existing = latestByGroup.get(concept.versionGroup)
+      // compareDates returns negative when first arg is newer (descending order)
+      if (!existing || compareDates(concept.date, existing.date) < 0) {
+        latestByGroup.set(concept.versionGroup, concept)
+      }
+    } else {
+      standalones.push(concept)
+    }
+  }
+
+  return [...latestByGroup.values(), ...standalones]
+}
+
+// Language versioning helpers
+export const getLanguageVersions = (versionGroup: string): Language[] =>
+  languages
+    .filter((l) => l.versionGroup === versionGroup)
+    .sort((a, b) => compareDates(a.date, b.date))
+
+export const getLatestLanguage = (versionGroup: string): Language | undefined => {
+  const versions = getLanguageVersions(versionGroup)
+  return versions[0] // compareDates sorts newest first
+}
+
+export const filterLatestLanguages = (languageList: Language[] = languages): Language[] => {
+  const latestByGroup = new Map<string, Language>()
+  const standalones: Language[] = []
+
+  for (const lang of languageList) {
+    if (lang.versionGroup) {
+      const existing = latestByGroup.get(lang.versionGroup)
+      // compareDates returns negative when first arg is newer (descending order)
+      if (!existing || compareDates(lang.date, existing.date) < 0) {
+        latestByGroup.set(lang.versionGroup, lang)
+      }
+    } else {
+      standalones.push(lang)
+    }
+  }
+
+  return [...latestByGroup.values(), ...standalones]
+}
+
+// Location versioning helpers
+export const getLocationVersions = (versionGroup: string): Location[] =>
+  locations
+    .filter((l) => l.versionGroup === versionGroup)
+    .sort((a, b) => compareDates(a.date, b.date))
+
+export const getLatestLocation = (versionGroup: string): Location | undefined => {
+  const versions = getLocationVersions(versionGroup)
+  return versions[0] // compareDates sorts newest first
+}
+
+export const filterLatestLocations = (locationList: Location[] = locations): Location[] => {
+  const latestByGroup = new Map<string, Location>()
+  const standalones: Location[] = []
+
+  for (const loc of locationList) {
+    if (loc.versionGroup) {
+      const existing = latestByGroup.get(loc.versionGroup)
+      // compareDates returns negative when first arg is newer (descending order)
+      if (!existing || compareDates(loc.date, existing.date) < 0) {
+        latestByGroup.set(loc.versionGroup, loc)
+      }
+    } else {
+      standalones.push(loc)
+    }
+  }
+
+  return [...latestByGroup.values(), ...standalones]
+}
+
+// ============================================================================
+// CONCEPT, LANGUAGE, LOCATION INFO HELPERS
+// ============================================================================
+
 // Concept helpers
 export const getConcept = (slug: string): Concept | undefined =>
   concepts.find((c) => c.slug === slug)
@@ -1048,7 +1297,7 @@ export const getConceptInfo = (slug: string): ConceptInfo | undefined => {
 }
 
 export const getAllConceptInfo = (): ConceptInfo[] =>
-  concepts.map((c) => getConceptInfo(c.slug)!).filter(Boolean)
+  filterLatestConcepts(concepts).map((c) => getConceptInfo(c.slug)!).filter(Boolean)
 
 export const getArticlesByConcept = (conceptSlug: string): Article[] =>
   filterLatestArticles(articles.filter((a) => a.concepts?.includes(conceptSlug)))
@@ -1113,7 +1362,7 @@ export const getLanguageInfo = (slug: string): LanguageInfo | undefined => {
 }
 
 export const getAllLanguageInfo = (): LanguageInfo[] =>
-  languages.map((l) => getLanguageInfo(l.slug)!).filter(Boolean)
+  filterLatestLanguages(languages).map((l) => getLanguageInfo(l.slug)!).filter(Boolean)
 
 export const getArticlesByLanguage = (languageSlug: string): Article[] =>
   filterLatestArticles(articles.filter((a) => a.languages?.includes(languageSlug)))
@@ -1178,7 +1427,7 @@ export const getLocationInfo = (slug: string): LocationInfo | undefined => {
 }
 
 export const getAllLocationInfo = (): LocationInfo[] =>
-  locations.map((l) => getLocationInfo(l.slug)!).filter(Boolean)
+  filterLatestLocations(locations).map((l) => getLocationInfo(l.slug)!).filter(Boolean)
 
 export const getArticlesByLocation = (locationSlug: string): Article[] =>
   filterLatestArticles(articles.filter((a) => a.locations?.includes(locationSlug)))

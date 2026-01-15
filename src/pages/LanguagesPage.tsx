@@ -1,13 +1,14 @@
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Languages, ChevronRight, Code, MessageCircle, FileText, Sparkles } from 'lucide-react'
-import { getAllLanguageInfo, getLanguageInfo, getLanguage } from '../data/content'
+import { ArrowLeft, Languages, ChevronRight, Code, MessageCircle, FileText, Sparkles, History } from 'lucide-react'
+import { getAllLanguageInfo, getLanguageInfo, getLanguage, getLanguageVersions } from '../data/content'
 import NotFoundPage from './NotFoundPage'
 
 const typeIcons = {
   programming: Code,
   natural: MessageCircle,
   markup: FileText,
+  query: Code,
   other: Languages,
 }
 
@@ -15,6 +16,7 @@ const typeLabels = {
   programming: 'Programming Language',
   natural: 'Natural Language',
   markup: 'Markup Language',
+  query: 'Query Language',
   other: 'Other',
 }
 
@@ -27,7 +29,11 @@ function LanguageDetailView({ slug }: { slug: string }) {
     return <NotFoundPage />
   }
 
-  const TypeIcon = typeIcons[language.type]
+  const TypeIcon = typeIcons[language.type] || Languages
+
+  // Get other versions if this language is part of a version group
+  const versions = language.versionGroup ? getLanguageVersions(language.versionGroup) : []
+  const hasMultipleVersions = versions.length > 1
 
   return (
     <div className="pt-24 pb-16">
@@ -74,15 +80,61 @@ function LanguageDetailView({ slug }: { slug: string }) {
               <h1 className="text-4xl font-bold text-[var(--color-text-primary)]">
                 {languageInfo.name}
               </h1>
-              <span className="text-sm text-[var(--color-text-muted)]">
-                {languageInfo.itemCount} {languageInfo.itemCount === 1 ? 'item' : 'items'}
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-[var(--color-text-muted)]">
+                  {languageInfo.itemCount} {languageInfo.itemCount === 1 ? 'item' : 'items'}
+                </span>
+                {language.version && (
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--color-accent-primary)]/10 text-[var(--color-accent-primary)]">
+                    v{language.version}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
           
           <p className="text-lg text-[var(--color-text-secondary)]">
             {languageInfo.description}
           </p>
+
+          {language.versionNote && (
+            <p className="mt-2 text-sm text-[var(--color-text-muted)] italic">
+              {language.versionNote}
+            </p>
+          )}
+
+          {/* Version history */}
+          {hasMultipleVersions && (
+            <div className="mt-6 p-4 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)]">
+              <h3 className="text-sm font-medium text-[var(--color-text-muted)] mb-3 flex items-center gap-2">
+                <History size={16} />
+                Version History
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {versions.map((v) => {
+                  const isActive = v.slug === slug
+                  return (
+                    <Link
+                      key={v.slug}
+                      to={`/languages/${v.slug}`}
+                      className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                        isActive
+                          ? 'bg-[var(--color-accent-primary)]'
+                          : 'bg-[var(--color-surface-elevated)] border border-[var(--color-border)] hover:border-[var(--color-accent-primary)]/50'
+                      }`}
+                    >
+                      <span className={isActive ? 'text-white font-medium' : 'text-gray-200 hover:text-white'}>
+                        {v.version || v.name}
+                      </span>
+                      <span className={`ml-2 ${isActive ? 'text-white/70' : 'text-gray-400'}`}>
+                        {v.date.slice(0, 4)}
+                      </span>
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
+          )}
         </motion.div>
 
         {/* Content items */}
