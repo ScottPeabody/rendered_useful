@@ -169,10 +169,11 @@ export interface VersionInfo {
 // Space Foundation: Concepts, Languages, Locations
 
 // Concept represents a node in conceptual space
-export interface Concept {
+export interface Concept extends Versionable {
   slug: string
   name: string
   description: string
+  date: string            // when this concept was added/updated
   icon?: string           // lucide icon or emoji
   color?: string          // accent color
   related?: string[]      // related concept slugs
@@ -200,10 +201,11 @@ export interface ConceptInfo {
 }
 
 // Language represents linguistic space (natural and programming)
-export interface Language {
+export interface Language extends Versionable {
   slug: string
   name: string
   description: string
+  date: string            // when this language entry was added/updated
   type: 'natural' | 'programming' | 'markup' | 'other'
   icon?: string
   color?: string
@@ -231,10 +233,11 @@ export interface LanguageInfo {
 }
 
 // Location represents physical/virtual space
-export interface Location {
+export interface Location extends Versionable {
   slug: string
   name: string
   description: string
+  date: string            // when this location entry was added/updated
   type: 'physical' | 'virtual' | 'hybrid'
   parent?: string         // e.g., "california" -> "united-states"
   coordinates?: [number, number] // latitude, longitude

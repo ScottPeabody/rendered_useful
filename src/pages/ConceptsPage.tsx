@@ -1,7 +1,7 @@
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Lightbulb, ChevronRight, Sparkles } from 'lucide-react'
-import { getAllConceptInfo, getConceptInfo, getConcept } from '../data/content'
+import { ArrowLeft, Lightbulb, ChevronRight, Sparkles, History } from 'lucide-react'
+import { getAllConceptInfo, getConceptInfo, getConcept, getConceptVersions } from '../data/content'
 import NotFoundPage from './NotFoundPage'
 
 // Individual concept view
@@ -12,6 +12,10 @@ function ConceptDetailView({ slug }: { slug: string }) {
   if (!conceptInfo || !concept) {
     return <NotFoundPage />
   }
+
+  // Get other versions if this concept is part of a version group
+  const versions = concept.versionGroup ? getConceptVersions(concept.versionGroup) : []
+  const hasMultipleVersions = versions.length > 1
 
   return (
     <div className="pt-24 pb-16">
@@ -44,15 +48,61 @@ function ConceptDetailView({ slug }: { slug: string }) {
               <h1 className="text-4xl font-bold text-[var(--color-text-primary)]">
                 {conceptInfo.name}
               </h1>
-              <span className="text-sm text-[var(--color-text-muted)]">
-                {conceptInfo.itemCount} {conceptInfo.itemCount === 1 ? 'item' : 'items'}
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-[var(--color-text-muted)]">
+                  {conceptInfo.itemCount} {conceptInfo.itemCount === 1 ? 'item' : 'items'}
+                </span>
+                {concept.version && (
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--color-accent-primary)]/10 text-[var(--color-accent-primary)]">
+                    v{concept.version}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
           
           <p className="text-lg text-[var(--color-text-secondary)]">
             {conceptInfo.description}
           </p>
+
+          {concept.versionNote && (
+            <p className="mt-2 text-sm text-[var(--color-text-muted)] italic">
+              {concept.versionNote}
+            </p>
+          )}
+
+          {/* Version history */}
+          {hasMultipleVersions && (
+            <div className="mt-6 p-4 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)]">
+              <h3 className="text-sm font-medium text-[var(--color-text-muted)] mb-3 flex items-center gap-2">
+                <History size={16} />
+                Version History
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {versions.map((v) => {
+                  const isActive = v.slug === slug
+                  return (
+                    <Link
+                      key={v.slug}
+                      to={`/concepts/${v.slug}`}
+                      className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                        isActive
+                          ? 'bg-[var(--color-accent-primary)]'
+                          : 'bg-[var(--color-surface-elevated)] border border-[var(--color-border)] hover:border-[var(--color-accent-primary)]/50'
+                      }`}
+                    >
+                      <span className={isActive ? 'text-white font-medium' : 'text-gray-200 hover:text-white'}>
+                        {v.version || v.name}
+                      </span>
+                      <span className={`ml-2 ${isActive ? 'text-white/70' : 'text-gray-400'}`}>
+                        {v.date.slice(0, 4)}
+                      </span>
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Related concepts */}
           {concept.related && concept.related.length > 0 && (
