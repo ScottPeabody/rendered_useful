@@ -158,6 +158,15 @@ export const concepts: Concept[] = [
     color: '#ec4899',
     related: ['version-control', 'content-systems'],
   },
+  {
+    slug: 'identity',
+    name: 'Identity',
+    description: 'Your corner of the platform. A space that evolves with you.',
+    date: '2026-01-14',
+    icon: '🪪',
+    color: '#6366f1',
+    related: ['space-as-context', 'temporal-modeling'],
+  },
 ]
 
 // Languages - linguistic space (natural and programming)
@@ -677,6 +686,23 @@ export const articles: Article[] = [
     concepts: ['space-as-context', 'version-control', 'temporal-modeling'],
     languages: ['typescript', 'mdx'],
     locations: ['github', 'the-web'],
+  },
+  // Personal spaces and feeds article
+  {
+    slug: 'personal-spaces-and-feeds',
+    title: 'Personal Spaces: Where Time Meets Identity',
+    description: 'Exploring how personal feeds, MDX posts, and customizable spaces could work within the Time and Space framework.',
+    author: 'scott-peabody',
+    date: '2026-01-15',
+    tags: ['architecture', 'philosophy', 'foundations', 'social'],
+    communities: ['rendered-useful'],
+    readingTime: 10,
+    featured: false,
+    series: 'platform-foundations',
+    seriesOrder: 5,
+    concepts: ['identity', 'space-as-context', 'temporal-modeling'],
+    languages: ['mdx'],
+    locations: ['the-web'],
   },
 ]
 
