@@ -1,0 +1,363 @@
+---
+title: "Your Corner of the Platform"
+slug: personal-spaces-and-feeds
+description: "Your corner of the platform. A space that evolves with you."
+date: "2026-01-15"
+author: speabody
+tags:
+  - architecture
+  - foundations
+series: foundations
+seriesOrder: 5
+concepts:
+  - identity
+  - space-as-context
+languages:
+  - mdx
+locations:
+  - the-web
+---
+
+# Personal Spaces: Your Corner of the Platform
+
+<Callout type="info">
+This article is part of the **Foundations** series. Here we explore what it would mean to give users their own spaces, complete with posts, themes, layouts, and the full expressive power of MDX.
+</Callout>
+
+## Beyond Articles and Projects
+
+We have Articles. We have Projects. Both are substantial, considered, edited. They take time to create and represent a certain level of commitment.
+
+But that's not always how thinking and sharing actually works.
+Ideas arrive half formed. Observations happen in passing. You stumble across something interesting and want to note it before the moment passes. A connection clicks and you need to sketch it out, not write a thesis about it.
+
+Right now, those moments have nowhere to go. They're too small for an Article, too informal for a Project. They fall through the cracks or end up on platforms that don't belong to you.
+
+What if they had a home?
+
+## The Post: A Third Content Type
+
+Imagine a content type that sits between a tweet and an article:
+
+| Dimension | Article | Post | Tweet |
+|-----------|---------|------|-------|
+| **Length** | Long-form | Any | Short |
+| **Formality** | Edited, structured | Casual, flexible | Ephemeral |
+| **Media** | Full MDX | Full MDX | Limited |
+| **Permanence** | Canonical | Archival | Disposable |
+
+A Post inherits everything that makes MDX powerful: interactive components, code blocks, diagrams, embedded demos. But it sheds the expectation of polish. A Post can be:
+
+- A question you're wrestling with
+- A code snippet that solved your problem
+- A half-baked idea you want to return to
+- A link with commentary
+- A reaction to something you read
+- A sketch, a draft, a fragment
+- Something funny you noticed in the wild
+
+The constraint isn't format. It's intent.
+
+## Your Own Space
+
+Every user has a **Space**. Not just a profile page, but a genuine space they inhabit and shape. This was the coolest part of MySpace on early social networks - a place that felt like yours.
+
+### Customization with Themes and Layouts
+
+We've already built [Themes](/articles/custom-themes-demo) and [Layouts](/articles/custom-layouts-demo) for articles. Those same systems could apply to personal spaces. They are modular, safe, and flexible. They are simple right now, but they will grow.
+
+Your space could have:
+- **A theme** you've chosen or created (colors, typography, mood)
+- **A layout** that reflects how you think (minimal, dense, visual, textual)
+- **Sections** you've arranged (about, feed, featured work, collections)
+
+When someone visits your space, they're not just seeing your content. They're seeing how you want to present yourself. The design is part of the expression.
+
+### What Goes in Your Space
+
+Your space becomes a container for everything you create:
+
+**Articles** you've written. The long-form, considered pieces that take time to craft.
+
+**Projects** you've built. The games, tools, experiments, and demos.
+
+**Posts** you've shared. The quick thoughts, snippets, questions, and observations.
+
+**Various Other Content Types** Things that do not yet exist in the platform but could in the future: journals, galleries, videos, music. We will extend the content model over time. You can use or not use them as you see fit.
+All of it lives in one place. All of it is yours.
+
+### Organizing Your Content
+
+Within your space, you control how things are organized:
+
+- **Pinned content**: What do you want visitors to see first?
+- **Collections**: Group related posts, articles, and projects together
+- **Timeline**: Your content in chronological order
+- **Featured work**: Highlight what you're most proud of
+
+You might pin a post introducing yourself. Create a collection around a topic you've been exploring. Feature the project you just finished. Archive the old stuff you don't want to delete but don't need front and center.
+
+## The Feed
+
+Your feed is the stream of posts in your space. It's where thoughts accumulate over time.
+
+### You Control the Order
+
+Chronological by default. But it's your feed, so you decide.
+
+Maybe you want newest first. Maybe you want to group posts by topic. Maybe you're telling a story and the order matters. You control the algorithm because there is no algorithm imposed on you.
+
+Options might include:
+
+- **Chronological**: Newest first, oldest scrolls down
+- **Reverse chronological**: Oldest first, for narratives that build
+- **Manual ordering**: Drag and drop, you decide what comes next
+- **By series**: Group related posts together
+
+No engagement optimization. No platform deciding what's "relevant." Your feed, your rules.
+
+### Multiple Feeds
+
+Why stop at one?
+
+Maybe you want separate streams for different parts of your thinking:
+
+- **Learning**: Your journey through new technologies, languages, concepts
+- **Building**: Updates on projects, experiments, works in progress
+- **Thinking**: Questions, observations, half-formed ideas
+- **Reading**: Links and commentary on things you've found interesting
+
+Each feed has its own page in your space. Each can have its own ordering rules. Visitors can browse the feed that interests them, or see everything combined.
+
+You might keep your learning feed chronological (the journey matters) while your building feed is organized by project. Your thinking feed might be manually ordered, with the ideas you're most excited about at the top.
+
+Some posts might appear in multiple feeds. A project update that taught you something new could live in both Building and Learning. You decide where things go.
+
+This isn't about complexity for its own sake. It's about giving shape to different modes of work. Not everyone needs multiple feeds. But if your space holds different kinds of thinking, you can organize it that way.
+
+### Full MDX Capabilities
+
+A post isn't just text. It's MDX. That means:
+
+```mdx
+Just figured out how to make this animation work:
+
+<Demo component="SpringAnimation" />
+
+The trick was using `useSpring` with the `config.gentle` preset 
+instead of trying to tune the physics manually.
+```
+
+Or:
+
+```mdx
+Working through this algorithm problem. Here's where I'm stuck:
+
+​```python
+def find_path(graph, start, end):
+    # This works for small graphs but blows up on large ones
+    # There has to be a better way...
+​```
+
+Anyone dealt with this before?
+```
+
+Posts can include code, diagrams, interactive components, embedded content. The same power you have in articles, available for quick thoughts.
+
+### Drafts and Visibility
+
+Not everything needs to be public:
+
+- **Draft**: Only you can see it. Work in progress.
+- **Public**: Anyone can see it. Shared with the world.
+- **Unlisted**: Accessible via link but not listed publicly.
+- **Private**: Only you and people you explicitly share with.
+
+Start something as a draft. Return to it later. Publish when ready, or don't. You control the visibility of each post.
+
+### Posts in Series
+
+Articles can be part of a series. Why not posts?
+
+Sometimes a thought unfolds over multiple posts. You're working through a problem, learning something new, building toward an insight. Those posts belong together.
+
+A series of posts might be:
+
+- **A learning journal**: "Week 1 with Rust", "Week 2 with Rust", etc.
+- **A project log**: Updates as you build something
+- **An evolving argument**: Thinking through a problem across multiple entries
+- **A tutorial broken into pieces**: Small digestible chunks that add up
+
+You set the series order. First post, second post, third. Readers can follow the sequence or jump in anywhere. The posts still appear in your feed, but they're also linked as a coherent whole.
+
+## Where Your Posts Can Go
+
+Your feed is yours. But posts don't have to stay there.
+
+### Future: Flowing Into Collective Feeds
+
+Right now, we're focused on personal spaces. But eventually, the platform might have community feeds, topic feeds, a general feed. When that happens, you'll control where your posts flow.
+
+For each post, you might choose:
+
+- **Your feed only**: Private to your space. Visitors see it, but it doesn't flow elsewhere.
+- **Community feeds**: Opt in to relevant communities. A post about Rust flows to the Rust community feed.
+- **Topic feeds**: Tag-based aggregation. Posts tagged `#gamedev` appear in the gamedev feed.
+- **General feed**: The firehose. Everything public, if you want maximum visibility.
+- **None of the above**: Your post, your choice. Keep it close or share it wide.
+
+The key: you decide. Each post can have different distribution. A quick note might stay in your space. A polished insight might flow everywhere. An experiment might go to one specific community.
+
+## Versioned Spaces
+
+Here's where it gets interesting.
+
+We've built [versioning into Concepts, Languages, and Locations](/articles/versioning-space-dimensions) because they change over time. But your space changes too.
+
+What if your space could have versions?
+
+Not a full redesign every time, but you can freeze your space at points in time - a theme, layout, pinned content, feed organization - and return to it later. You can experiment without losing what came before.
+
+## Aliases: More Than One Page
+
+One account. Multiple pages.
+
+Not everyone presents as a single unified identity. You might have different facets of who you are, different audiences you're speaking to, different contexts that don't mix well.
+
+An alias is a separate page under your account:
+
+- **@username-abc**: Your main space. Professional work, public-facing projects.
+- **@username-abc-learns**: Learning in public. Questions, mistakes, rough drafts. A space where you don't have to look polished.
+- **@nightowl**: Creative work under a pseudonym. Art, fiction, experiments that feel separate from your day job.
+
+Each alias gets its own:
+
+- **URL and identity**: A distinct page people can visit
+- **Theme and layout**: Different visual presentation for different contexts
+- **Feeds**: Separate streams of posts
+- **Visibility settings**: Maybe one alias is public, another is unlisted, maybe one is private, maybe one is limited to a select group.
+
+But they're all connected to one account. You manage them from one place. You can move content between aliases. You control which ones are publicly linked and which stay separate.
+
+### Why Multiple Pages?
+
+People are multifaceted. The work self, the learning self, the creative self. Forcing everything into one page can feel constraining.
+
+Some reasons you might want aliases:
+
+- **Context separation**: Keep your gamedev experiments separate from your professional consulting presence
+- **Audience separation**: Write for different groups without confusing either
+- **Pseudonymous work**: Create under a different name without losing account continuity
+- **Collaboration pages**: A shared alias for a project or team (future possibility)
+- **Archival**: An old alias preserved but no longer active
+
+This isn't about hiding or fragmenting identity. It's about giving you room to be more than one thing.
+
+### Linking or Not
+
+You control whether aliases are visibly connected:
+
+- **Linked**: Your main page lists your other aliases. Visitors can see they're all you.
+- **Unlinked**: The aliases appear independent. Only you know they share an account.
+- **Partially linked**: Some aliases reference each other, some don't.
+
+No judgment either way. Different situations call for different approaches.
+
+## Full Control: What You See and What Others See
+
+Most platforms make these decisions for you. They decide what shows up in your feed. They decide what information about you is visible. They optimize for engagement, not for you.
+
+Here, you control both directions.
+
+### What Others See About You
+
+You decide what's visible on your space:
+
+- **Profile information**: Name, bio, links. Show what you want, hide what you don't.
+- **Activity visibility**: Do visitors see when you last posted? When you were last active? Your choice.
+- **Content visibility**: Public, unlisted (accessible via link but not listed), or private (only you).
+- **Interaction visibility**: If we add reactions or comments later, you control whether those are visible.
+- **Connection visibility**: Who you follow, who follows you, whether that's anyone's business.
+
+Each piece of information is a separate toggle. You might show your bio but hide your activity. Show your public posts but keep your reading list private. It's not all-or-nothing.
+
+### What You See From Others
+
+You also control your incoming experience:
+
+- **Muting**: Don't want to see someone's posts? Mute them. They'll never know.
+- **Blocking**: Stronger boundary. They can't see your space, you can't see theirs.
+- **Filtering**: Hide posts with certain tags, topics, or keywords.
+- **Feed curation**: If collective feeds exist, you control what flows into your view.
+
+No algorithm decides you should see more of something because you lingered on it. No platform nudges you toward "engaging content." You build the experience you want.
+
+### The Principle
+
+Two simple rules:
+
+1. **Your space, your rules.** You control what's visible about you.
+2. **Your attention, your choice.** You control what reaches you.
+
+No dark patterns. No defaults designed to maximize platform metrics. No "are you sure?" when you try to protect your privacy. The controls exist, they're clear, and they work.
+
+This is what it means to own your corner of the platform.
+
+## What This Requires
+
+This isn't just a feature. It's an expansion of what the platform is.
+
+### Data Model
+
+```
+User (account)
+  ├── Privacy settings (outgoing)
+  │     ├── profile visibility (what to show/hide)
+  │     ├── activity visibility (last active, post frequency)
+  │     └── connection visibility (follows, followers)
+  ├── View settings (incoming)
+  │     ├── muted users
+  │     ├── blocked users
+  │     ├── filtered tags/topics
+  │     └── feed preferences
+  └── Aliases (one or many)
+        └── Space (versionable, per alias)
+              ├── Theme
+              ├── Layout  
+              ├── Sections
+              ├── Feeds (one or many, each with own settings)
+              │     ├── name, slug
+              │     ├── ordering (chronological, manual, by series)
+              │     └── visibility
+              ├── Alias settings
+              │     ├── linked (visible connection to other aliases)
+              │     └── visibility (public, unlisted)
+              └── Content
+                    ├── Articles (existing)
+                    ├── Projects (existing)
+                    └── Posts (new)
+                          ├── MDX content
+                          ├── timestamp
+                          ├── visibility (draft, public, unlisted)
+                          ├── concepts, languages, locations
+                          ├── series, seriesOrder
+                          ├── feeds (which of your feeds this appears in)
+                          ├── distribution (external feeds to flow into)
+                          └── pinned, collection, manualOrder, etc.
+```
+
+### Theme and Layout Application
+
+We already have theme and layout systems. Extending them to spaces means:
+
+- Themes apply to the entire space, not just individual articles
+- Layouts define how the space is structured (sidebar, grid, timeline)
+- Users can preview changes before publishing
+- Version history tracks theme/layout changes alongside content
+
+
+<Callout type="warning">
+**Status: Exploration**
+
+This article describes possibilities, not plans. The ideas here are meant to explore what personal spaces could mean. Next I will implement prototypes to test these concepts in practice.
+</Callout>
