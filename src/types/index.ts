@@ -265,3 +265,117 @@ export interface LocationInfo {
     author: string
   }>
 }
+
+// ============================================
+// PERSONAL SPACES: Posts, Feeds, Spaces
+// ============================================
+
+// Post: A lightweight content type between a tweet and an article
+export interface Post extends Versionable {
+  slug: string
+  title?: string          // optional - posts can be untitled
+  content: string         // MDX content (for data-defined posts) or path to MDX file
+  author: string          // author slug
+  alias?: string          // alias slug (if posted under an alias)
+  date: string            // ISO 8601 timestamp
+  tags?: string[]
+  concepts?: string[]     // concept slugs
+  languages?: string[]    // language slugs
+  locations?: string[]    // location slugs
+  
+  // Organization
+  series?: string         // series slug
+  seriesOrder?: number    // position in series
+  feeds?: string[]        // which of the author's feeds this appears in
+  pinned?: boolean        // pinned to top of feed
+  manualOrder?: number    // for manual feed ordering
+  
+  // Visibility & Distribution
+  visibility: 'draft' | 'public' | 'unlisted'
+  distribution?: string[] // external feeds to flow into (future: community feeds, topic feeds)
+}
+
+export interface PostInfo {
+  slug: string
+  title?: string
+  excerpt: string         // first ~200 chars of content
+  author: string
+  alias?: string          // alias slug (if posted under an alias)
+  date: string
+  tags?: string[]
+  visibility: 'draft' | 'public' | 'unlisted'
+  pinned?: boolean
+  series?: string
+  seriesOrder?: number
+}
+
+// Feed: A named collection of posts with its own ordering rules
+export interface Feed {
+  slug: string
+  name: string
+  description?: string
+  author: string          // author slug (owner of this feed)
+  alias?: string          // alias slug (if this feed belongs to an alias)
+  ordering: 'chronological' | 'reverse-chronological' | 'manual' | 'by-series'
+  visibility: 'public' | 'unlisted' | 'private'
+  icon?: string
+  color?: string
+}
+
+export interface FeedInfo extends Feed {
+  postCount: number
+  posts: PostInfo[]
+}
+
+// Space: A user's customizable page
+export interface Space extends Versionable {
+  author: string          // author slug
+  alias?: string          // alias slug (if this is an alias space)
+  theme?: string          // theme slug
+  layout?: string         // layout slug
+  bio?: string            // space-specific bio (can differ from author bio)
+  pinnedContent?: Array<{
+    type: 'article' | 'project' | 'post'
+    slug: string
+  }>
+  sections?: string[]     // ordered list of sections to show: 'feed', 'articles', 'projects', 'about'
+  feeds?: string[]        // which feeds to show (if multiple)
+  defaultFeed?: string    // which feed to show by default
+}
+
+// Alias: An alternate identity under the same account
+export interface Alias {
+  slug: string            // unique alias identifier
+  author: string          // parent author slug
+  displayName: string
+  avatar?: string
+  bio?: string
+  linkedToMain: boolean   // whether this alias is publicly connected to main identity
+  visibility: 'public' | 'unlisted'
+  createdDate: string
+}
+
+// Privacy settings: What others see about you
+export interface PrivacySettings {
+  showActivity: boolean           // show last active / post frequency
+  showConnections: boolean        // show followers/following (future)
+  showReadingList: boolean        // show what you've bookmarked (future)
+  defaultPostVisibility: 'draft' | 'public' | 'unlisted'
+}
+
+// View settings: What you see from others
+export interface ViewSettings {
+  mutedUsers: string[]            // author slugs
+  blockedUsers: string[]          // author slugs
+  filteredTags: string[]          // tags to hide
+  filteredConcepts: string[]      // concepts to hide
+}
+
+// Extended author with space features
+export interface AuthorWithSpace extends Author {
+  space?: Space
+  feeds?: Feed[]
+  aliases?: Alias[]
+  privacy?: PrivacySettings
+  viewSettings?: ViewSettings
+}

@@ -1,21 +1,23 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Search, Moon, Sun, Command, Github, ChevronDown, Lightbulb, Languages, MapPin } from 'lucide-react'
+import { Menu, X, Search, Moon, Sun, Command, Github, ChevronDown, Lightbulb, Languages, MapPin, Calendar, Users, BookOpen } from 'lucide-react'
 import { useTheme } from '../../context/ThemeContext'
 import { useSearchStore } from '../../store'
 import { useLayoutContext } from '../../hooks/useLayoutContext'
 
+// Primary nav items - always visible
 const navItems = [
   { label: 'Home', href: '/' },
   { label: 'Projects', href: '/projects' },
   { label: 'Articles', href: '/articles' },
-  { label: 'Series', href: '/series' },
-  { label: 'Events', href: '/events' },
-  { label: 'Communities', href: '/communities' },
 ]
 
-const spaceItems = [
+// Explore dropdown - content discovery and dimensional navigation
+const exploreItems = [
+  { label: 'Series', href: '/series', icon: BookOpen, description: 'Multi-part article collections' },
+  { label: 'Events', href: '/events', icon: Calendar, description: 'Upcoming and past events' },
+  { label: 'Communities', href: '/communities', icon: Users, description: 'Groups and shared interests' },
   { label: 'Concepts', href: '/concepts', icon: Lightbulb, description: 'Explore the landscape of ideas' },
   { label: 'Languages', href: '/languages', icon: Languages, description: 'Navigate linguistic space' },
   { label: 'Locations', href: '/locations', icon: MapPin, description: 'Physical and virtual places' },
@@ -29,8 +31,8 @@ const moreItems = [
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [isSpaceDropdownOpen, setIsSpaceDropdownOpen] = useState(false)
-  const spaceDropdownRef = useRef<HTMLDivElement>(null)
+  const [isExploreDropdownOpen, setIsExploreDropdownOpen] = useState(false)
+  const exploreDropdownRef = useRef<HTMLDivElement>(null)
   const { resolvedTheme, toggleTheme } = useTheme()
   const { openSearch } = useSearchStore()
   const location = useLocation()
@@ -50,14 +52,14 @@ export default function Navbar() {
   // Close mobile menu on route change
   useEffect(() => {
     setIsMobileMenuOpen(false) // eslint-disable-line react-hooks/set-state-in-effect
-    setIsSpaceDropdownOpen(false)
+    setIsExploreDropdownOpen(false)
   }, [location])
 
-  // Close space dropdown when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (spaceDropdownRef.current && !spaceDropdownRef.current.contains(event.target as Node)) {
-        setIsSpaceDropdownOpen(false)
+      if (exploreDropdownRef.current && !exploreDropdownRef.current.contains(event.target as Node)) {
+        setIsExploreDropdownOpen(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -109,7 +111,7 @@ export default function Navbar() {
     ? navItems.filter(item => ['/', '/articles', '/projects'].includes(item.href))
     : navItems
 
-  const isSpaceActive = spaceItems.some(item => location.pathname.startsWith(item.href))
+  const isExploreActive = exploreItems.some(item => location.pathname.startsWith(item.href))
 
   return (
     <header className={getHeaderClasses()}>
@@ -141,23 +143,23 @@ export default function Navbar() {
               </Link>
             ))}
 
-            {/* Space Dropdown */}
+            {/* Explore Dropdown */}
             {navbarStyle !== 'minimal' && (
-              <div ref={spaceDropdownRef} className="relative">
+              <div ref={exploreDropdownRef} className="relative">
                 <button
-                  onClick={() => setIsSpaceDropdownOpen(!isSpaceDropdownOpen)}
+                  onClick={() => setIsExploreDropdownOpen(!isExploreDropdownOpen)}
                   className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                    isSpaceActive
+                    isExploreActive
                       ? 'text-[var(--color-accent-primary)] bg-[var(--color-accent-primary)]/10'
                       : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]'
                   }`}
                 >
-                  Space
-                  <ChevronDown size={14} className={`transition-transform ${isSpaceDropdownOpen ? 'rotate-180' : ''}`} />
+                  Explore
+                  <ChevronDown size={14} className={`transition-transform ${isExploreDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 <AnimatePresence>
-                  {isSpaceDropdownOpen && (
+                  {isExploreDropdownOpen && (
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -166,7 +168,7 @@ export default function Navbar() {
                       className="absolute top-full left-0 mt-2 w-64 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-lg overflow-hidden z-50"
                     >
                       <div className="p-2">
-                        {spaceItems.map((item) => (
+                        {exploreItems.map((item) => (
                           <Link
                             key={item.href}
                             to={item.href}
@@ -285,12 +287,12 @@ export default function Navbar() {
                 </Link>
               ))}
               
-              {/* Space Section */}
+              {/* Explore Section */}
               <div className="pt-2 border-t border-[var(--color-border)]">
                 <div className="px-4 py-2 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">
-                  Space
+                  Explore
                 </div>
-                {spaceItems.map((item) => (
+                {exploreItems.map((item) => (
                   <Link
                     key={item.href}
                     to={item.href}
