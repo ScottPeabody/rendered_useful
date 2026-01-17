@@ -1,9 +1,9 @@
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, MapPin, Calendar, Github, Twitter, Globe, Linkedin, BookOpen, Folder } from 'lucide-react'
+import { ArrowLeft, MapPin, Calendar, Github, Twitter, Globe, Linkedin, BookOpen, Folder, Archive, Sparkles } from 'lucide-react'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
-import { getAuthor, getArticlesByAuthor, getProjectsByAuthor } from '../data/content'
+import { getAuthor, getArticlesByAuthor, getProjectsByAuthor, getSpacesByAuthor } from '../data/content'
 import { formatDate } from '../lib/time'
 import NotFoundPage from './NotFoundPage'
 
@@ -12,6 +12,7 @@ export default function AuthorPage() {
   const author = slug ? getAuthor(slug) : undefined
   const articles = author ? getArticlesByAuthor(author.slug) : []
   const projects = author ? getProjectsByAuthor(author.slug) : []
+  const authorSpaces = author ? getSpacesByAuthor(author.slug) : []
 
   if (!author) {
     return <NotFoundPage />
@@ -133,6 +134,63 @@ export default function AuthorPage() {
             </div>
           </div>
         </motion.div>
+
+        {/* Spaces */}
+        {authorSpaces.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="mb-12"
+          >
+            <h2 className="text-2xl font-bold text-[var(--color-text-primary)] mb-6 flex items-center gap-2">
+              <Archive size={24} />
+              Spaces
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {authorSpaces.map((space) => {
+                const spaceLink = space.alias 
+                  ? `/@${space.alias}` 
+                  : `/@${author.slug}`
+                const spaceName = space.alias || author.name
+                const spaceBio = space.bio || author.bio
+                const isMainSpace = !space.alias
+                
+                return (
+                  <Link
+                    key={space.alias || 'main'}
+                    to={spaceLink}
+                    className="group relative p-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-accent-primary)]/50 hover:bg-[var(--color-surface-elevated)] transition-all"
+                  >
+                    {isMainSpace && (
+                      <div className="absolute top-3 right-3 px-2 py-1 text-xs font-medium bg-[var(--color-accent-primary)] text-white rounded-full">
+                        Main
+                      </div>
+                    )}
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-[var(--color-accent-primary)]/10 flex items-center justify-center text-[var(--color-accent-primary)]">
+                        {space.alias ? <Sparkles size={24} /> : <Archive size={24} />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-accent-primary)] transition-colors truncate">
+                          {spaceName}
+                        </h3>
+                        <p className="text-sm text-[var(--color-text-muted)] mt-1 line-clamp-2">
+                          {spaceBio}
+                        </p>
+                        <div className="flex items-center gap-2 mt-3 text-xs text-[var(--color-text-muted)]">
+                          <span>{space.sections?.length || 0} sections</span>
+                          <span>•</span>
+                          <span>{space.feeds?.length || 0} feeds</span>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          </motion.section>
+        )}
 
         {/* Articles */}
         {articles.length > 0 && (

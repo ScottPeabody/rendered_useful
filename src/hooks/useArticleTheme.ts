@@ -20,11 +20,7 @@ export function useArticleTheme({ theme, customVariables }: UseArticleThemeOptio
     const preset = theme ? getTheme(theme) : undefined
     const variables = customVariables || preset?.variables
 
-    if (!variables && !preset?.forcedMode) {
-      return
-    }
-
-    // Clean up any previously applied values before applying new ones
+    // Clean up any previously applied values before applying new ones (or if no theme)
     if (hasApplied.current) {
       for (const [key, value] of originalValues.current.entries()) {
         if (value) {
@@ -39,6 +35,12 @@ export function useArticleTheme({ theme, customVariables }: UseArticleThemeOptio
         root.classList.remove('dark', 'light')
         root.classList.add(originalClass.current)
       }
+      hasApplied.current = false
+    }
+
+    // If no theme to apply, we're done (cleanup already happened above)
+    if (!variables && !preset?.forcedMode) {
+      return
     }
 
     // Store original class for mode restoration

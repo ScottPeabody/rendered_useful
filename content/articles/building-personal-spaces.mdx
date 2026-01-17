@@ -1,0 +1,326 @@
+---
+title: "Building Personal Spaces: Identity and Aliases"
+description: "How I built the personal spaces feature for rendered_useful, enabling authors to have their own feeds, themes, and even alternate identities."
+date: "2026-01-16"
+author: "scott-peabody"
+tags: ["react", "typescript", "features", "design", "open-source"]
+featured: true
+readingTime: 10
+---
+
+import { Callout } from '@/components/mdx'
+
+When I wrote about [building open platforms](/articles/building-open-platforms), I talked about the magic of early social media—how platforms felt like tools *you* controlled. Personal spaces is my attempt to bring some of that back.
+
+The idea is simple: give every contributor their own corner of the platform. A place where they can post updates, organize their work into feeds, and express themselves with custom themes and layouts.
+
+## Navigation Changes
+
+This feature required rethinking how we organize the site. Previously, "Space" was a navbar item that grouped various discovery features. But now "Spaces" means something specific: personal spaces for contributors. Using the same word for two different concepts would be confusing.
+
+So I moved those discovery features under **Explore** and repurposed the concept. Now "Spaces" refers exclusively to personal spaces, and you find them through contributor profiles. When you visit an author's page, you see a **Spaces** section showing all their spaces—both their main identity and any aliases.
+
+This makes the mental model cleaner: Explore is for discovering content, Spaces are where users can curate and manage their own content.
+
+## The Vision
+
+I wanted something between Twitter and a full blog. Posts can be quick thoughts, code snippets, or longer reflections. You organize them into feeds (like "Building", "Learning", "Thinking") rather than dumping everything into one timeline. And you have control over how your space looks and feels.
+
+<Callout type="info" title="Try It">
+  Visit [/@scott-peabody](/@scott-peabody) to see my personal space, or [/@pixel-wizard](/@pixel-wizard) to see an alias with a completely different theme and content.
+</Callout>
+
+## Data Model
+
+The foundation is three new types: `Space`, `Feed`, and `Post`.
+
+```typescript
+interface Space {
+  author: string           // links to Author
+  alias?: string           // alternate identity (e.g., "pixel-wizard")
+  bio?: string             // custom bio for this space
+  theme?: string           // custom theme preset
+  layout?: string          // custom layout preset
+  pinnedContent: PinnedItem[]
+  sections: SpaceSection[] // what to show: feed, articles, projects
+  feeds: string[]          // which feeds are visible
+  defaultFeed: string      // which feed loads first
+}
+
+interface Feed {
+  slug: string
+  name: string
+  description?: string
+  author: string
+  alias?: string           // associate feed with specific alias
+  ordering: 'chronological' | 'reverse-chronological' | 'manual'
+  visibility: 'draft' | 'public' | 'unlisted'
+  icon?: string
+  color?: string
+}
+
+interface Post {
+  slug: string
+  title?: string           // optional - posts can be untitled
+  content: string
+  author: string
+  alias?: string           // associate post with specific alias
+  date: string
+  tags?: string[]
+  feeds: string[]          // which feeds this post appears in
+  visibility: 'draft' | 'public' | 'unlisted'
+  pinned?: boolean
+}
+```
+
+The `alias` field is the key innovation here. It lets a single author have multiple identities, each with their own content, feeds, theme, and layout. More on that later.
+
+## Feeds: Better Than Algorithms
+
+Most platforms either show you everything chronologically (overwhelming) or use an algorithm to decide what you see (opaque and manipulative). Feeds are a middle ground.
+
+You organize your own content into categories. Readers can follow the feeds they care about. No algorithm deciding what's "relevant"—just transparent, user-controlled organization.
+
+```typescript
+const feeds: Feed[] = [
+  {
+    slug: 'main',
+    name: 'Main Feed',
+    description: 'The everything feed',
+    author: 'scott-peabody',
+    ordering: 'chronological',
+    icon: '📝',
+  },
+  {
+    slug: 'building',
+    name: 'Building',
+    description: 'What I\'m working on',
+    author: 'scott-peabody',
+    ordering: 'chronological',
+    icon: '🔨',
+  },
+  {
+    slug: 'thinking',
+    name: 'Thinking',
+    description: 'Ideas and reflections',
+    author: 'scott-peabody',
+    ordering: 'chronological',
+    icon: '💭',
+  },
+]
+```
+
+A post can appear in multiple feeds. A quick update about a project might go in both "Building" and "Main". A philosophical tangent goes in "Thinking". Users can browse what interests them.
+
+## The Alias System
+
+Here's where it gets interesting. What if you want to write about things that don't fit your main identity? What if you have a side project, a hobby, or just a different voice you want to explore?
+
+Aliases let you create alternate identities under the same author account. Each alias can have:
+
+- Its own bio
+- Its own theme and layout
+- Its own feeds and posts
+- A completely different URL (`/@pixel-wizard` instead of `/@scott-peabody`)
+
+```typescript
+// Main space
+{
+  author: 'scott-peabody',
+  theme: undefined,        // uses default
+  layout: undefined,       // uses default
+  feeds: ['main', 'building', 'thinking'],
+}
+
+// Alias space
+{
+  author: 'scott-peabody',
+  alias: 'pixel-wizard',
+  bio: 'Retro game enthusiast and pixel art dabbler.',
+  theme: 'terminal',       // green-on-black hacker aesthetic
+  layout: 'minimal',       // clean, distraction-free
+  feeds: ['gamedev'],
+}
+```
+
+The content is completely separate. Posts with `alias: 'pixel-wizard'` only appear in the pixel-wizard space. The main space only shows posts without an alias.
+
+<Callout type="tip" title="Why Aliases?">
+  People are multifaceted. Your professional identity might not be the right place for your gamedev experiments or creative writing. Aliases let you be all of yourself without compromising any part.
+</Callout>
+
+## Themes: Make It Yours
+
+Personal spaces support the same theme system we built for articles. Each space can specify a theme preset that changes colors, typography, and mood.
+
+```typescript
+// Available themes
+const themes = {
+  cyberpunk: { /* neon pink and cyan */ },
+  terminal: { /* green on black */ },
+  retro: { /* warm amber CRT */ },
+  ocean: { /* calm blues */ },
+  paper: { /* warm white, sepia */ },
+  sunset: { /* orange and purple */ },
+}
+```
+
+The implementation uses CSS custom properties. When you visit a space with a custom theme, we apply the theme's values to CSS variables:
+
+```typescript
+function useArticleTheme(themeName?: string) {
+  useEffect(() => {
+    if (!themeName) {
+      // Clean up any previous theme
+      resetCssVariables()
+      return
+    }
+    
+    const theme = themes[themeName]
+    if (theme) {
+      // Apply theme colors to CSS variables
+      Object.entries(theme.colors).forEach(([key, value]) => {
+        document.documentElement.style.setProperty(`--color-${key}`, value)
+      })
+    }
+    
+    return () => resetCssVariables() // cleanup on unmount
+  }, [themeName])
+}
+```
+
+The tricky part was cleanup. If you visit `/@pixel-wizard` (terminal theme) and then navigate to `/@scott-peabody` (default theme), we need to restore the original values. The hook stores original values before applying theme changes and restores them on cleanup.
+
+## Layouts: Structure Matters
+
+Beyond colors, spaces can also choose a layout preset that controls page structure:
+
+| Layout | Content Width | Best For |
+|--------|---------------|----------|
+| default | standard | general purpose |
+| minimal | narrow | clean reading |
+| docs | wide + TOC | tutorials |
+| showcase | full width | visual projects |
+| immersive | wide, hidden nav | focused reading |
+| centered | narrow, elegant | essays |
+
+```typescript
+const layouts = {
+  minimal: {
+    options: {
+      contentWidth: 'narrow',
+      headerStyle: 'minimal',
+      showAuthor: false,
+      showReadingTime: false,
+      showRelatedArticles: false,
+      navbarStyle: 'minimal',
+      verticalSpacing: 'relaxed',
+    },
+  },
+  // ...
+}
+```
+
+This is constrained customization. Users can't inject arbitrary CSS or HTML (that's how MySpace became a security nightmare), but they can meaningfully change how their space looks and feels.
+
+## Routing and Resolution
+
+Personal spaces live at `/@username` and `/@alias`. The routing needs to:
+
+1. Check if the slug is a direct author username
+2. If not, check if it's an alias for any space
+3. Load the appropriate space configuration
+4. Filter content to only show that space's posts and feeds
+
+```typescript
+function SpacePage() {
+  const { username } = useParams()
+  
+  // First try direct author match
+  let author = getAuthorBySlug(username)
+  let space = author ? getSpaceByAuthor(username) : null
+  let currentAlias: string | undefined
+  
+  // If no direct match, check for alias
+  if (!space) {
+    space = getSpaceByAlias(username)
+    if (space) {
+      author = getAuthorBySlug(space.author)
+      currentAlias = space.alias
+    }
+  }
+  
+  // Get content filtered by alias
+  const spaceContent = getSpaceWithContent(space.author, currentAlias)
+  
+  // Apply theme
+  useArticleTheme(space.theme)
+  
+  // ...render
+}
+```
+
+The `currentAlias` parameter flows through all the content helper functions, ensuring that alias spaces only see their own content.
+
+## Content Filtering
+
+This was the trickiest part to get right. When you're on `/@scott-peabody`, you should only see posts *without* an alias. When you're on `/@pixel-wizard`, you should only see posts *with* that specific alias.
+
+```typescript
+function getPostsByAuthor(authorSlug: string, alias?: string): Post[] {
+  let authorPosts = posts.filter((p) => p.author === authorSlug)
+  
+  if (alias) {
+    // Alias space: only posts with this alias
+    authorPosts = authorPosts.filter((p) => p.alias === alias)
+  } else {
+    // Main space: only posts WITHOUT an alias
+    authorPosts = authorPosts.filter((p) => !p.alias)
+  }
+  
+  return authorPosts
+}
+```
+
+The same pattern applies to feeds, recent posts, and all other content queries. The alias is like a namespace that keeps content separate.
+
+## What's Next
+
+Personal spaces is live, but this is very much a first draft and there are many rough edges.
+
+### More Robust Defaults
+
+The current theme and layout presets are pretty basic. Six themes, six layouts—enough to prove the concept, but not enough for real variety. I want to expand both:
+
+**Themes**: The existing themes (terminal, cyberpunk, retro, ocean, paper, sunset) only vary colors. Future themes should explore:
+- Typography choices (serif vs sans, monospace options)
+- Spacing and density preferences
+- Animation and interaction styles
+- Light mode variants for each theme
+
+**Layouts**: The current layouts are simple configuration objects. They need more nuance:
+- Better responsive behavior at different breakpoints
+- More granular control over spacing and margins
+- Support for sidebars, multi-column layouts
+- Proper TOC implementations that actually work
+
+### Safe Arbitrary Customization
+
+The ultimate goal is letting users define their own themes and layouts—but safely. This is the hard problem that killed MySpace customization. Raw CSS and HTML injection is a security nightmare.
+
+I'm thinking about approaches like:
+- **A theme builder UI** that only exposes safe properties
+- **CSS-in-JSON schemas** that validate before applying
+- **Content Security Policies** that limit what custom styles can do
+
+The key insight is that most customization needs can be met with a well-designed set of variables.
+
+### Foundational Work
+
+This feature laid groundwork for future enhancements.
+
+I am nearing the point where I can start to support user accounts and authentication. Personal spaces are a natural fit for logged-in users to manage their own content. But I really need to think through this carefully to avoid the pitfalls of early social media. This is that point where platforms either empower users or exploit them.
+
+---
+
+*Want to see the code? Check out [/@pixel-wizard](/@pixel-wizard) to see an alias in action, or browse the [source on GitHub](https://github.com/ScottPeabody/rendered_useful).*

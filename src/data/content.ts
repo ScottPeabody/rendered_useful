@@ -1,4 +1,4 @@
-import type { Author, Article, Project, TagInfo, Community, CommunityInfo, Series, SeriesInfo, Event, EventInfo, VersionInfo, Versionable, Concept, ConceptInfo, Language, LanguageInfo, Location, LocationInfo } from '../types'
+import type { Author, Article, Project, TagInfo, Community, CommunityInfo, Series, SeriesInfo, Event, EventInfo, VersionInfo, Versionable, Concept, ConceptInfo, Language, LanguageInfo, Location, LocationInfo, Post, PostInfo, Feed, FeedInfo, Space } from '../types'
 import { compareDates, getEventStatus } from '../lib/time'
 
 // ============================================
@@ -560,6 +560,19 @@ export const articles: Article[] = [
     languages: ['english'],
   },
   {
+    slug: 'building-personal-spaces',
+    title: 'Building Personal Spaces: Identity and Aliases',
+    description: 'How I built the personal spaces feature for rendered_useful, enabling authors to have their own feeds, themes, and even alternate identities.',
+    author: 'scott-peabody',
+    date: '2026-01-16',
+    tags: ['react', 'typescript', 'features', 'design', 'open-source'],
+    communities: ['rendered-useful', 'opensource'],
+    readingTime: 10,
+    featured: true,
+    concepts: ['platform-architecture', 'identity', 'content-systems'],
+    languages: ['typescript', 'english'],
+  },
+  {
     slug: 'custom-themes-demo',
     title: 'Custom Themes System',
     description: 'Demonstrating the custom theme system that allows articles to completely override the site\'s visual style.',
@@ -690,7 +703,7 @@ export const articles: Article[] = [
   // Personal spaces and feeds article
   {
     slug: 'personal-spaces-and-feeds',
-    title: 'Personal Spaces: Where Time Meets Identity',
+    title: 'Personal Spaces: Your Corner of the Platform',
     description: 'Exploring how personal feeds, MDX posts, and customizable spaces could work within the Time and Space framework.',
     author: 'scott-peabody',
     date: '2026-01-15',
@@ -754,6 +767,257 @@ export const projects: Project[] = [
     concepts: ['game-development'],
     languages: ['typescript', 'english'],
     locations: ['github', 'the-web'],
+  },
+]
+
+// ============================================
+// PERSONAL SPACES: Posts, Feeds, Spaces
+// ============================================
+
+// Feeds - named collections of posts with ordering rules
+export const feeds: Feed[] = [
+  {
+    slug: 'main',
+    name: 'Main Feed',
+    description: 'All posts in chronological order',
+    author: 'scott-peabody',
+    ordering: 'chronological',
+    visibility: 'public',
+  },
+  {
+    slug: 'building',
+    name: 'Building',
+    description: 'Updates on projects and experiments',
+    author: 'scott-peabody',
+    ordering: 'chronological',
+    visibility: 'public',
+    icon: '🔨',
+    color: '#f59e0b',
+  },
+  {
+    slug: 'thinking',
+    name: 'Thinking',
+    description: 'Questions, observations, and half-formed ideas',
+    author: 'scott-peabody',
+    ordering: 'chronological',
+    visibility: 'public',
+    icon: '💭',
+    color: '#8b5cf6',
+  },
+  {
+    slug: 'gamedev',
+    name: 'Game Dev',
+    description: 'Retro games, pixel art, and coding experiments',
+    author: 'scott-peabody',
+    alias: 'pixel-wizard',
+    ordering: 'chronological',
+    visibility: 'public',
+    icon: '🎮',
+    color: '#00ff00',
+  },
+]
+
+// Posts - lightweight content between tweets and articles
+export const posts: Post[] = [
+  {
+    slug: 'hello-world',
+    title: 'Hello, World',
+    content: `This is my first post. Testing out the new personal spaces feature.
+
+Posts are like articles, but lighter. They don't need to be polished. They can be:
+- A quick thought
+- A code snippet
+- A question I'm wrestling with
+- A link with commentary
+
+Let's see how this goes.`,
+    author: 'scott-peabody',
+    date: '2026-01-16T10:00:00Z',
+    tags: ['meta'],
+    concepts: ['identity'],
+    feeds: ['main'],
+    visibility: 'public',
+    pinned: true,
+  },
+  {
+    slug: 'working-on-spaces',
+    title: 'Building Personal Spaces',
+    content: `Started implementing the personal spaces feature today. The idea is simple: give everyone their own corner of the platform.
+
+\`\`\`typescript
+interface Post {
+  slug: string
+  title?: string  // optional - posts can be untitled
+  content: string
+  visibility: 'draft' | 'public' | 'unlisted'
+  // ...
+}
+\`\`\`
+
+The interesting part is how feeds work. You can have multiple feeds (Building, Learning, Thinking) and each post can appear in one or more of them.`,
+    author: 'scott-peabody',
+    date: '2026-01-16T14:30:00Z',
+    tags: ['building', 'architecture'],
+    concepts: ['identity', 'platform-architecture'],
+    languages: ['typescript'],
+    feeds: ['main', 'building'],
+    visibility: 'public',
+  },
+  {
+    slug: 'feed-ordering',
+    content: `Question I'm working through: should feeds default to chronological or let users pick?
+
+Chronological is simple and honest. No algorithm deciding what's "relevant."
+
+But sometimes order matters. A learning journal reads better oldest-first. A project log might want pinned posts at the top.
+
+Current thinking: chronological by default, but you control the algorithm. Your feed, your rules.`,
+    author: 'scott-peabody',
+    date: '2026-01-16T16:45:00Z',
+    tags: ['thinking', 'design'],
+    concepts: ['identity'],
+    feeds: ['main', 'thinking'],
+    visibility: 'public',
+  },
+  // pixel-wizard gamedev posts
+  {
+    slug: 'gamedev-journey',
+    title: '> INIT GAMEDEV.EXE',
+    content: `Welcome to my gamedev corner. This is where I dump experiments, half-baked ideas, and pixel art disasters.
+
+\`\`\`
+████████████████████████████████
+█  PIXEL WIZARD'S GAME LAB    █
+█  ========================   █
+█  [1] Current Projects       █
+█  [2] Devlogs               █
+█  [3] Pixel Art             █
+█  [4] Exit                  █
+████████████████████████████████
+\`\`\`
+
+Currently obsessed with: recreating classic games in modern frameworks.`,
+    author: 'scott-peabody',
+    alias: 'pixel-wizard',
+    date: '2026-01-15T09:00:00Z',
+    tags: ['gamedev', 'intro'],
+    concepts: ['game-development'],
+    feeds: ['gamedev'],
+    visibility: 'public',
+    pinned: true,
+  },
+  {
+    slug: 'tetris-collision-deep-dive',
+    title: 'Collision Detection: The Hard Way',
+    content: `Spent 3 hours debugging why pieces were clipping through walls. Turns out I was checking collision AFTER moving, not before.
+
+\`\`\`typescript
+// WRONG - check after move
+piece.y += 1
+if (checkCollision(piece, board)) {
+  piece.y -= 1  // too late, damage done
+}
+
+// RIGHT - check before move
+if (!checkCollision({...piece, y: piece.y + 1}, board)) {
+  piece.y += 1
+}
+\`\`\`
+
+Lesson learned: always simulate the move first, then commit if safe.
+
+> "The bug is never where you think it is." - Ancient Proverb`,
+    author: 'scott-peabody',
+    alias: 'pixel-wizard',
+    date: '2026-01-15T14:20:00Z',
+    tags: ['gamedev', 'tetris', 'debugging'],
+    concepts: ['collision-detection', 'game-loops'],
+    languages: ['typescript'],
+    feeds: ['gamedev'],
+    visibility: 'public',
+  },
+  {
+    slug: 'pixel-art-process',
+    title: '8x8 Character Sprites',
+    content: `Working on a tiny sprite sheet. Constraints breed creativity.
+
+\`\`\`
+Frame 1:    Frame 2:    Frame 3:
+  ██          ██          ██  
+ ████       ████        ████ 
+  ██          ██          ██  
+ ████       █  █        ████ 
+ █  █       █  █         ██  
+ █  █        ██         █  █ 
+\`\`\`
+
+At 8x8, every pixel matters. You can't hide behind detail - it's all about silhouette and animation.
+
+Tools: Aseprite + way too much coffee.`,
+    author: 'scott-peabody',
+    alias: 'pixel-wizard',
+    date: '2026-01-16T11:00:00Z',
+    tags: ['pixel-art', 'gamedev', 'art'],
+    concepts: ['game-development'],
+    feeds: ['gamedev'],
+    visibility: 'public',
+  },
+  {
+    slug: 'rubiks-cube-render',
+    title: 'Rendering a 3D Cube in CSS',
+    content: `Can you build a working Rubik's cube with just CSS transforms? Yes. Should you? ...also yes.
+
+\`\`\`css
+.cube-face {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  transform-style: preserve-3d;
+}
+
+.front  { transform: translateZ(75px); }
+.back   { transform: rotateY(180deg) translateZ(75px); }
+.right  { transform: rotateY(90deg) translateZ(75px); }
+// ...
+\`\`\`
+
+The math for rotation animations was... intense. But seeing those faces actually rotate around the correct axis? *chef's kiss*`,
+    author: 'scott-peabody',
+    alias: 'pixel-wizard',
+    date: '2026-01-16T15:30:00Z',
+    tags: ['gamedev', 'css', '3d'],
+    concepts: ['3d-graphics', 'game-development'],
+    languages: ['typescript'],
+    feeds: ['gamedev'],
+    visibility: 'public',
+  },
+]
+
+// Spaces - user customization for their page
+export const spaces: Space[] = [
+  {
+    author: 'scott-peabody',
+    theme: undefined, // uses default
+    layout: undefined, // uses default
+    pinnedContent: [
+      { type: 'post', slug: 'hello-world' },
+    ],
+    sections: ['feed', 'articles', 'projects'],
+    feeds: ['main'],
+    defaultFeed: 'main',
+  },
+  {
+    author: 'scott-peabody',
+    alias: 'pixel-wizard',
+    bio: 'Retro game enthusiast and pixel art dabbler. Where I share gamedev experiments and nostalgia-fueled projects.',
+    theme: 'terminal',
+    layout: 'minimal',
+    pinnedContent: [
+      { type: 'post', slug: 'gamedev-journey' },
+    ],
+    sections: ['feed', 'projects'],
+    feeds: ['gamedev'],
+    defaultFeed: 'gamedev',
   },
 ]
 
@@ -1460,3 +1724,175 @@ export const getArticlesByLocation = (locationSlug: string): Article[] =>
 
 export const getProjectsByLocation = (locationSlug: string): Project[] =>
   filterLatestProjects(projects.filter((p) => p.locations?.includes(locationSlug)))
+
+// ============================================
+// POST, FEED, AND SPACE HELPERS
+// ============================================
+
+// Post helpers
+export const getPost = (slug: string): Post | undefined =>
+  posts.find((p) => p.slug === slug)
+
+export const getPostsByAuthor = (authorSlug: string, alias?: string | null): Post[] =>
+  posts.filter((p) => {
+    if (p.visibility === 'draft') return false
+    if (p.author !== authorSlug) return false
+    // If alias is provided, only return posts with that alias
+    // If alias is null/undefined, only return posts without an alias (main author posts)
+    if (alias) {
+      return p.alias === alias
+    } else {
+      return !p.alias
+    }
+  })
+
+export const getPostsByFeed = (feedSlug: string, authorSlug?: string, alias?: string | null): Post[] => {
+  let feedPosts = posts.filter((p) => 
+    p.feeds?.includes(feedSlug) && p.visibility !== 'draft'
+  )
+  if (authorSlug) {
+    feedPosts = feedPosts.filter((p) => p.author === authorSlug)
+  }
+  // Filter by alias: if alias provided, match it; if null/undefined, only non-alias posts
+  if (alias) {
+    feedPosts = feedPosts.filter((p) => p.alias === alias)
+  } else {
+    feedPosts = feedPosts.filter((p) => !p.alias)
+  }
+  return feedPosts.sort((a, b) => compareDates(a.date, b.date))
+}
+
+export const getPostsByConcept = (conceptSlug: string): Post[] =>
+  posts.filter((p) => p.concepts?.includes(conceptSlug) && p.visibility !== 'draft')
+
+export const getPostsByTag = (tag: string): Post[] =>
+  posts.filter((p) => p.tags?.includes(tag) && p.visibility !== 'draft')
+
+export const getRecentPosts = (count: number = 10, authorSlug?: string, alias?: string | null): Post[] => {
+  let allPosts = posts.filter((p) => p.visibility !== 'draft')
+  if (authorSlug) {
+    allPosts = allPosts.filter((p) => p.author === authorSlug)
+  }
+  // Filter by alias: if alias provided, match it; if null/undefined, only non-alias posts
+  if (alias) {
+    allPosts = allPosts.filter((p) => p.alias === alias)
+  } else if (authorSlug) {
+    // Only filter out alias posts if we're looking at a specific author
+    allPosts = allPosts.filter((p) => !p.alias)
+  }
+  return allPosts.sort((a, b) => compareDates(a.date, b.date)).slice(0, count)
+}
+
+// Feed helpers
+export const getFeed = (slug: string, authorSlug?: string, alias?: string | null): Feed | undefined => {
+  if (authorSlug) {
+    return feeds.find((f) => {
+      if (f.slug !== slug || f.author !== authorSlug) return false
+      if (alias) {
+        return f.alias === alias
+      } else {
+        return !f.alias
+      }
+    })
+  }
+  return feeds.find((f) => f.slug === slug)
+}
+
+export const getFeedsByAuthor = (authorSlug: string, alias?: string | null): Feed[] =>
+  feeds.filter((f) => {
+    if (f.author !== authorSlug || f.visibility === 'private') return false
+    // Filter by alias: if alias provided, match it; if null/undefined, only non-alias feeds
+    if (alias) {
+      return f.alias === alias
+    } else {
+      return !f.alias
+    }
+  })
+
+export const getFeedInfo = (feedSlug: string, authorSlug: string, alias?: string | null): FeedInfo | undefined => {
+  const feed = feeds.find((f) => {
+    if (f.slug !== feedSlug || f.author !== authorSlug) return false
+    if (alias) {
+      return f.alias === alias
+    } else {
+      return !f.alias
+    }
+  })
+  if (!feed) return undefined
+
+  const feedPosts = getPostsByFeed(feedSlug, authorSlug, alias)
+  const postInfos: PostInfo[] = feedPosts.map((p) => ({
+    slug: p.slug,
+    title: p.title,
+    excerpt: p.content.slice(0, 200) + (p.content.length > 200 ? '...' : ''),
+    author: p.author,
+    alias: p.alias,
+    date: p.date,
+    tags: p.tags || [],
+    visibility: p.visibility,
+  }))
+
+  return {
+    slug: feed.slug,
+    name: feed.name,
+    description: feed.description,
+    author: feed.author,
+    alias: feed.alias,
+    ordering: feed.ordering,
+    visibility: feed.visibility,
+    icon: feed.icon,
+    color: feed.color,
+    postCount: postInfos.length,
+    posts: postInfos,
+  }
+}
+
+// Space helpers
+export const getSpace = (authorSlug: string, alias?: string): Space | undefined => {
+  if (alias) {
+    return spaces.find((s) => s.author === authorSlug && s.alias === alias)
+  }
+  return spaces.find((s) => s.author === authorSlug && !s.alias)
+}
+
+export const getSpaceWithContent = (authorSlug: string, alias?: string): {
+  space: Space | undefined
+  author: Author | undefined
+  feeds: FeedInfo[]
+  pinnedPosts: Post[]
+  recentPosts: Post[]
+} => {
+  const space = alias 
+    ? spaces.find((s) => s.alias === alias)
+    : spaces.find((s) => s.author === authorSlug && !s.alias)
+  const author = getAuthor(authorSlug)
+  
+  // Get feeds for this specific space (alias or main)
+  const authorFeeds = getFeedsByAuthor(authorSlug, alias || undefined)
+    .map((f) => getFeedInfo(f.slug, authorSlug, alias || undefined)!)
+    .filter(Boolean)
+  
+  const pinnedPosts = space?.pinnedContent
+    ?.filter((c) => c.type === 'post')
+    .map((c) => getPost(c.slug)!)
+    .filter(Boolean) || []
+  
+  // Get recent posts for this specific space (alias or main)
+  const recentPosts = getRecentPosts(10, authorSlug, alias || undefined)
+
+  return {
+    space,
+    author,
+    feeds: authorFeeds,
+    pinnedPosts,
+    recentPosts,
+  }
+}
+
+// Get all spaces for an author (main + aliases)
+export const getSpacesByAuthor = (authorSlug: string): Space[] =>
+  spaces.filter((s) => s.author === authorSlug)
+
+// Get a specific space by alias
+export const getSpaceByAlias = (alias: string): Space | undefined =>
+  spaces.find((s) => s.alias === alias)
