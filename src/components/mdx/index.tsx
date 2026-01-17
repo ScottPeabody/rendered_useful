@@ -8,9 +8,10 @@ import Todo from './Todo'
 import ThemeSelector from './ThemeSelector'
 import LayoutSelector from './LayoutSelector'
 import Mermaid from './Mermaid'
+import CodePlayground from './CodePlayground'
 
  
-export { Callout, TechStack, Image, Video, Audio, Todo, ThemeSelector, LayoutSelector, Mermaid }
+export { Callout, TechStack, Image, Video, Audio, Todo, ThemeSelector, LayoutSelector, Mermaid, CodePlayground }
 
 interface MDXProps {
   children?: ReactNode
