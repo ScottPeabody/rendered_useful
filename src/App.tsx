@@ -28,6 +28,9 @@ const SpacePage = lazy(() => import('./pages/SpacePage'))
 const PostPage = lazy(() => import('./pages/PostPage'))
 const FeedPage = lazy(() => import('./pages/FeedPage'))
 
+// Editor
+const EditPage = lazy(() => import('./pages/EditPage'))
+
 // Scroll to top on route change
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -68,6 +71,9 @@ function App() {
           <Route path="/languages/:slug" element={<LanguagesPage />} />
           <Route path="/locations" element={<LocationsPage />} />
           <Route path="/locations/:slug" element={<LocationsPage />} />
+          {/* Editor */}
+          <Route path="/edit" element={<EditPage />} />
+          <Route path="/edit/:slug" element={<EditPage />} />
           {/* Personal spaces - using @ prefix for usernames */}
           <Route path="/:username" element={<SpacePage />} />
           <Route path="/:username/posts/:slug" element={<PostPage />} />

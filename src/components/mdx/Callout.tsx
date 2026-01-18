@@ -43,7 +43,9 @@ const typeConfig = {
 }
 
 export default function Callout({ type = 'info', title, children }: CalloutProps) {
-  const config = typeConfig[type]
+  // Handle invalid or 'danger' type (map danger to error)
+  const normalizedType = type === 'danger' ? 'error' : type
+  const config = typeConfig[normalizedType] || typeConfig.info
   const Icon = config.icon
 
   return (
