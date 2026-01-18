@@ -404,23 +404,24 @@ export default function EditPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 pt-24 pb-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
+      {/* Header - responsive layout */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
           <Link
             to="/articles"
-            className="text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors"
+            className="text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors text-sm sm:text-base"
           >
-            ← Back to Articles
+            ← Back
           </Link>
-          <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
+          <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary)] truncate">
             {isNewArticle ? 'New Article' : `Editing: ${actualSlug}`}
           </h1>
         </div>
         
-        <div className="flex items-center gap-3">
-          {/* Theme preview dropdown */}
-          <div className="flex items-center gap-2">
+        {/* Controls - wrap on mobile */}
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          {/* Theme preview dropdown - hidden on very small screens */}
+          <div className="hidden sm:flex items-center gap-2">
             <label htmlFor="theme-preview" className="text-sm text-[var(--color-text-muted)]">
               Preview:
             </label>
@@ -428,9 +429,9 @@ export default function EditPage() {
               id="theme-preview"
               value={previewTheme}
               onChange={(e) => setPreviewTheme(e.target.value)}
-              className="px-3 py-1.5 text-sm bg-[var(--color-surface-elevated)] text-[var(--color-text-primary)] rounded-lg border border-[var(--color-border)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-primary)]"
+              className="px-2 py-1 text-xs sm:text-sm bg-[var(--color-surface-elevated)] text-[var(--color-text-primary)] rounded-lg border border-[var(--color-border)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-primary)]"
             >
-              <option value="default">Site Default</option>
+              <option value="default">Default</option>
               {Object.keys(themes).map((themeName) => (
                 <option key={themeName} value={themeName}>
                   {themes[themeName].name}
@@ -440,66 +441,71 @@ export default function EditPage() {
           </div>
           
           {/* Status indicator */}
-          <span className="text-sm text-[var(--color-text-muted)]">
+          <span className="text-xs sm:text-sm text-[var(--color-text-muted)]">
             {hasUnsavedChanges ? (
-              <span className="text-amber-500">● Unsaved changes</span>
+              <span className="text-amber-500">● Unsaved</span>
             ) : lastSaved ? (
-              <span className="text-green-500">
-                ✓ Saved {new Date(lastSaved).toLocaleTimeString()}
-              </span>
+              <span className="text-green-500">✓ Saved</span>
             ) : null}
           </span>
           
-          {/* Action buttons */}
+          {/* Action buttons - compact on mobile */}
           <button
             onClick={handleSave}
             disabled={isSaving || !hasUnsavedChanges}
-            className="px-4 py-2 text-sm font-medium bg-[var(--color-accent-primary)] text-white rounded-lg hover:bg-[var(--color-accent-secondary)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium bg-[var(--color-accent-primary)] text-white rounded-lg hover:bg-[var(--color-accent-secondary)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSaving ? 'Saving...' : 'Save Draft'}
+            {isSaving ? 'Saving...' : 'Save'}
           </button>
           
           <button
             onClick={handleDownload}
-            className="px-4 py-2 text-sm font-medium bg-[var(--color-surface-elevated)] text-[var(--color-text-primary)] rounded-lg hover:bg-[var(--color-surface)] border border-[var(--color-border)] transition-colors"
+            className="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium bg-[var(--color-surface-elevated)] text-[var(--color-text-primary)] rounded-lg hover:bg-[var(--color-surface)] border border-[var(--color-border)] transition-colors"
+            title="Download .mdx"
           >
-            Download .mdx
+            <span className="hidden sm:inline">Download</span>
+            <span className="sm:hidden">↓</span>
           </button>
           
           <button
             onClick={handleCopy}
-            className="px-4 py-2 text-sm font-medium bg-[var(--color-surface-elevated)] text-[var(--color-text-primary)] rounded-lg hover:bg-[var(--color-surface)] border border-[var(--color-border)] transition-colors"
+            className="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium bg-[var(--color-surface-elevated)] text-[var(--color-text-primary)] rounded-lg hover:bg-[var(--color-surface)] border border-[var(--color-border)] transition-colors"
+            title="Copy markdown"
           >
-            Copy
+            <span className="hidden sm:inline">Copy</span>
+            <span className="sm:hidden">📋</span>
           </button>
           
           <button
             onClick={handleDiscard}
-            className="px-4 py-2 text-sm font-medium text-red-500 hover:text-red-600 transition-colors"
+            className="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium text-red-500 hover:text-red-600 transition-colors"
+            title="Discard draft"
           >
-            Discard
+            <span className="hidden sm:inline">Discard</span>
+            <span className="sm:hidden">✕</span>
           </button>
         </div>
       </div>
       
-      {/* Info banner */}
-      <div className="mb-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-        <p className="text-sm text-blue-600 dark:text-blue-400">
-          <strong>Note:</strong> This editor saves drafts to your browser's local storage. 
-          To publish, download the .mdx file and submit a pull request to the repository.
-          {' '}
+      {/* Info banner - responsive text */}
+      <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+        <p className="text-xs sm:text-sm text-blue-600 dark:text-blue-400">
+          <strong>Note:</strong> Drafts save to your browser.{' '}
+          <span className="hidden sm:inline">
+            To publish, download the .mdx file and submit a pull request.{' '}
+          </span>
           <Link to="/contribute" className="underline hover:no-underline">
-            Learn more about contributing
+            Learn more
           </Link>
         </p>
       </div>
       
       {/* View Mode Tabs - Sticky below navbar */}
-      <div className="sticky top-16 z-30 bg-[var(--color-background)] py-3 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+      <div className="sticky top-14 sm:top-16 z-30 bg-[var(--color-background)] py-2 sm:py-3 -mx-4 px-4">
         <div className="flex items-center gap-1 p-1 bg-[var(--color-surface)] rounded-lg w-fit border border-[var(--color-border)]">
           <button
             onClick={() => setViewMode('edit')}
-            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            className={`px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium rounded-md transition-colors ${
               viewMode === 'edit'
                 ? 'bg-[var(--color-accent-primary)] text-white'
                 : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-elevated)]'
@@ -509,7 +515,7 @@ export default function EditPage() {
           </button>
           <button
             onClick={() => setViewMode('preview')}
-            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            className={`px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium rounded-md transition-colors ${
               viewMode === 'preview'
                 ? 'bg-[var(--color-accent-primary)] text-white'
                 : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-elevated)]'
@@ -523,7 +529,7 @@ export default function EditPage() {
       {/* Editor / Preview */}
       <div 
         ref={editorContainerRef}
-        className="relative border border-[var(--color-border)] rounded-lg shadow-lg min-h-[500px]"
+        className="relative border border-[var(--color-border)] rounded-lg shadow-lg min-h-[400px] sm:min-h-[500px]"
       >
         {viewMode === 'edit' && (
           <MDXEditorWrapper
@@ -535,14 +541,14 @@ export default function EditPage() {
         )}
         
         {viewMode === 'preview' && (
-          <div className="bg-[var(--color-background)] min-h-[500px]">
-            <MDXPreview markdown={markdown} className="max-w-4xl mx-auto" />
+          <div className="bg-[var(--color-background)] min-h-[400px] sm:min-h-[500px]">
+            <MDXPreview markdown={markdown} className="max-w-4xl mx-auto px-4 sm:px-6" />
           </div>
         )}
       </div>
       
-      {/* Tips */}
-      <div className="mt-6 p-4 bg-[var(--color-surface-elevated)] rounded-lg">
+      {/* Tips - hidden on mobile to save space */}
+      <div className="hidden sm:block mt-6 p-4 bg-[var(--color-surface-elevated)] rounded-lg">
         <h3 className="font-semibold text-[var(--color-text-primary)] mb-2">Editor Tips</h3>
         <ul className="text-sm text-[var(--color-text-muted)] space-y-1">
           <li>• <strong>Edit:</strong> Use the toolbar to format text, insert images, and add code blocks</li>
