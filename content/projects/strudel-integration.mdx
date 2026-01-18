@@ -1,0 +1,218 @@
+---
+title: "Strudel Integration"
+description: "Live coding music patterns directly in MDX articles using Strudel, a web-based TidalCycles port."
+date: "2026-01-18"
+author: "scott-peabody"
+tags: ["music", "live-coding", "creative-coding", "integration"]
+techStack: ["Strudel", "Web Audio API", "React", "TypeScript"]
+type: "integration"
+status: "completed"
+featured: true
+---
+
+import { Callout, Strudel } from '@/components/mdx'
+
+# Strudel Integration
+
+[Strudel](https://strudel.cc) is a live coding environment for making music with code. It's a JavaScript port of [TidalCycles](https://tidalcycles.org/), bringing algorithmic music composition to the browser.
+
+Now you can embed interactive Strudel patterns directly in articles on this site.
+
+## Try It Out
+
+Click the play button below to hear a simple pattern:
+
+<Strudel code={`
+note("c3 e3 g3 b3")
+  .sound("piano")
+  .slow(2)
+`} useIframe={true} />
+
+<Callout type="info">
+Click the play button (or press Ctrl+Enter) to start the pattern. Click stop (or press Ctrl+.) to stop it.
+</Callout>
+
+## What is Live Coding?
+
+Live coding is the practice of writing code that generates music or visuals in real-time, often as a performance art. The code becomes the instrument.
+
+Strudel uses a pattern-based approach where you describe *what* should happen over time, and the system figures out *when* to trigger sounds.
+
+## Pattern Examples
+
+### Drum Pattern
+
+<Strudel code={`
+sound("bd sd bd sd")
+  .bank("RolandTR808")
+`} useIframe={true} />
+
+### Melodic Sequence
+
+<Strudel code={`
+note("c4 e4 g4 c5 g4 e4")
+  .sound("sawtooth")
+  .lpf(800)
+  .decay(0.2)
+  .sustain(0)
+`} useIframe={true} />
+
+### Polyrhythm
+
+<Strudel code={`
+stack(
+  sound("bd*4").bank("RolandTR808"),
+  sound("hh*8").bank("RolandTR808").gain(0.5),
+  note("<c3 eb3 g3 bb3>*2").sound("sawtooth").lpf(600)
+)
+`} useIframe={true} />
+
+## Visualizers
+
+Strudel has built-in visualizations that react to the music. Use the `_` prefix (like `_pianoroll`) to render visuals inline below the code.
+
+### Oscilloscope
+
+Shows the waveform of the audio signal in real-time:
+
+<Strudel code={`
+s("sawtooth")
+  .note("c2 e2 g2 c3")
+  .slow(2)
+  .lpf(800)
+  ._scope()
+`} height={400} />
+
+### Piano Roll
+
+A scrolling visualization showing notes over time:
+
+<Strudel code={`
+note("c3 e3 g3 b3 c4 b3 g3 e3")
+  .s("piano")
+  .slow(2)
+  ._pianoroll()
+`} height={450} />
+
+### Punchcard
+
+Similar to piano roll but also shows transformations applied after:
+
+<Strudel code={`
+stack(
+  s("bd*4"),
+  s("~ sd ~ sd"),
+  s("hh*8")
+).bank("RolandTR808")
+  ._punchcard()
+`} height={400} />
+
+### Spectrum Analyzer
+
+Shows the frequency spectrum of the audio:
+
+<Strudel code={`
+n("0 4 2 5")
+  .scale("C3:minor")
+  .s("sawtooth")
+  .lpf(600)
+  ._spectrum()
+`} height={400} />
+
+### Spiral
+
+A circular visualization that spirals outward with the pattern:
+
+<Strudel code={`
+note("c2 e2 g2 b2")
+  .euclid(5,8)
+  .s("sawtooth")
+  .lpf(400)
+  ._spiral({ steady: 0.96 })
+`} height={450} />
+
+### Pitch Wheel
+
+Visualizes frequencies on a circular pitch wheel (great for seeing harmonics):
+
+<Strudel code={`
+n("0 .. 12")
+  .scale("C:chromatic")
+  .s("sawtooth")
+  .lpf(500)
+  .slow(4)
+  ._pitchwheel()
+`} height={450} />
+
+### Combined Visualizers
+
+You can combine multiple visualizers on the same pattern:
+
+<Strudel code={`
+note("c3 e3 g3 b3")
+  .s("sawtooth")
+  .lpf(sine.range(200, 2000).slow(4))
+  ._scope()
+  ._pianoroll({ vertical: 1, labels: 1 })
+`} height={500} />
+
+## Mini-Notation
+
+Strudel uses a concise "mini-notation" for describing patterns:
+
+| Syntax | Meaning |
+|--------|---------|
+| `a b c` | Sequence: play a, then b, then c |
+| `a*3` | Repeat: play a three times |
+| `a/2` | Slow down: play a over 2 cycles |
+| `[a b]` | Group: treat as single step |
+| `<a b c>` | Alternate: different value each cycle |
+| `a?` | Maybe: 50% chance to play |
+| `a(3,8)` | Euclidean: 3 hits spread over 8 steps |
+
+<Strudel code={`
+// Try modifying this pattern!
+note("<c3 e3 g3>*4")
+  .sound("piano")
+  .jux(rev)
+`} useIframe={true} />
+
+## Using Strudel in Your Articles
+
+To add a Strudel editor to any MDX article, import and use the component:
+
+```mdx
+import { Strudel } from '@/components/mdx'
+
+<Strudel code={\`
+note("c3 e3 g3").sound("piano")
+\`} />
+```
+
+### Component Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `code` | string | required | The Strudel pattern code |
+| `height` | number | 300 | Editor height in pixels |
+| `lineNumbers` | boolean | true | Show line numbers |
+| `autoplay` | boolean | false | Auto-play on load |
+
+## Learning Resources
+
+- [Strudel Workshop](https://strudel.cc/workshop/getting-started/) - Interactive tutorial
+- [Pattern Documentation](https://strudel.cc/learn/mini-notation/) - Mini-notation reference
+- [Function Reference](https://strudel.cc/functions/intro/) - All available functions
+- [TidalCycles Discord](https://discord.com/invite/HGEdXmRkzT) - Community chat
+
+## License Note
+
+<Callout type="info">
+Strudel is licensed under AGPL-3.0. This integration loads Strudel externally via iframe/CDN, so AGPL does not affect this site's license. You're free to use this Strudel component in your own projects regardless of your license.
+</Callout>
+
+## Credits
+
+Strudel is created by [Felix Roos](https://loophole-letters.vercel.app/) and many contributors. It's a faithful JavaScript port of TidalCycles, originally created by Alex McLean.
+
+The project is hosted on [Codeberg](https://codeberg.org/uzu/strudel) (not GitHub, for ethical reasons).
