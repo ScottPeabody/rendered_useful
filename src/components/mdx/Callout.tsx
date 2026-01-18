@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { Info, AlertTriangle, AlertCircle, CheckCircle, Lightbulb } from 'lucide-react'
 
-type CalloutType = 'info' | 'warning' | 'error' | 'success' | 'tip'
+type CalloutType = 'info' | 'warning' | 'error' | 'success' | 'tip' | 'danger'
 
 interface CalloutProps {
   type?: CalloutType
