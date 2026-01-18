@@ -60,7 +60,7 @@ export interface Project extends Versionable {
   githubUrl?: string
   techStack: string[]
   featured?: boolean
-  type: 'game' | 'app' | 'widget' | 'tool' | 'library' | 'other'
+  type: 'game' | 'app' | 'widget' | 'tool' | 'library' | 'integration' | 'other'
   status: 'active' | 'completed' | 'archived' | 'wip'
 }
 

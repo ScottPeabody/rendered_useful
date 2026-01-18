@@ -795,6 +795,22 @@ export const projects: Project[] = [
     languages: ['typescript', 'english'],
     locations: ['github', 'the-web'],
   },
+  {
+    slug: 'strudel-integration',
+    title: 'Strudel Integration',
+    description: 'Live coding music patterns directly in MDX articles using Strudel, a web-based TidalCycles port.',
+    author: 'scott-peabody',
+    date: '2026-01-18',
+    tags: ['music', 'live-coding', 'creative-coding', 'integration'],
+    communities: ['creative-coding', 'opensource'],
+    techStack: ['Strudel', 'Web Audio API', 'React', 'TypeScript'],
+    type: 'integration',
+    status: 'completed',
+    featured: true,
+    concepts: ['reactivity'],
+    languages: ['typescript', 'javascript'],
+    locations: ['codeberg', 'the-web'],
+  },
 ]
 
 // ============================================

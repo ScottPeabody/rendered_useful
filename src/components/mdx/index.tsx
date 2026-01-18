@@ -9,9 +9,10 @@ import ThemeSelector from './ThemeSelector'
 import LayoutSelector from './LayoutSelector'
 import Mermaid from './Mermaid'
 import CodePlayground from './CodePlayground'
+import { Strudel, StrudelEmbed } from './Strudel'
 
  
-export { Callout, TechStack, Image, Video, Audio, Todo, ThemeSelector, LayoutSelector, Mermaid, CodePlayground }
+export { Callout, TechStack, Image, Video, Audio, Todo, ThemeSelector, LayoutSelector, Mermaid, CodePlayground, Strudel, StrudelEmbed }
 
 interface MDXProps {
   children?: ReactNode
