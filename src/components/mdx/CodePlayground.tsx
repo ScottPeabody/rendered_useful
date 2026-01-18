@@ -72,7 +72,8 @@ function CodeEditor({
     return () => {
       view.destroy()
     }
-  }, [language]) // Only recreate on language change
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [language]) // Only recreate on language change, not on every code/onChange change
 
   // Update content when code prop changes externally
   useEffect(() => {
@@ -110,8 +111,8 @@ export default function CodePlayground({
   const [consoleOutput, setConsoleOutput] = useState<string[]>([])
   const [showConsole, setShowConsole] = useState(false)
   
-  // Unique ID for this playground instance
-  const playgroundId = useRef(`playground-${Math.random().toString(36).slice(2, 11)}`).current
+  // Unique ID for this playground instance - use useState lazy initializer for stable ID
+  const [playgroundId] = useState(() => `playground-${Math.random().toString(36).slice(2, 11)}`)
 
   // Generate preview HTML with console capture
   // CSP to block network requests (disabled when allowNetwork is true)

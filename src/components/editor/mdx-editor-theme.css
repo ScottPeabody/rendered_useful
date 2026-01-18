@@ -1,0 +1,609 @@
+/* MDXEditor Theme Overrides for rendered_useful */
+/* Uses site's CSS variables for 1:1 theme parity with articles */
+
+/* Map site CSS variables to MDXEditor internal variables */
+.mdx-editor-wrapper,
+.mdx-editor-wrapper [class*="_editorRoot_"] {
+  /* Accent colors - use site theme */
+  --accentBase: var(--color-accent-primary, #8b5cf6);
+  --accentBgSubtle: color-mix(in srgb, var(--color-accent-primary, #8b5cf6) 15%, transparent);
+  --accentBg: color-mix(in srgb, var(--color-accent-primary, #8b5cf6) 20%, transparent);
+  --accentBgHover: color-mix(in srgb, var(--color-accent-primary, #8b5cf6) 25%, transparent);
+  --accentBgActive: color-mix(in srgb, var(--color-accent-primary, #8b5cf6) 30%, transparent);
+  --accentLine: color-mix(in srgb, var(--color-accent-primary, #8b5cf6) 40%, transparent);
+  --accentBorder: color-mix(in srgb, var(--color-accent-primary, #8b5cf6) 50%, transparent);
+  --accentBorderHover: color-mix(in srgb, var(--color-accent-primary, #8b5cf6) 60%, transparent);
+  --accentSolid: var(--color-accent-primary, #8b5cf6);
+  --accentSolidHover: var(--color-accent-secondary, #7c3aed);
+  --accentText: var(--color-accent-primary, #c4b5fd);
+  --accentTextContrast: #ffffff;
+  
+  /* Base colors - use site theme */
+  --basePageBg: var(--color-background, #1a1a2e);
+  --baseBgSubtle: var(--color-surface, #1e1e32);
+  --baseBg: var(--color-surface, #252540);
+  --baseBgHover: var(--color-surface-elevated, #2d2d4a);
+  --baseBgActive: var(--color-surface-elevated, #353555);
+  --baseLine: var(--color-border, #3f3f5a);
+  --baseBorder: var(--color-border, #4a4a6a);
+  --baseBorderHover: var(--color-border, #5a5a7a);
+  --baseSolid: var(--color-text-muted, #6b6b8a);
+  --baseSolidHover: var(--color-text-secondary, #7b7b9a);
+  --baseText: var(--color-text-primary, #e5e5e5);
+  --baseTextSubtle: var(--color-text-secondary, #a1a1aa);
+  --baseTextMuted: var(--color-text-muted, #71717a);
+  --baseTextContrast: #ffffff;
+}
+
+/* Editor container */
+.mdx-editor-wrapper {
+  border-radius: 0.5rem;
+  position: relative;
+  isolation: isolate;
+}
+
+/* Ensure MDXEditor root creates proper stacking context and layout */
+.mdx-editor-wrapper [class*="_editorRoot_"] {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  min-height: 500px;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+/* Toolbar should be sticky below navbar + Edit/Preview tabs */
+.mdx-editor-wrapper [class*="_toolbarRoot_"] {
+  position: sticky;
+  top: 134px;
+  flex-shrink: 0;
+  z-index: 20;
+  background: var(--color-surface, #1e1e32);
+  border-bottom: 1px solid var(--color-border, #3f3f5a);
+  margin-top: 0 !important;
+  padding-top: 0.5rem !important;
+}
+
+/* Remove any default padding/margin that creates the gap */
+.mdx-editor-wrapper [class*="_editorRoot_"] > div:first-child,
+.mdx-editor-wrapper [class*="_editorWrapper_"],
+.mdx-editor-wrapper > div,
+.mdx-editor-wrapper > div > div {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Content wrapper */
+.mdx-editor-wrapper [class*="_rootContentEditableWrapper_"] {
+  flex: 1;
+  min-height: 400px;
+}
+
+/* Content editable inside the wrapper */
+.mdx-editor-wrapper [class*="_contentEditable_"] {
+  min-height: 400px;
+}
+
+/* Light mode defaults */
+.mdx-editor-wrapper {
+  --basePageBg: #ffffff;
+  --baseBgSubtle: #f9fafb;
+  --baseBgActive: #f3f4f6;
+  --baseLine: #e5e7eb;
+  --baseText: #1f2937;
+  --baseTextSubtle: #6b7280;
+  --baseTextMuted: #9ca3af;
+}
+
+/* Dark mode overrides */
+.dark .mdx-editor-wrapper,
+.dark-theme.mdx-editor-wrapper,
+[data-theme="dark"] .mdx-editor-wrapper {
+  --basePageBg: #1a1a2e;
+  --baseBgSubtle: #1e1e32;
+  --baseBgActive: #252540;
+  --baseLine: #3f3f5a;
+  --baseText: #e5e5e5;
+  --baseTextSubtle: #a1a1aa;
+  --baseTextMuted: #71717a;
+}
+
+/* Toolbar styling */
+.mdx-editor-wrapper [class*="_toolbarRoot_"] {
+  background: var(--color-surface, var(--baseBgSubtle));
+  border-bottom: 1px solid var(--color-border, var(--baseLine));
+  padding: 0.5rem;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.mdx-editor-wrapper [class*="_toolbarRoot_"] button,
+.mdx-editor-wrapper [class*="_toolbarRoot_"] [role="button"] {
+  background: transparent;
+  color: var(--color-text-primary, var(--baseText));
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.375rem 0.5rem;
+  transition: all 0.15s ease;
+}
+
+/* SVG icons in toolbar */
+.mdx-editor-wrapper [class*="_toolbarRoot_"] svg {
+  color: var(--color-text-primary, var(--baseText));
+  fill: currentColor;
+  stroke: currentColor;
+  width: 18px;
+  height: 18px;
+}
+
+.mdx-editor-wrapper [class*="_toolbarRoot_"] button:hover,
+.mdx-editor-wrapper [class*="_toolbarRoot_"] [role="button"]:hover {
+  background: var(--color-surface-elevated, var(--baseBgActive));
+  color: var(--color-text-primary, var(--baseText));
+}
+
+.mdx-editor-wrapper [class*="_toolbarRoot_"] button:hover svg,
+.mdx-editor-wrapper [class*="_toolbarRoot_"] [role="button"]:hover svg {
+  color: var(--color-text-primary, var(--baseText));
+}
+
+.mdx-editor-wrapper [class*="_toolbarRoot_"] button[data-state="on"],
+.mdx-editor-wrapper [class*="_toolbarRoot_"] [data-active="true"] {
+  background: var(--accentBgActive);
+  color: var(--color-accent-primary, var(--accentText));
+}
+
+.mdx-editor-wrapper [class*="_toolbarRoot_"] button[data-state="on"] svg,
+.mdx-editor-wrapper [class*="_toolbarRoot_"] [data-active="true"] svg {
+  color: var(--color-accent-primary, var(--accentText));
+}
+
+/* Toolbar separator */
+.mdx-editor-wrapper [class*="_toolbarRoot_"] [class*="_separator_"] {
+  background: var(--color-border, var(--baseLine));
+  width: 1px;
+  height: 1.5rem;
+  margin: 0 0.25rem;
+}
+
+/* Toolbar select/dropdown */
+.mdx-editor-wrapper [class*="_selectTrigger_"],
+.mdx-editor-wrapper [class*="_toolbarRoot_"] select,
+.mdx-editor-wrapper [class*="_toolbarRoot_"] [class*="_select_"] {
+  background: var(--color-surface-elevated, var(--baseBgActive));
+  color: var(--color-text-primary, var(--baseText));
+  border: 1px solid var(--color-border, var(--baseLine));
+  border-radius: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.mdx-editor-wrapper [class*="_selectTrigger_"] svg,
+.mdx-editor-wrapper [class*="_toolbarRoot_"] select svg {
+  color: var(--color-text-primary, var(--baseText));
+}
+
+.mdx-editor-wrapper [class*="_selectContent_"] {
+  background: var(--color-background, var(--basePageBg));
+  border: 1px solid var(--color-border, var(--baseLine));
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.mdx-editor-wrapper [class*="_selectItem_"] {
+  color: var(--color-text-primary, var(--baseText));
+  padding: 0.5rem 0.75rem;
+}
+
+.mdx-editor-wrapper [class*="_selectItem_"]:hover,
+.mdx-editor-wrapper [class*="_selectItem_"][data-highlighted] {
+  background: var(--accentBgSubtle);
+  color: var(--color-accent-primary, var(--accentText));
+}
+
+/* Content editable area styling - uses site's CSS variables for 1:1 match */
+.mdx-editor-wrapper [class*="_rootContentEditableWrapper_"] {
+  background: var(--color-background, #1a1a2e);
+}
+
+.mdx-editor-wrapper [class*="_contentEditable_"] {
+  background: var(--color-background, #1a1a2e);
+  color: var(--color-text-primary, #e5e5e5);
+  padding: 1.5rem 2rem;
+}
+
+.mdx-editor-wrapper [contenteditable="true"] {
+  outline: none;
+}
+
+/* ========================================
+   CONTENT STYLES - Match MDXContentProvider
+   ======================================== */
+
+/* Headings - Match site's article styling */
+.mdx-editor-wrapper h1 {
+  font-size: 1.875rem; /* text-3xl */
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.mdx-editor-wrapper h1:first-child {
+  margin-top: 0;
+}
+
+.mdx-editor-wrapper h2 {
+  font-size: 1.5rem; /* text-2xl */
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+
+.mdx-editor-wrapper h3 {
+  font-size: 1.25rem; /* text-xl */
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+}
+
+.mdx-editor-wrapper h4 {
+  font-size: 1.125rem; /* text-lg */
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Paragraphs */
+.mdx-editor-wrapper p {
+  color: var(--color-text-secondary);
+  line-height: 1.625; /* leading-relaxed */
+  margin-bottom: 1rem;
+}
+
+/* Links */
+.mdx-editor-wrapper a {
+  color: var(--color-accent-primary);
+  text-decoration: none;
+}
+
+.mdx-editor-wrapper a:hover {
+  text-decoration: underline;
+}
+
+/* Lists - Match site styling */
+.mdx-editor-wrapper ul {
+  list-style-type: disc;
+  list-style-position: inside;
+  color: var(--color-text-secondary);
+  margin-bottom: 1.5rem;
+  margin-left: 0.5rem;
+}
+
+.mdx-editor-wrapper ol {
+  list-style-type: decimal;
+  list-style-position: inside;
+  color: var(--color-text-secondary);
+  margin-bottom: 1.5rem;
+  margin-left: 0.5rem;
+}
+
+.mdx-editor-wrapper li {
+  color: var(--color-text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.mdx-editor-wrapper ul ul,
+.mdx-editor-wrapper ol ol,
+.mdx-editor-wrapper ul ol,
+.mdx-editor-wrapper ol ul {
+  margin-left: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Blockquotes */
+.mdx-editor-wrapper blockquote {
+  border-left: 4px solid var(--color-accent-primary);
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* Inline code - Match site styling */
+.mdx-editor-wrapper code:not([class*="language-"]) {
+  background: var(--color-surface);
+  color: var(--color-accent-primary);
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* Code blocks - Match site styling */
+.mdx-editor-wrapper pre {
+  background: var(--color-surface) !important;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin: 1.5rem 0;
+  overflow-x: auto;
+}
+
+.mdx-editor-wrapper pre code {
+  background: transparent !important;
+  color: var(--color-text-primary);
+  padding: 0;
+  font-size: 0.875rem;
+}
+
+/* CodeMirror in editor */
+.mdx-editor-wrapper [class*="_codeBlockEditorWrapper_"] {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  margin: 1.5rem 0;
+}
+
+.mdx-editor-wrapper [class*="_codeMirrorWrapper_"] {
+  background: var(--color-surface);
+}
+
+.mdx-editor-wrapper .cm-editor {
+  background: var(--color-surface);
+}
+
+.mdx-editor-wrapper .cm-gutters {
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+}
+
+.mdx-editor-wrapper .cm-activeLineGutter,
+.mdx-editor-wrapper .cm-activeLine {
+  background: var(--color-surface-elevated);
+}
+
+.mdx-editor-wrapper .cm-content {
+  color: var(--color-text-primary);
+}
+
+.mdx-editor-wrapper .cm-cursor {
+  border-left-color: var(--color-accent-primary);
+}
+
+/* Code block language selector */
+.mdx-editor-wrapper [class*="_codeBlockLanguageSelector_"] {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+.mdx-editor-wrapper [class*="_codeBlockLanguageSelector_"] select {
+  background: var(--color-surface-elevated);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+/* Tables - Match site styling */
+.mdx-editor-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+}
+
+.mdx-editor-wrapper th,
+.mdx-editor-wrapper td {
+  border: 1px solid var(--color-border);
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.mdx-editor-wrapper th {
+  background: var(--color-surface);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.mdx-editor-wrapper td {
+  color: var(--color-text-secondary);
+}
+
+/* Horizontal rule */
+.mdx-editor-wrapper hr {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 2rem 0;
+}
+
+/* Front-matter editor */
+.mdx-editor-wrapper [class*="_frontmatterWrapper_"] {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.mdx-editor-wrapper [class*="_frontmatterWrapper_"] input,
+.mdx-editor-wrapper [class*="_frontmatterWrapper_"] textarea {
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+  width: 100%;
+}
+
+.mdx-editor-wrapper [class*="_frontmatterWrapper_"] label {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Admonitions/Callouts */
+.mdx-editor-wrapper [class*="_admonitionWrapper_"],
+.mdx-editor-wrapper [class*="_directiveWrapper_"] {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-accent-primary);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin: 1.5rem 0;
+}
+
+/* JSX component placeholders - Enhanced styling */
+.mdx-editor-wrapper [class*="_nestedEditor_"],
+.mdx-editor-wrapper [class*="_jsxWrapper_"] {
+  background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-surface-elevated) 100%);
+  border: 2px solid var(--color-accent-primary);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Component type indicator badge */
+.mdx-editor-wrapper [class*="_nestedEditor_"]::before,
+.mdx-editor-wrapper [class*="_jsxWrapper_"]::before {
+  content: "Component";
+  position: absolute;
+  top: -0.75rem;
+  left: 1rem;
+  background: var(--color-accent-primary);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Specific component type styling */
+.mdx-editor-wrapper [class*="_nestedEditor_"][data-lexical-editor] {
+  border-color: var(--color-accent-secondary, #00ffff);
+}
+
+/* Make the content inside JSX wrappers more readable */
+.mdx-editor-wrapper [class*="_nestedEditor_"] p,
+.mdx-editor-wrapper [class*="_jsxWrapper_"] p {
+  color: var(--color-text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.mdx-editor-wrapper [class*="_nestedEditor_"] p:last-child,
+.mdx-editor-wrapper [class*="_jsxWrapper_"] p:last-child {
+  margin-bottom: 0;
+}
+
+/* Image styling */
+.mdx-editor-wrapper img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 1.5rem 0;
+}
+
+/* Placeholder text */
+.mdx-editor-wrapper [data-placeholder]::before {
+  color: var(--color-text-muted);
+}
+
+/* Dialog/modal styling */
+.mdx-editor-wrapper [class*="_dialogContent_"] {
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+  padding: 1.5rem;
+}
+
+.mdx-editor-wrapper [class*="_dialogContent_"] input {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 0.375rem;
+  padding: 0.625rem 0.875rem;
+  width: 100%;
+}
+
+.mdx-editor-wrapper [class*="_dialogContent_"] button[type="submit"],
+.mdx-editor-wrapper [class*="_primaryButton_"] {
+  background: var(--color-accent-primary);
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+}
+
+.mdx-editor-wrapper [class*="_dialogContent_"] button[type="submit"]:hover,
+.mdx-editor-wrapper [class*="_primaryButton_"]:hover {
+  opacity: 0.9;
+}
+
+/* Diff view */
+.mdx-editor-wrapper [class*="_diffSourceWrapper_"] {
+  background: var(--color-surface);
+}
+
+/* Source mode textarea */
+.mdx-editor-wrapper [class*="_sourceWrapper_"] textarea {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  padding: 1rem;
+  border: none;
+  resize: none;
+}
+
+/* Focus states */
+.mdx-editor-wrapper [class*="_toolbarRoot_"] button:focus-visible,
+.mdx-editor-wrapper input:focus-visible,
+.mdx-editor-wrapper textarea:focus-visible,
+.mdx-editor-wrapper [contenteditable]:focus-visible {
+  outline: 2px solid var(--color-accent-primary);
+  outline-offset: 2px;
+}
+
+/* Tooltip styling */
+.mdx-editor-wrapper [class*="_tooltipContent_"] {
+  background: var(--color-surface-elevated);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 0.375rem;
+  padding: 0.375rem 0.625rem;
+  font-size: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Popover styling */
+.mdx-editor-wrapper [class*="_popoverContent_"] {
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+  padding: 0.5rem;
+}
+
+/* Selection */
+.mdx-editor-wrapper ::selection {
+  background: color-mix(in srgb, var(--color-accent-primary) 30%, transparent);
+}

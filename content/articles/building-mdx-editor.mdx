@@ -1,0 +1,256 @@
+---
+title: "Editing MDX Files"
+description: "How I integrated MDXEditor to let users write and edit MDX content with a rich text interface, while keeping the flexibility of markdown."
+date: "2026-01-17"
+author: "scott-peabody"
+tags: ["react", "typescript", "mdx", "editor", "features"]
+featured: true
+readingTime: 10
+---
+
+import { Callout } from '@/components/mdx'
+
+One of the core features of rendered_useful is letting people create content. Not just read it, but write it. And while I love markdown, not everyone does. Some people want a Notion-like experience where they can just... write.
+
+Enter [MDXEditor](https://mdxeditor.dev/): a React component that gives you editing that outputs clean MDX. It's the best of both worlds.
+
+## Why MDXEditor?
+
+I evaluated several options:
+
+| Option | Pros | Cons |
+|--------|------|------|
+| **Plain textarea** | Simple, small | No formatting help, error-prone |
+| **Monaco Editor** | Full IDE experience | Overkill, large bundle |
+| **ProseMirror** | Flexible, powerful | Complex to configure for MDX |
+| **MDXEditor** | Purpose-built for MDX, WYSIWYG | ~150KB bundle |
+
+MDXEditor won because it's specifically designed for MDX. It understands front-matter, JSX components, and markdown extensions out of the box.
+
+## Why not build my own?
+I may in the future, but MDXEditor saves a ton of time as is.
+
+## What We Built
+
+The editor at preview is live at [/edit](/edit). It gives you:
+
+- **WYSIWYG editing** - What you see is what you get
+  - MDXEditor renders basic markdown in place: **bold**, *italic*, headings, lists, links, blockquotes, and code blocks all display formatted
+  - Tables show as actual tables, not pipe-separated text
+  - Code blocks get syntax highlighting via CodeMirror
+  - However, **custom JSX components** (like `<Callout>` or `<Mermaid>`) show as editable placeholder boxes with their props—not the actual rendered component. That's why we added Preview mode.
+- **Live Preview mode** - See exactly how your article will render with all components
+- **Source/Diff toggle** - Switch to raw markdown or see changes since you started
+  - **Source mode** is where you can directly edit the MDX text, including component props. This is essential for tweaking `<CodePlayground>` CSS, adjusting `<Mermaid>` diagrams, or adding attributes that aren't exposed in the placeholder UI
+  - **Diff mode** shows a side-by-side comparison of your original content vs current changes—helpful for reviewing what you've modified before saving
+  - Toggle between Rich Text, Source, and Diff using the buttons in the editor toolbar (right side)
+- **Front-matter editing** - Edit title, tags, and metadata in a form
+- **Syntax-highlighted code blocks** - With language selection for 15+ languages
+- **Auto-save drafts** - To localStorage, so you never lose work
+- **Custom component support** - Insert `Callout`, `CodePlayground`, `Mermaid`, and more
+- **Theme preview** - Test how your article looks in different site themes
+- **Sticky toolbar** - Edit and Preview tabs plus formatting tools stay visible as you scroll
+
+<Callout type="info" title="Try It Now">
+  Head to [/edit](/edit) to try the editor. Your drafts are saved locally in your browser.
+</Callout>
+
+## Architecture
+
+The key insight is that MDXEditor is heavy (~150KB gzipped). We don't want that in the main bundle. So we:
+
+1. **Lazy load** the editor only when visiting `/edit`
+2. **Split the component** into a wrapper and the actual editor
+3. **Show a loading spinner** while the editor loads
+
+```tsx
+// MDXEditorWrapper.tsx - The lightweight wrapper
+const InitializedMDXEditor = lazy(() => import('./InitializedMDXEditor'))
+
+const MDXEditorWrapper = forwardRef((props, ref) => {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <InitializedMDXEditor {...props} editorRef={ref} />
+    </Suspense>
+  )
+})
+```
+
+The heavy lifting happens in `InitializedMDXEditor.tsx`, which imports all the plugins.
+
+## Plugin Architecture
+
+MDXEditor uses a plugin system. You only pay for what you use:
+
+```tsx
+plugins={[
+  // Basic formatting
+  headingsPlugin(),
+  listsPlugin(),
+  quotePlugin(),
+  markdownShortcutPlugin(),
+  
+  // Rich content
+  linkPlugin(),
+  imagePlugin(),
+  tablePlugin(),
+  
+  // Code
+  codeBlockPlugin(),
+  codeMirrorPlugin({ codeBlockLanguages }),
+  
+  // MDX-specific
+  frontmatterPlugin(),
+  jsxPlugin({ jsxComponentDescriptors }),
+  directivesPlugin({ directiveDescriptors }),
+  
+  // UI
+  toolbarPlugin({ toolbarContents: EditorToolbar }),
+  diffSourcePlugin({ viewMode: 'rich-text' }),
+]}
+```
+
+Each plugin adds specific functionality. The `jsxPlugin` is what makes our custom components work.
+
+## Custom Component Descriptors
+
+This is the magic that lets users insert `<Callout>` or `<CodePlayground>` from the toolbar:
+
+```tsx
+const jsxComponentDescriptors: JsxComponentDescriptor[] = [
+  {
+    name: 'Callout',
+    kind: 'flow',  // block-level
+    source: '@/components/mdx',
+    props: [
+      { name: 'type', type: 'string' },
+      { name: 'title', type: 'string' },
+    ],
+    hasChildren: true,
+    Editor: GenericJsxEditor,
+  },
+  {
+    name: 'CodePlayground',
+    kind: 'flow',
+    source: '@/components/mdx',
+    props: [
+      { name: 'title', type: 'string' },
+      { name: 'initialHtml', type: 'string' },
+      { name: 'initialCss', type: 'string' },
+      { name: 'initialJs', type: 'string' },
+      { name: 'height', type: 'expression' },
+      { name: 'allowNetwork', type: 'expression' },
+    ],
+    hasChildren: false,
+    Editor: GenericJsxEditor,
+  },
+  // ... more components
+]
+```
+
+Each descriptor tells MDXEditor:
+- **name**: The JSX tag name
+- **kind**: `'flow'` (block) or `'text'` (inline)
+- **props**: What properties the component accepts
+- **hasChildren**: Whether it wraps content
+- **Editor**: The component used to edit it in the WYSIWYG view
+
+## Draft Storage
+
+Until we figure out our persistence strategy, drafts live in localStorage:
+
+```tsx
+const DRAFT_KEY_PREFIX = 'rendered_useful_draft_'
+
+function saveDraft(slug: string, markdown: string) {
+  const draft = {
+    markdown,
+    lastSaved: new Date().toISOString(),
+  }
+  localStorage.setItem(`${DRAFT_KEY_PREFIX}${slug}`, JSON.stringify(draft))
+}
+
+function loadDraft(slug: string) {
+  const stored = localStorage.getItem(`${DRAFT_KEY_PREFIX}${slug}`)
+  return stored ? JSON.parse(stored) : null
+}
+```
+
+The editor auto-saves every second when you make changes. A status indicator shows whether you have unsaved changes.
+
+## Publishing Workflow
+
+Right now, publishing is manual:
+
+1. Write your article in the editor
+2. Click "Download .mdx" to get the file
+3. Submit a pull request to add it to `content/articles/`
+4. Once merged, it appears on the site
+
+In the future, I will design a more seamless publishing flow.
+
+## Theming Considerations
+
+MDXEditor comes with its own styles. To make it match our site themes 1:1, we map our CSS variables to MDXEditor's internal variables:
+
+```css
+.mdx-editor-wrapper [class*="_editorRoot_"] {
+  /* Use site theme colors */
+  --accentBase: var(--color-accent-primary);
+  --basePageBg: var(--color-background);
+  --baseBgSubtle: var(--color-surface);
+  --baseText: var(--color-text-primary);
+  --baseLine: var(--color-border);
+  /* ... and more */
+}
+```
+
+This means when you switch themes (cyberpunk, terminal, ocean, etc.), the editor automatically adapts. The theme preview dropdown lets you test your article in any theme before publishing.
+
+```tsx
+<MDXEditor
+  className="mdx-editor-wrapper"
+  contentEditableClassName="prose prose-lg max-w-none"
+  // ...
+/>
+```
+
+The toolbar is sticky and stays visible as you scroll, positioned below the fixed navbar and Edit/Preview tabs.
+
+## Live Preview
+
+One of the most powerful features is the **Preview** tab. It uses `@mdx-js/mdx`'s `evaluate()` function to compile MDX at runtime:
+
+```tsx
+const { default: MDXContent } = await evaluate(processedContent, {
+  ...runtime,
+  remarkPlugins: [remarkGfm, remarkFrontmatter],
+  useMDXComponents: () => mdxComponents,
+})
+```
+
+This means you see exactly what readers will see - including:
+- Rendered Callouts with icons and colors
+- Working CodePlayground with live code execution
+- Mermaid diagrams
+- Proper typography and spacing
+
+The preview is wrapped in an ErrorBoundary, so if your MDX has issues, you get a helpful error message instead of a crashed page.
+
+## What's Next
+
+The foundation is solid. Planned improvements:
+
+- **Split view** - See editor and preview side-by-side
+- **Image upload** - Currently just returns a placeholder URL
+- **Collaboration** - Real-time editing with multiple people
+- **Version history** - See past versions of your draft
+- **Template library** - Start from pre-built article templates
+- **Custom component builders** - Visual editors for complex components like CodePlayground
+
+## Try It
+
+The editor is live at [/edit](/edit). Write something! Your draft stays in your browser until you clear it.
+---
+
+*MDXEditor is MIT licensed and actively maintained. Check out the [documentation](https://mdxeditor.dev/editor/docs/getting-started) for more advanced features.*
