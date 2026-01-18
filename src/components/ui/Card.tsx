@@ -22,7 +22,7 @@ interface CardProps {
   techStack?: string[]
   className?: string
   // Allow project's type field to pass through without error
-  type?: 'game' | 'app' | 'widget' | 'tool' | 'library' | 'other'
+  type?: 'game' | 'app' | 'widget' | 'tool' | 'library' | 'integration' | 'other'
 }
 
 export default function Card({
