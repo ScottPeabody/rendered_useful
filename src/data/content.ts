@@ -811,6 +811,22 @@ export const projects: Project[] = [
     languages: ['typescript', 'javascript'],
     locations: ['codeberg', 'the-web'],
   },
+  {
+    slug: 'whiteboard-tools',
+    title: 'Whiteboard Tools',
+    description: 'Embed interactive whiteboards in MDX articles using Excalidraw and tldraw. Draw, diagram, and collaborate directly in the browser.',
+    author: 'scott-peabody',
+    date: '2026-01-19',
+    tags: ['drawing', 'whiteboard', 'diagrams', 'creative-coding', 'integration'],
+    communities: ['creative-coding', 'opensource'],
+    techStack: ['Excalidraw', 'tldraw', 'React', 'TypeScript'],
+    type: 'tool',
+    status: 'completed',
+    featured: true,
+    concepts: ['reactivity'],
+    languages: ['typescript', 'javascript'],
+    locations: ['github', 'the-web'],
+  },
 ]
 
 // ============================================
