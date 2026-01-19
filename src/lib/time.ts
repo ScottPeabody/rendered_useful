@@ -13,13 +13,18 @@ interface FormatOptions {
 }
 
 /**
- * Parse a date string into a UTC Date object
+ * Parse a date string into a Date object
  * Handles both date-only strings (YYYY-MM-DD) and full ISO strings
+ * 
+ * For date-only strings, we parse as LOCAL midnight to avoid timezone shifts
+ * when displaying. This ensures "2026-01-19" displays as Jan 19 everywhere.
  */
 export function parseUTCDate(dateString: string): Date {
-  // If it's just a date (YYYY-MM-DD), treat it as UTC midnight
+  // If it's just a date (YYYY-MM-DD), treat it as LOCAL midnight
+  // This prevents the date from shifting when displayed in local timezone
   if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-    return new Date(dateString + 'T00:00:00Z')
+    const [year, month, day] = dateString.split('-').map(Number)
+    return new Date(year, month - 1, day) // month is 0-indexed
   }
   // If it already has time/timezone info, parse as-is
   return new Date(dateString)
