@@ -1,6 +1,6 @@
 ---
 title: "Whiteboard Tools"
-description: "Embed interactive whiteboards in MDX articles using Excalidraw and tldraw. Draw, diagram, and collaborate directly in the browser."
+description: "Embed interactive whiteboards in MDX articles using Excalidraw. Draw, diagram, and collaborate directly in the browser."
 date: "2026-01-19"
 author: "rendered_useful"
 tags: ["drawing", "whiteboard", "diagrams", "creative-coding", "integration"]
@@ -8,17 +8,17 @@ image: "/images/whiteboard-tools.png"
 featured: true
 ---
 
-import { ExcalidrawEditor, TldrawEditor, Callout } from '@/components/mdx'
+import { ExcalidrawEditor, Callout } from '@/components/mdx'
 
 # Whiteboard Tools
 
-Add hand-drawn diagrams, flowcharts, and sketches directly to your MDX articles. This project integrates two powerful open-source whiteboards that run entirely in the browser.
+Add hand-drawn diagrams, flowcharts, and sketches directly to your MDX articles. This project integrates [Excalidraw](https://excalidraw.com), a powerful open-source whiteboard that runs entirely in the browser.
 
 ---
 
 ## Excalidraw
 
-[Excalidraw](https://excalidraw.com) provides a hand-drawn, sketchy aesthetic perfect for diagrams and wireframes.
+Excalidraw provides a hand-drawn, sketchy aesthetic perfect for diagrams, wireframes, and technical illustrations.
 
 ### Example Flow Diagram (Read-Only)
 
@@ -43,57 +43,21 @@ Add hand-drawn diagrams, flowcharts, and sketches directly to your MDX articles.
 
 ---
 
-## tldraw
-
-[tldraw](https://tldraw.dev) is a polished infinite canvas with a professional UI and multiplayer support.
-
-### Example Diagram (Read-Only)
-
-<TldrawEditor 
-  height={500} 
-  viewOnly={true}
-  dataUrl="/examples/tldraw-flowchart.json"
-/>
-
-### Interactive Canvas
-
-<Callout type="info" title="Persistence">
-  Use **Save File** to download your diagram as JSON. You can share this file or host it for read-only embeds.
-</Callout>
-
-<TldrawEditor 
-  height={500} 
-  persistenceKey="demo-tldraw"
-/>
-
----
-
 ## How to Use in Your Articles
 
 ### Available Props
-
-Both editors support these common props:
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `height` | number | 500 | Height in pixels |
 | `viewOnly` | boolean | false | Read-only mode (no editing) |
 | `dataUrl` | string | - | URL to load diagram JSON from |
-| `initialData` | object | - | Inline JSON data |
-| `showSave` | boolean | true | Show the Save File button |
-| `showClear` | boolean | true | Show the Clear button |
-
-**Excalidraw-specific:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
+| `initialData` | array | - | Inline JSON element array |
 | `storageKey` | string | - | Key for localStorage auto-save |
 | `theme` | 'light' \| 'dark' | 'dark' | Color theme |
 | `gridMode` | boolean | false | Show grid background |
-
-**tldraw-specific:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `persistenceKey` | string | - | Key for localStorage auto-save |
+| `showSave` | boolean | true | Show the Save File button |
+| `showClear` | boolean | true | Show the Clear button |
 
 ---
 
@@ -113,7 +77,7 @@ Host your JSON file anywhere accessible via URL—GitHub raw files, your site's 
 />
 
 {/* From GitHub raw content */}
-<TldrawEditor 
+<ExcalidrawEditor 
   viewOnly={true}
   dataUrl="https://raw.githubusercontent.com/user/repo/main/diagram.json"
 />
@@ -142,12 +106,11 @@ Pass the data directly via the `initialData` prop. This works well for simple di
 
 #### 3. Interactive with Auto-Save
 
-For editable canvases, use `storageKey` (Excalidraw) or `persistenceKey` (tldraw) to enable localStorage persistence:
+For editable canvases, use `storageKey` to enable localStorage persistence:
 
 ```jsx
 {/* User's work persists in their browser */}
 <ExcalidrawEditor storageKey="my-article-sketch" />
-<TldrawEditor persistenceKey="my-tldraw-canvas" />
 ```
 
 ---
@@ -168,7 +131,7 @@ Hide buttons for cleaner embeds:
 />
 
 {/* Only show Save */}
-<TldrawEditor persistenceKey="save-only" showClear={false} />
+<ExcalidrawEditor storageKey="save-only" showClear={false} />
 ```
 
 ---
@@ -187,25 +150,33 @@ Hide buttons for cleaner embeds:
 
 ---
 
-## Comparison
+## Why Excalidraw?
 
-| Feature | Excalidraw | tldraw |
-|---------|------------|--------|
-| Style | Hand-drawn, sketchy | Clean, professional |
-| License | MIT | tldraw license |
-| Dark mode | ✅ Theme prop | ✅ Auto-inferred |
-| Persistence | localStorage | localStorage |
-| Export format | Elements array | Snapshot object |
-| Grid mode | ✅ | ❌ |
+| Feature | Details |
+|---------|---------|
+| **License** | MIT - fully open source |
+| **Style** | Hand-drawn, sketchy aesthetic |
+| **Dark mode** | ✅ Via `theme` prop |
+| **Persistence** | Browser localStorage |
+| **Export** | JSON elements array |
+| **Grid mode** | ✅ Via `gridMode` prop |
+
+---
+
+## What About tldraw?
+
+<Callout type="warning" title="License Note">
+  We initially integrated [tldraw](https://tldraw.dev) as well—it's a beautiful infinite canvas with a professional UI. However, tldraw requires a commercial license for production deployments. Since this is an open-source project, we decided to stick with Excalidraw (MIT licensed) for now. If you have a tldraw license, the integration pattern would be similar!
+</Callout>
 
 ---
 
 ## Future Improvements
 
-<Callout type="warning" title="Coming Soon">
-  I am exploring better persistence storage for rendered_useful overall. For now, these whiteboard tools rely on browser localStorage and hosting in the the github repo. You can use the the tools at their source sites for a more robust experience and export for embedding here. You can also use the tools here to create diagrams and export the JSON then import them back here which is a little bit of juggling. I will make this better in the future!
+<Callout type="info" title="Coming Soon">
+  I'm exploring better persistence options for rendered_useful overall. For now, these whiteboard tools rely on browser localStorage and hosting JSON files in the GitHub repo. You can use [excalidraw.com](https://excalidraw.com) for a more robust experience and export diagrams for embedding here. I'll make this workflow smoother in the future!
 </Callout>
 
 ---
 
-*Built with React, TypeScript, [@excalidraw/excalidraw](https://www.npmjs.com/package/@excalidraw/excalidraw), and [tldraw](https://www.npmjs.com/package/tldraw)*
+*Built with React, TypeScript, and [@excalidraw/excalidraw](https://www.npmjs.com/package/@excalidraw/excalidraw)*

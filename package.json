@@ -42,7 +42,6 @@
     "remark-math": "^6.0.0",
     "remark-mdx-frontmatter": "^5.2.0",
     "three": "^0.182.0",
-    "tldraw": "^4.2.3",
     "zustand": "^5.0.9"
   },
   "devDependencies": {

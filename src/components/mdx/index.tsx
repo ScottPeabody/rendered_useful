@@ -11,10 +11,9 @@ import Mermaid from './Mermaid'
 import CodePlayground from './CodePlayground'
 import { Strudel, StrudelEmbed } from './Strudel'
 import { ExcalidrawEditor } from './ExcalidrawEditor'
-import { TldrawEditor } from './TldrawEditor'
 
  
-export { Callout, TechStack, Image, Video, Audio, Todo, ThemeSelector, LayoutSelector, Mermaid, CodePlayground, Strudel, StrudelEmbed, ExcalidrawEditor, TldrawEditor }
+export { Callout, TechStack, Image, Video, Audio, Todo, ThemeSelector, LayoutSelector, Mermaid, CodePlayground, Strudel, StrudelEmbed, ExcalidrawEditor }
 
 interface MDXProps {
   children?: ReactNode
