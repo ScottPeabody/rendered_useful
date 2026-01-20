@@ -11,9 +11,10 @@ import Mermaid from './Mermaid'
 import CodePlayground from './CodePlayground'
 import { Strudel, StrudelEmbed } from './Strudel'
 import { ExcalidrawEditor } from './ExcalidrawEditor'
+import { JupyterLiteEmbed } from './JupyterLiteEmbed'
 
  
-export { Callout, TechStack, Image, Video, Audio, Todo, ThemeSelector, LayoutSelector, Mermaid, CodePlayground, Strudel, StrudelEmbed, ExcalidrawEditor }
+export { Callout, TechStack, Image, Video, Audio, Todo, ThemeSelector, LayoutSelector, Mermaid, CodePlayground, Strudel, StrudelEmbed, ExcalidrawEditor, JupyterLiteEmbed }
 
 interface MDXProps {
   children?: ReactNode

@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# JupyterLite build (built during CI/CD)
+public/jupyterlite
+.jupyterlite.doit.db
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

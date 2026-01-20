@@ -379,3 +379,38 @@ export interface AuthorWithSpace extends Author {
   privacy?: PrivacySettings
   viewSettings?: ViewSettings
 }
+
+// ============================================
+// NOTEBOOKS: Interactive Jupyter notebooks
+// ============================================
+
+// Notebook represents a JupyterLite notebook
+export interface Notebook extends Versionable {
+  slug: string
+  title: string
+  description: string
+  author: string          // author slug
+  date: string            // ISO 8601 timestamp
+  tags?: string[]
+  concepts?: string[]     // concept slugs
+  languages?: string[]    // language slugs (e.g., 'python', 'javascript')
+  locations?: string[]    // location slugs
+  communities?: string[]  // community slugs
+  
+  // Notebook-specific
+  kernelLanguage: 'python' | 'javascript' | 'r' | 'julia'
+  notebookUrl?: string    // URL to .ipynb file (if external)
+  featured?: boolean
+  draft?: boolean
+}
+
+export interface NotebookInfo {
+  slug: string
+  title: string
+  description: string
+  author: string
+  date: string
+  tags?: string[]
+  kernelLanguage: 'python' | 'javascript' | 'r' | 'julia'
+  featured?: boolean
+}

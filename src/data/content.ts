@@ -1,4 +1,4 @@
-import type { Author, Article, Project, TagInfo, Community, CommunityInfo, Series, SeriesInfo, Event, EventInfo, VersionInfo, Versionable, Concept, ConceptInfo, Language, LanguageInfo, Location, LocationInfo, Post, PostInfo, Feed, FeedInfo, Space } from '../types'
+import type { Author, Article, Project, TagInfo, Community, CommunityInfo, Series, SeriesInfo, Event, EventInfo, VersionInfo, Versionable, Concept, ConceptInfo, Language, LanguageInfo, Location, LocationInfo, Post, PostInfo, Feed, FeedInfo, Space, Notebook } from '../types'
 import { compareDates, getEventStatus } from '../lib/time'
 
 // ============================================
@@ -827,6 +827,70 @@ export const projects: Project[] = [
     languages: ['typescript', 'javascript'],
     locations: ['github', 'the-web'],
   },
+  {
+    slug: 'jupyter-notebooks',
+    title: 'Jupyter Notebooks Integration',
+    description: 'Run interactive Jupyter notebooks directly in MDX articles using JupyterLite—no server required, all in the browser via WebAssembly.',
+    author: 'scott-peabody',
+    date: '2026-01-19T12:00:00',
+    tags: ['notebooks', 'data-science', 'python', 'integration'],
+    communities: ['creative-coding', 'opensource', 'learners'],
+    techStack: ['JupyterLite', 'Pyodide', 'WebAssembly', 'React', 'TypeScript'],
+    type: 'integration',
+    status: 'completed',
+    featured: true,
+    concepts: ['reactivity'],
+    languages: ['typescript', 'python'],
+    locations: ['github', 'the-web'],
+  },
+]
+
+// ============================================
+// NOTEBOOKS: Interactive Jupyter notebooks
+// ============================================
+
+export const notebooks: Notebook[] = [
+  {
+    slug: 'getting-started-python',
+    title: 'Getting Started with Python',
+    description: 'Learn Python basics in an interactive notebook. Variables, data types, loops, functions, and more—all running in your browser.',
+    author: 'scott-peabody',
+    date: '2026-01-19T12:00:00',
+    tags: ['python', 'beginner', 'tutorial'],
+    concepts: [],
+    languages: ['python'],
+    communities: ['learners'],
+    kernelLanguage: 'python',
+    notebookUrl: '/jupyterlite/files/getting-started-python/getting-started-python.ipynb',
+    featured: true,
+  },
+  {
+    slug: 'data-visualization-intro',
+    title: 'Introduction to Data Visualization',
+    description: 'Create beautiful charts and graphs with matplotlib and pandas. Explore data visualization fundamentals interactively.',
+    author: 'scott-peabody',
+    date: '2026-01-19T12:00:00',
+    tags: ['python', 'data-science', 'visualization', 'matplotlib', 'pandas'],
+    concepts: [],
+    languages: ['python'],
+    communities: ['learners'],
+    kernelLanguage: 'python',
+    notebookUrl: '/jupyterlite/files/data-visualization-intro/data-visualization-intro.ipynb',
+    featured: true,
+  },
+  {
+    slug: 'numpy-fundamentals',
+    title: 'NumPy Fundamentals',
+    description: 'Master NumPy arrays and operations. Essential for data science, machine learning, and scientific computing.',
+    author: 'scott-peabody',
+    date: '2026-01-19T12:00:00',
+    tags: ['python', 'numpy', 'data-science'],
+    concepts: [],
+    languages: ['python'],
+    communities: ['learners'],
+    kernelLanguage: 'python',
+    notebookUrl: '/jupyterlite/files/numpy-fundamentals/numpy-fundamentals.ipynb',
+  },
 ]
 
 // ============================================
@@ -1166,6 +1230,24 @@ export const getArticle = (slug: string): Article | undefined =>
 
 export const getProject = (slug: string): Project | undefined =>
   projects.find((p) => p.slug === slug)
+
+export const getNotebook = (slug: string): Notebook | undefined =>
+  notebooks.find((n) => n.slug === slug)
+
+export const getNotebooksByAuthor = (authorSlug: string): Notebook[] =>
+  notebooks.filter((n) => n.author === authorSlug && !n.draft)
+
+export const getNotebooksByTag = (tag: string): Notebook[] =>
+  notebooks.filter((n) => n.tags?.includes(tag) && !n.draft)
+
+export const getFeaturedNotebooks = (): Notebook[] =>
+  notebooks.filter((n) => n.featured && !n.draft)
+
+export const getRecentNotebooks = (count: number = 5): Notebook[] =>
+  [...notebooks]
+    .filter((n) => !n.draft)
+    .sort((a, b) => compareDates(a.date, b.date))
+    .slice(0, count)
 
 export const getArticlesByAuthor = (authorSlug: string): Article[] =>
   filterLatestArticles(articles.filter((a) => a.author === authorSlug))
