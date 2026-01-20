@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Maximize2, Minimize2 } from 'lucide-react';
 
 // Import Excalidraw CSS
 import '@excalidraw/excalidraw/index.css';
@@ -27,6 +28,8 @@ interface ExcalidrawEditorProps {
   showSave?: boolean;
   /** Show the Clear button */
   showClear?: boolean;
+  /** Show the Fullscreen button */
+  showFullscreen?: boolean;
 }
 
 export function ExcalidrawEditor({
@@ -39,12 +42,15 @@ export function ExcalidrawEditor({
   initialData,
   showSave = true,
   showClear = true,
+  showFullscreen = true,
 }: ExcalidrawEditorProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [Excalidraw, setExcalidraw] = useState<React.ComponentType<any> | null>(null);
   const [initialElements, setInitialElements] = useState<ExcalidrawElement[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const excalidrawAPIRef = useRef<ExcalidrawAPI>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   
   // Load Excalidraw component dynamically
   useEffect(() => {
@@ -159,6 +165,33 @@ export function ExcalidrawEditor({
     }
   }, [storageKey]);
 
+  // Toggle fullscreen mode
+  const toggleFullscreen = useCallback(() => {
+    setIsFullscreen(prev => !prev);
+  }, []);
+
+  // Handle Escape key to exit fullscreen
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isFullscreen) {
+        setIsFullscreen(false);
+      }
+    };
+    
+    if (isFullscreen) {
+      document.addEventListener('keydown', handleKeyDown);
+      // Prevent body scroll when fullscreen
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [isFullscreen]);
+
   if (!Excalidraw || isLoading) {
     return (
       <div 
@@ -171,10 +204,16 @@ export function ExcalidrawEditor({
   }
 
   return (
-    <div className="my-4">
+    <div 
+      ref={containerRef}
+      className={isFullscreen 
+        ? "fixed inset-0 z-50 bg-gray-900 flex flex-col" 
+        : "my-4"
+      }
+    >
       {/* Toolbar */}
-      {!viewOnly && (showSave || showClear || storageKey) && (
-        <div className="flex flex-wrap gap-2 mb-2">
+      {!viewOnly && (showSave || showClear || showFullscreen || storageKey) && (
+        <div className={`flex flex-wrap items-center gap-2 ${isFullscreen ? 'p-2 border-b border-gray-700' : 'mb-2'}`}>
           {showSave && (
             <button
               onClick={handleExport}
@@ -191,6 +230,17 @@ export function ExcalidrawEditor({
               🗑️ Clear
             </button>
           )}
+          {showFullscreen && (
+            <button
+              onClick={toggleFullscreen}
+              className="px-3 py-1.5 text-sm bg-gray-700 hover:bg-gray-600 rounded transition-colors flex items-center gap-1.5"
+              title={isFullscreen ? 'Exit fullscreen (Esc)' : 'Fullscreen'}
+            >
+              {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+              {isFullscreen ? 'Exit' : 'Fullscreen'}
+            </button>
+          )}
+          <div className="flex-1" />
           {storageKey && (
             <span className="px-3 py-1.5 text-xs text-gray-500">
               Auto-saving to browser
@@ -199,10 +249,26 @@ export function ExcalidrawEditor({
         </div>
       )}
 
+      {/* Fullscreen close button for view-only mode */}
+      {viewOnly && isFullscreen && (
+        <div className="absolute top-2 right-2 z-10">
+          <button
+            onClick={toggleFullscreen}
+            className="px-3 py-1.5 text-sm bg-gray-700 hover:bg-gray-600 rounded transition-colors flex items-center gap-1.5"
+          >
+            <Minimize2 size={14} />
+            Exit
+          </button>
+        </div>
+      )}
+
       {/* Excalidraw Canvas */}
       <div 
-        className="rounded-lg overflow-hidden border border-gray-700"
-        style={{ height }}
+        className={isFullscreen 
+          ? "flex-1" 
+          : "rounded-lg overflow-hidden border border-gray-700"
+        }
+        style={isFullscreen ? undefined : { height }}
       >
         <Excalidraw
           excalidrawAPI={(api: ExcalidrawAPI) => { excalidrawAPIRef.current = api; }}
@@ -220,7 +286,22 @@ export function ExcalidrawEditor({
         />
       </div>
 
-      {viewOnly && (
+      {viewOnly && !isFullscreen && showFullscreen && (
+        <div className="flex items-center justify-between mt-2">
+          <p className="text-xs text-gray-500">
+            This canvas is in view-only mode
+          </p>
+          <button
+            onClick={toggleFullscreen}
+            className="px-2 py-1 text-xs bg-gray-700 hover:bg-gray-600 rounded transition-colors flex items-center gap-1"
+          >
+            <Maximize2 size={12} />
+            Fullscreen
+          </button>
+        </div>
+      )}
+
+      {viewOnly && !showFullscreen && (
         <p className="text-xs text-gray-500 mt-2">
           This canvas is in view-only mode
         </p>

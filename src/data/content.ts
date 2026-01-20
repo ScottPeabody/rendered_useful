@@ -943,6 +943,52 @@ export const feeds: Feed[] = [
 // Posts - lightweight content between tweets and articles
 export const posts: Post[] = [
   {
+    slug: 'excalidraw-fullscreen',
+    title: 'Added Fullscreen Mode to Excalidraw',
+    content: `Just shipped a small but useful feature: fullscreen mode for the Excalidraw editor.
+
+The implementation is straightforward—fixed positioning with a z-index overlay:
+
+\`\`\`typescript
+const [isFullscreen, setIsFullscreen] = useState(false);
+
+// Handle Escape key to exit
+useEffect(() => {
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Escape' && isFullscreen) {
+      setIsFullscreen(false);
+    }
+  };
+  
+  if (isFullscreen) {
+    document.addEventListener('keydown', handleKeyDown);
+    document.body.style.overflow = 'hidden';
+  }
+  
+  return () => {
+    document.removeEventListener('keydown', handleKeyDown);
+    document.body.style.overflow = '';
+  };
+}, [isFullscreen]);
+\`\`\`
+
+Key details:
+- Uses Lucide icons (Maximize2/Minimize2) for the toggle button
+- Escape key exits fullscreen
+- Body scroll is locked when fullscreen
+- Works in both edit and view-only modes
+- New \`showFullscreen\` prop (defaults to true)
+
+Small quality-of-life improvements like this make a big difference when you're actually using a tool.`,
+    author: 'scott-peabody',
+    date: '2026-01-19T23:30:00Z',
+    tags: ['building', 'excalidraw', 'ux'],
+    concepts: [],
+    languages: ['typescript', 'react'],
+    feeds: ['main', 'building'],
+    visibility: 'public',
+  },
+  {
     slug: 'hello-world',
     title: 'Hello, World',
     content: `This is my first post. Testing out the new personal spaces feature.
