@@ -6,7 +6,7 @@ import { getAuthor } from '../../data/content'
 import { formatDate } from '../../lib/time'
 
 interface CardProps {
-  contentType: 'article' | 'project'
+  contentType: 'article' | 'project' | 'notebook'
   variant?: 'card' | 'list'
   title: string
   description: string
@@ -43,7 +43,11 @@ export default function Card({
   className = '',
 }: CardProps) {
   const author = getAuthor(authorSlug)
-  const linkTo = contentType === 'article' ? `/articles/${slug}` : `/projects/${slug}`
+  const linkTo = contentType === 'article' 
+    ? `/articles/${slug}` 
+    : contentType === 'notebook'
+    ? `/notebooks/${slug}`
+    : `/projects/${slug}`
 
   // List variant
   if (variant === 'list') {
