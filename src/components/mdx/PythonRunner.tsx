@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { Play, Square, RotateCcw, Loader2 } from 'lucide-react';
+import { Play, Square, RotateCcw, Loader2, Maximize2, X } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
@@ -203,6 +203,7 @@ export function PythonRunner({
   const [isRunning, setIsRunning] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [pyodideReady, setPyodideReady] = useState(!!window._sharedPyodide);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const pyodideRef = useRef<PyodideInterface | null>(window._sharedPyodide || null);
   const hasAutoRun = useRef(false);
   const htmlContainerRef = useRef<HTMLDivElement>(null);
@@ -342,6 +343,25 @@ def _clear_bokeh_figures():
     setError(null);
   };
 
+  // Handle escape key to exit fullscreen
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isFullscreen) {
+        setIsFullscreen(false);
+      }
+    };
+    
+    if (isFullscreen) {
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden';
+    }
+    
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = '';
+    };
+  }, [isFullscreen]);
+
   // Execute Bokeh scripts when HTML output changes
   useEffect(() => {
     if (htmlOutput && htmlContainerRef.current) {
@@ -426,109 +446,206 @@ def _clear_bokeh_figures():
   }, [htmlOutput]);
 
   return (
-    <div className="my-6 rounded-lg border border-[var(--color-border)] overflow-hidden bg-[var(--color-surface)]">
-      {/* Header */}
-      <div className="flex items-center gap-2 px-3 py-2 bg-[var(--color-background)] border-b border-[var(--color-border)]">
-        <span className="text-xs font-medium text-[var(--color-text-muted)]">
-          🐍 {title || 'Python'}
-        </span>
-        <div className="flex-1" />
-        {(output || error || figures.length > 0 || htmlOutput) && (
-          <button
-            onClick={clearOutput}
-            className="p-1.5 rounded text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors"
-            title="Clear output"
-          >
-            <RotateCcw size={14} />
-          </button>
-        )}
-        <button
-          onClick={runCode}
-          disabled={isRunning || isLoading}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-green-600/20 text-green-400 hover:bg-green-600/30"
-          title={pyodideReady ? 'Run code' : 'Click to load Python runtime and run'}
-        >
-          {isLoading ? (
-            <>
-              <Loader2 size={12} className="animate-spin" />
-              Loading Python...
-            </>
-          ) : isRunning ? (
-            <>
-              <Square size={12} className="animate-pulse" />
-              Running...
-            </>
-          ) : (
-            <>
-              <Play size={12} />
-              Run
-            </>
-          )}
-        </button>
-      </div>
-
-      {/* Code */}
-      {showCode && (
-        <div className="text-sm">
-          <SyntaxHighlighter
-            language="python"
-            style={oneDark}
-            showLineNumbers={lineNumbers}
-            customStyle={{
-              margin: 0,
-              padding: '12px 16px',
-              background: 'transparent',
-              fontSize: '13px',
-            }}
-            lineNumberStyle={{
-              minWidth: '2em',
-              paddingRight: '1em',
-              color: 'var(--color-text-muted)',
-              opacity: 0.5,
-            }}
-          >
-            {code}
-          </SyntaxHighlighter>
-        </div>
-      )}
-
-      {/* Output */}
-      {(output || error || figures.length > 0 || htmlOutput) && (
+    <>
+      {/* Fullscreen overlay for matplotlib figures */}
+      {isFullscreen && figures.length > 0 && (
         <div 
-          className="border-t border-[var(--color-border)] p-3 bg-[var(--color-background)]"
-          style={{ maxHeight: maxOutputHeight, overflowY: 'auto' }}
+          className="fixed inset-0 z-50 bg-black/95 flex flex-col"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsFullscreen(false);
+          }}
         >
-          {error ? (
-            <pre className="text-sm text-red-400 whitespace-pre-wrap font-mono bg-red-500/10 p-2 rounded">
-              {error}
-            </pre>
-          ) : (
-            <>
-              {output && (
-                <pre className="text-sm text-[var(--color-text-secondary)] whitespace-pre-wrap font-mono">
-                  {output}
-                </pre>
-              )}
+          {/* Fullscreen header */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+            <span className="text-sm font-medium text-white/80">
+              🐍 {title || 'Python'} - Visualization
+            </span>
+            <button
+              onClick={() => setIsFullscreen(false)}
+              className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+              title="Exit fullscreen (Esc)"
+            >
+              <X size={20} />
+            </button>
+          </div>
+          
+          {/* Fullscreen content */}
+          <div className="flex-1 overflow-auto p-6 flex items-center justify-center">
+            <div className="max-w-full max-h-full">
               {figures.map((fig, i) => (
                 <img
                   key={i}
                   src={`data:image/png;base64,${fig}`}
                   alt={`Figure ${i + 1}`}
-                  className="mt-2 max-w-full rounded"
+                  className="max-w-full max-h-[calc(100vh-120px)] object-contain rounded"
                 />
               ))}
-              {htmlOutput && (
-                <div 
-                  ref={htmlContainerRef}
-                  className="mt-2 bokeh-output"
-                  style={{ minHeight: 100 }}
-                />
-              )}
-            </>
-          )}
+            </div>
+          </div>
+          
+          {/* Fullscreen hint */}
+          <div className="text-center py-2 text-white/40 text-xs">
+            Press <kbd className="px-1.5 py-0.5 bg-white/10 rounded">Esc</kbd> or click outside to exit
+          </div>
         </div>
       )}
-    </div>
+
+      {/* Fullscreen overlay for Bokeh - uses portal-style approach */}
+      {isFullscreen && htmlOutput && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/95 flex flex-col"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsFullscreen(false);
+          }}
+        >
+          {/* Fullscreen header */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+            <span className="text-sm font-medium text-white/80">
+              🐍 {title || 'Python'} - Interactive Visualization
+            </span>
+            <button
+              onClick={() => setIsFullscreen(false)}
+              className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+              title="Exit fullscreen (Esc)"
+            >
+              <X size={20} />
+            </button>
+          </div>
+          
+          {/* Fullscreen Bokeh content - the actual container is positioned here via CSS */}
+          <div className="flex-1 overflow-auto p-6 flex items-center justify-center">
+            {/* Placeholder - actual Bokeh content stays in place but gets styled */}
+          </div>
+          
+          {/* Fullscreen hint */}
+          <div className="text-center py-2 text-white/40 text-xs">
+            Press <kbd className="px-1.5 py-0.5 bg-white/10 rounded">Esc</kbd> or click outside to exit
+          </div>
+        </div>
+      )}
+
+      <div className="my-6 rounded-lg border border-[var(--color-border)] overflow-hidden bg-[var(--color-surface)]">
+        {/* Header */}
+        <div className="flex items-center gap-2 px-3 py-2 bg-[var(--color-background)] border-b border-[var(--color-border)]">
+          <span className="text-xs font-medium text-[var(--color-text-muted)]">
+            🐍 {title || 'Python'}
+          </span>
+          <div className="flex-1" />
+          {(figures.length > 0 || htmlOutput) && (
+            <button
+              onClick={() => setIsFullscreen(true)}
+              className="p-1.5 rounded text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors"
+              title="Fullscreen visualization"
+            >
+              <Maximize2 size={14} />
+            </button>
+          )}
+          {(output || error || figures.length > 0 || htmlOutput) && (
+            <button
+              onClick={clearOutput}
+              className="p-1.5 rounded text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors"
+              title="Clear output"
+            >
+              <RotateCcw size={14} />
+            </button>
+          )}
+          <button
+            onClick={runCode}
+            disabled={isRunning || isLoading}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-green-600/20 text-green-400 hover:bg-green-600/30"
+            title={pyodideReady ? 'Run code' : 'Click to load Python runtime and run'}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 size={12} className="animate-spin" />
+                Loading Python...
+              </>
+            ) : isRunning ? (
+              <>
+                <Square size={12} className="animate-pulse" />
+                Running...
+              </>
+            ) : (
+              <>
+                <Play size={12} />
+                Run
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Code */}
+        {showCode && (
+          <div className="text-sm">
+            <SyntaxHighlighter
+              language="python"
+              style={oneDark}
+              showLineNumbers={lineNumbers}
+              customStyle={{
+                margin: 0,
+                padding: '12px 16px',
+                background: 'transparent',
+                fontSize: '13px',
+              }}
+              lineNumberStyle={{
+                minWidth: '2em',
+                paddingRight: '1em',
+                color: 'var(--color-text-muted)',
+                opacity: 0.5,
+              }}
+            >
+              {code}
+            </SyntaxHighlighter>
+          </div>
+        )}
+
+        {/* Output */}
+        {(output || error || figures.length > 0 || htmlOutput) && (
+          <div 
+            className="border-t border-[var(--color-border)] p-3 bg-[var(--color-background)]"
+            style={{ maxHeight: maxOutputHeight, overflowY: 'auto' }}
+          >
+            {error ? (
+              <pre className="text-sm text-red-400 whitespace-pre-wrap font-mono bg-red-500/10 p-2 rounded">
+                {error}
+              </pre>
+            ) : (
+              <>
+                {output && (
+                  <pre className="text-sm text-[var(--color-text-secondary)] whitespace-pre-wrap font-mono">
+                    {output}
+                  </pre>
+                )}
+                {figures.map((fig, i) => (
+                  <img
+                    key={i}
+                    src={`data:image/png;base64,${fig}`}
+                    alt={`Figure ${i + 1}`}
+                    className="mt-2 max-w-full rounded cursor-pointer hover:opacity-90 transition-opacity"
+                    onClick={() => setIsFullscreen(true)}
+                    title="Click to view fullscreen"
+                  />
+                ))}
+                {htmlOutput && (
+                  <div 
+                    ref={htmlContainerRef}
+                    className={`mt-2 bokeh-output ${isFullscreen ? 'bokeh-fullscreen' : ''}`}
+                    style={isFullscreen ? {
+                      position: 'fixed',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%) scale(1.15)',
+                      zIndex: 51,
+                      minHeight: 100,
+                    } : { minHeight: 100 }}
+                  />
+                )}
+              </>
+            )}
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 
