@@ -12,9 +12,10 @@ import CodePlayground from './CodePlayground'
 import { Strudel, StrudelEmbed } from './Strudel'
 import { ExcalidrawEditor } from './ExcalidrawEditor'
 import { JupyterLiteEmbed } from './JupyterLiteEmbed'
+import { PythonRunner } from './PythonRunner'
 
  
-export { Callout, TechStack, Image, Video, Audio, Todo, ThemeSelector, LayoutSelector, Mermaid, CodePlayground, Strudel, StrudelEmbed, ExcalidrawEditor, JupyterLiteEmbed }
+export { Callout, TechStack, Image, Video, Audio, Todo, ThemeSelector, LayoutSelector, Mermaid, CodePlayground, Strudel, StrudelEmbed, ExcalidrawEditor, JupyterLiteEmbed, PythonRunner }
 
 interface MDXProps {
   children?: ReactNode
@@ -160,4 +161,5 @@ export const mdxComponents: MDXComponents = {
 
   Callout,
   TechStack,
+  Python: PythonRunner,
 }

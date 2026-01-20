@@ -81,7 +81,7 @@ export default function NotebooksPage() {
           </h1>
           <p className="text-lg text-[var(--color-text-secondary)] max-w-2xl">
             Interactive Jupyter notebooks that run entirely in your browser. 
-            Explore data science, machine learning, and coding tutorials—no installation required.
+            Explore data science, machine learning, and coding tutorials. No installation required.
           </p>
         </motion.div>
 

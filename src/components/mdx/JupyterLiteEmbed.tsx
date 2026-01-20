@@ -177,7 +177,7 @@ export function JupyterLiteEmbed({
       {displayFooter && (
         <div className="px-4 py-2 border-t border-[var(--color-border)] bg-[var(--color-background)]">
           <p className="text-xs text-[var(--color-text-muted)]">
-            Powered by <a href="https://jupyterlite.readthedocs.io/" target="_blank" rel="noopener noreferrer" className="text-[var(--color-accent-primary)] hover:underline">JupyterLite</a> — 
+            Powered by <a href="https://jupyterlite.readthedocs.io/" target="_blank" rel="noopener noreferrer" className="text-[var(--color-accent-primary)] hover:underline">JupyterLite</a> - 
             runs entirely in your browser using WebAssembly. No server required.
           </p>
         </div>
