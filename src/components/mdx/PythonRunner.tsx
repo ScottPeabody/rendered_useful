@@ -423,7 +423,7 @@ def _clear_bokeh_figures():
       
       // Wait for Bokeh to be available
       const waitForBokeh = (attempts = 0) => {
-        if ((window as any).Bokeh) {
+        if (window.Bokeh) {
           // Give Bokeh a moment to fully initialize
           setTimeout(executeBokehScripts, 50);
         } else if (attempts < 50) {
