@@ -9,6 +9,9 @@ const ProjectsPage = lazy(() => import('./pages/ProjectsPage'))
 const ProjectPage = lazy(() => import('./pages/ProjectPage'))
 const ArticlesPage = lazy(() => import('./pages/BlogPage'))
 const ArticlePage = lazy(() => import('./pages/ArticlePage'))
+const NotebooksPage = lazy(() => import('./pages/NotebooksPage'))
+const NotebookPage = lazy(() => import('./pages/NotebookPage'))
+const JupyterLabPage = lazy(() => import('./components/ui/JupyterLiteEmbed').then(m => ({ default: m.JupyterLabPage })))
 const AboutPage = lazy(() => import('./pages/AboutPage'))
 const ContributePage = lazy(() => import('./pages/ContributePage'))
 const ContributorsPage = lazy(() => import('./pages/ContributorsPage'))
@@ -54,6 +57,9 @@ function App() {
           <Route path="/projects/:slug" element={<ProjectPage />} />
           <Route path="/articles" element={<ArticlesPage />} />
           <Route path="/articles/:slug" element={<ArticlePage />} />
+          <Route path="/notebooks" element={<NotebooksPage />} />
+          <Route path="/notebooks/:slug" element={<NotebookPage />} />
+          <Route path="/lab" element={<JupyterLabPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contribute" element={<ContributePage />} />
           <Route path="/contributors" element={<ContributorsPage />} />

@@ -11,6 +11,7 @@ const navItems = [
   { label: 'Home', href: '/' },
   { label: 'Projects', href: '/projects' },
   { label: 'Articles', href: '/articles' },
+  { label: 'Notebooks', href: '/notebooks' },
 ]
 
 // Explore dropdown - content discovery and dimensional navigation

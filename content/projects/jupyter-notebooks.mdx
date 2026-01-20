@@ -1,0 +1,380 @@
+---
+title: Jupyter Notebooks Integration
+description: Run interactive Jupyter notebooks directly in MDX articles—choose between rendered mode (lightweight) or full JupyterLite interface.
+---
+
+import { Callout, TechStack } from '../../src/components/mdx'
+import PyodideNotebook from '../../src/components/ui/PyodideNotebook'
+import JupyterLiteEmbed from '../../src/components/ui/JupyterLiteEmbed'
+
+# Jupyter Notebooks Integration
+
+Run interactive Python notebooks directly in your browser. No installation, no server—just pure browser-based computing powered by WebAssembly.
+
+<TechStack 
+  items={['JupyterLite', 'Pyodide', 'WebAssembly', 'uv/uvx', 'React']} 
+/>
+
+## Two Rendering Modes
+
+We offer two ways to display notebooks:
+
+| Mode | Best For | Features |
+|------|----------|----------|
+| **JupyterLite** | Full exploration | Complete Jupyter interface, file browser |
+| **Rendered** | Quick examples, tutorials | Lightweight, fast load, clean UI |
+
+### JupyterLite Mode
+
+The complete Jupyter notebook experience embedded in an iframe. Uses the "notebooks" interface for a single-document view without tab leakage.
+
+<JupyterLiteEmbed 
+  notebookUrl="/jupyterlite/files/getting-started-python/getting-started-python.ipynb"
+  height="500px"
+/>
+
+### Rendered Mode
+
+A minimal interface using Pyodide directly. Parses `.ipynb` files and renders cells with syntax highlighting and executable Python.
+
+<PyodideNotebook notebookUrl="/jupyterlite/files/getting-started-python/getting-started-python.ipynb" />
+
+---
+
+## Implementation Deep Dive
+
+### Project Structure
+
+Notebooks live in the `content/` folder, organized by name:
+
+```
+content/
+  notebooks/
+    getting-started-python/
+      getting-started-python.ipynb
+    numpy-fundamentals/
+      numpy-fundamentals.ipynb
+      sample-data.csv          # Optional supporting files
+    data-visualization-intro/
+      data-visualization-intro.ipynb
+```
+
+Each notebook gets its own folder. This allows:
+- Adding supporting files (datasets, images) per notebook
+- File browser in JupyterLite shows only that notebook's folder
+- Clean separation between notebooks
+
+### Build Process
+
+We use **uvx** (from [uv](https://github.com/astral-sh/uv)) to build JupyterLite. No Python virtual environment needed—uvx handles isolation automatically.
+
+```bash
+# Local build
+npm run build:jupyterlite
+
+# What it runs:
+uvx --with jupyterlite-core --with jupyterlite-pyodide-kernel \
+  jupyter lite build \
+  --contents content/notebooks \
+  --output-dir public/jupyterlite
+```
+
+The build script (`scripts/build-jupyterlite.js`):
+
+```javascript
+// Check for uvx
+execSync('uvx --version', { stdio: 'pipe' });
+
+// Build JupyterLite with notebooks bundled in
+execSync(
+  `uvx --with jupyterlite-core --with jupyterlite-pyodide-kernel \
+   jupyter lite build \
+   --contents "${notebooksDir}" \
+   --output-dir "${outputDir}"`,
+  { cwd: rootDir, stdio: 'inherit' }
+);
+```
+
+Output goes to `public/jupyterlite/` which Vite serves statically.
+
+---
+
+## Component: JupyterLiteEmbed
+
+Embeds a self-hosted JupyterLite instance in an iframe.
+
+```tsx
+interface JupyterLiteEmbedProps {
+  notebookUrl?: string      // Path to .ipynb file
+  height?: string           // Default: '700px'
+  fullScreen?: boolean      // Default: false
+  mode?: 'notebook' | 'lab' // Default: 'notebook'
+}
+```
+
+### Key Implementation Details
+
+**URL Construction:**
+```tsx
+// Extract notebook name from URL
+const filename = notebookUrl.split('/').pop() || ''
+const notebookName = filename.replace('.ipynb', '')
+
+// Path in JupyterLite: {name}/{name}.ipynb
+const notebookPath = `${notebookName}/${filename}`
+
+// Notebooks interface = single document, no tabs
+jupyterUrl = `/jupyterlite/notebooks/index.html?path=${notebookPath}`
+```
+
+**Preventing History Pollution:**
+
+The iframe uses `sandbox` to prevent JupyterLite from hijacking browser back/forward:
+
+```tsx
+<iframe
+  src={jupyterUrl}
+  sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-modals allow-downloads"
+  // Note: no allow-top-navigation
+/>
+```
+
+**Mode Options:**
+- `mode="notebook"` — Single-document view, no file browser tabs leaking between pages
+- `mode="lab"` — Full JupyterLab with file browser (tabs persist in storage)
+
+---
+
+## Component: PyodideNotebook
+
+Renders notebooks using Pyodide directly—no iframe, lighter weight.
+
+### Notebook Parsing
+
+Fetches and parses standard `.ipynb` JSON:
+
+```tsx
+const response = await fetch(notebookUrl);
+const notebook: NotebookData = await response.json();
+
+// NotebookData structure
+interface NotebookData {
+  cells: NotebookCell[];
+  metadata?: { kernelspec?: { language?: string } };
+  nbformat: number;
+}
+
+interface NotebookCell {
+  cell_type: 'markdown' | 'code' | 'raw';
+  source: string | string[];
+  outputs?: NotebookOutput[];
+}
+```
+
+### Pyodide Initialization
+
+Loads Pyodide from CDN and sets up output capture:
+
+```tsx
+const pyodide = await window.loadPyodide({
+  indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/',
+});
+
+// Capture stdout/stderr
+await pyodide.runPythonAsync(`
+import sys
+from io import StringIO
+
+class OutputCapture:
+    def __init__(self):
+        self.output = StringIO()
+        self.figures = []  # For matplotlib
+    
+    def write(self, text):
+        self.output.write(text)
+    
+    def get_output(self):
+        return self.output.getvalue()
+    
+    def add_figure(self, fig_data):
+        self.figures.append(fig_data)
+
+_output_capture = OutputCapture()
+sys.stdout = _output_capture
+sys.stderr = _output_capture
+`);
+```
+
+### Handling IPython Magic Commands
+
+IPython magics like `%matplotlib inline` don't work in plain Pyodide. We strip them:
+
+```tsx
+const cleanedSource = source
+  .split('\n')
+  .filter(line => {
+    const trimmed = line.trim();
+    // Skip magic commands
+    return !trimmed.startsWith('%') && !trimmed.startsWith('!');
+  })
+  .join('\n');
+```
+
+### Matplotlib Support
+
+We intercept `plt.show()` to capture figures as base64 PNG:
+
+```python
+def setup_matplotlib():
+    import matplotlib
+    matplotlib.use('AGG')  # Non-interactive backend
+    import matplotlib.pyplot as plt
+    
+    def capture_show(*args, **kwargs):
+        import base64
+        from io import BytesIO
+        for fig_num in plt.get_fignums():
+            fig = plt.figure(fig_num)
+            buf = BytesIO()
+            fig.savefig(buf, format='png', bbox_inches='tight')
+            buf.seek(0)
+            img_data = base64.b64encode(buf.read()).decode('utf-8')
+            _output_capture.add_figure(img_data)
+        plt.close('all')
+    
+    plt.show = capture_show
+```
+
+Then render figures as inline images:
+
+```tsx
+// After execution
+const figures = await pyodide.runPythonAsync('_output_capture.get_figures()');
+const figureList = figures.toJs();
+
+if (figureList.length > 0) {
+  const figuresHtml = figureList.map(imgData => 
+    `<img src="data:image/png;base64,${imgData}" />`
+  ).join('\n');
+  output += figuresHtml;
+}
+```
+
+---
+
+## Using in MDX
+
+### Rendered Mode
+
+```jsx
+import PyodideNotebook from '../../src/components/ui/PyodideNotebook'
+
+<PyodideNotebook 
+  notebookUrl="/jupyterlite/files/getting-started-python/getting-started-python.ipynb" 
+/>
+```
+
+### JupyterLite Mode
+
+```jsx
+import JupyterLiteEmbed from '../../src/components/ui/JupyterLiteEmbed'
+
+<JupyterLiteEmbed 
+  notebookUrl="/jupyterlite/files/numpy-fundamentals/numpy-fundamentals.ipynb"
+  height="600px"
+  mode="notebook"
+/>
+```
+
+### Full Lab Interface
+
+```jsx
+<JupyterLiteEmbed 
+  mode="lab"
+  height="700px"
+/>
+```
+
+---
+
+## Adding a New Notebook
+
+1. **Create the folder and notebook:**
+   ```bash
+   mkdir content/notebooks/my-notebook
+   # Add your .ipynb file
+   cp my-notebook.ipynb content/notebooks/my-notebook/
+   ```
+
+2. **Add to content registry** (`src/data/content.ts`):
+   ```typescript
+   {
+     slug: 'my-notebook',
+     title: 'My Notebook Title',
+     description: 'What this notebook teaches',
+     author: 'your-author-slug',
+     date: '2026-01-19T12:00:00',
+     tags: ['python', 'tutorial'],
+     kernelLanguage: 'python',
+     notebookUrl: '/jupyterlite/files/my-notebook/my-notebook.ipynb',
+   }
+   ```
+
+3. **Rebuild JupyterLite:**
+   ```bash
+   npm run build:jupyterlite
+   ```
+
+4. **Test locally:**
+   ```bash
+   npm run dev
+   # Visit /notebooks/my-notebook
+   ```
+
+<Callout type="info">
+The notebook page at `/notebooks/{slug}` automatically provides toggle buttons to switch between Rendered and JupyterLite modes.
+</Callout>
+
+---
+
+## Configuration
+
+### JupyterLite Settings
+
+The `jupyter-lite.json` in the project root configures JupyterLite:
+
+```json
+{
+  "jupyter-lite-schema-version": 0,
+  "jupyter-config-data": {
+    "contentsStorageName": "JupyterLite Storage",
+    "settingsStorageName": "JupyterLite Settings",
+    "disableRecovery": true,
+    "collaborative": false,
+    "appName": "Rendered Useful Notebooks"
+  }
+}
+```
+
+- `disableRecovery: true` — Prevents restoring previous sessions (reduces tab leakage)
+- `collaborative: false` — No real-time collaboration features
+
+---
+
+## Supported Libraries
+
+Both modes support Pyodide's package ecosystem:
+
+- **NumPy** — Numerical computing
+- **Pandas** — Data manipulation  
+- **Matplotlib** — Visualization (with inline rendering)
+- **Scikit-learn** — Machine learning
+- **SciPy** — Scientific computing
+
+<Callout type="warning">
+Some libraries with native C extensions aren't available in Pyodide. Check the [Pyodide packages list](https://pyodide.org/en/stable/usage/packages-in-pyodide.html) for compatibility.
+</Callout>
+
+---
+
+Interactive notebooks make learning and sharing code truly accessible. No more "install this first" barriers—just click and code.
