@@ -146,7 +146,7 @@ function CellOutput({ output }: { output: NotebookOutput }) {
   return null;
 }
 
-function CodeCell({ cell, index }: { cell: NotebookCell; index: number }) {
+function CodeCell({ cell, index: _index }: { cell: NotebookCell; index: number }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const source = getSourceText(cell.source);
   const hasOutput = cell.outputs && cell.outputs.length > 0;

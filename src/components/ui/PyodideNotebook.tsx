@@ -104,7 +104,7 @@ interface CodeCellProps {
   pyodideReady: boolean;
 }
 
-function CodeCell({ cell, index, cellState, onRun, pyodideReady }: CodeCellProps) {
+function CodeCell({ cell, index: _index, cellState, onRun, pyodideReady }: CodeCellProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const source = getSourceText(cell.source);
 
