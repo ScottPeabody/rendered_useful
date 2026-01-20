@@ -6,10 +6,6 @@ import '@excalidraw/excalidraw/index.css';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ExcalidrawElement = any;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AppState = any;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type BinaryFiles = any;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ExcalidrawAPI = any;
 
 interface ExcalidrawEditorProps {
@@ -124,7 +120,7 @@ export function ExcalidrawEditor({
 
   // Save to localStorage on change
   const handleChange = useCallback(
-    (elements: readonly ExcalidrawElement[], _appState: AppState, _files: BinaryFiles) => {
+    (elements: readonly ExcalidrawElement[]) => {
       if (storageKey && elements.length > 0) {
         const toSave = elements.filter((el: ExcalidrawElement) => !el.isDeleted);
         localStorage.setItem(`excalidraw-${storageKey}`, JSON.stringify(toSave));

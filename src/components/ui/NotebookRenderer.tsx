@@ -61,7 +61,7 @@ function renderMarkdown(text: string): string {
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
     .replace(/`([^`]+)`/g, '<code class="px-1.5 py-0.5 rounded bg-[var(--color-surface)] text-[var(--color-accent-primary)] font-mono text-sm">$1</code>')
     // Lists
-    .replace(/^\- (.*$)/gm, '<li class="ml-4 list-disc">$1</li>')
+    .replace(/^- (.*$)/gm, '<li class="ml-4 list-disc">$1</li>')
     .replace(/^\d+\. (.*$)/gm, '<li class="ml-4 list-decimal">$1</li>')
     // Links
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener" class="text-[var(--color-accent-primary)] hover:underline">$1</a>')
@@ -135,10 +135,12 @@ function CellOutput({ output }: { output: NotebookOutput }) {
   }
 
   if (output.output_type === 'error') {
+    // eslint-disable-next-line no-control-regex
+    const stripAnsi = (str: string) => str.replace(/\x1b\[[0-9;]*m/g, '');
     return (
       <pre className="text-sm text-red-400 whitespace-pre-wrap font-mono bg-red-500/10 p-2 rounded">
         {output.ename}: {output.evalue}
-        {output.traceback && '\n' + output.traceback.join('\n').replace(/\x1b\[[0-9;]*m/g, '')}
+        {output.traceback && '\n' + stripAnsi(output.traceback.join('\n'))}
       </pre>
     );
   }
@@ -146,7 +148,7 @@ function CellOutput({ output }: { output: NotebookOutput }) {
   return null;
 }
 
-function CodeCell({ cell, index: _index }: { cell: NotebookCell; index: number }) {
+function CodeCell({ cell }: { cell: NotebookCell }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const source = getSourceText(cell.source);
   const hasOutput = cell.outputs && cell.outputs.length > 0;
@@ -286,7 +288,7 @@ export function NotebookRenderer({ notebookUrl }: NotebookRendererProps) {
       <div className="space-y-3">
         {notebook.cells.map((cell, index) => {
           if (cell.cell_type === 'code') {
-            return <CodeCell key={index} cell={cell} index={index} />;
+            return <CodeCell key={index} cell={cell} />;
           }
           if (cell.cell_type === 'markdown') {
             return <MarkdownCell key={index} cell={cell} />;

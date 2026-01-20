@@ -77,7 +77,7 @@ function renderMarkdown(text: string): string {
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
     .replace(/`([^`]+)`/g, '<code class="px-1.5 py-0.5 rounded bg-[var(--color-surface)] text-[var(--color-accent-primary)] font-mono text-sm">$1</code>')
-    .replace(/^\- (.*$)/gm, '<li class="ml-4 list-disc">$1</li>')
+    .replace(/^- (.*$)/gm, '<li class="ml-4 list-disc">$1</li>')
     .replace(/^\d+\. (.*$)/gm, '<li class="ml-4 list-decimal">$1</li>')
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener" class="text-[var(--color-accent-primary)] hover:underline">$1</a>')
     .replace(/\n\n/g, '</p><p class="mb-3">')
@@ -98,13 +98,12 @@ function MarkdownCell({ cell }: { cell: NotebookCell }) {
 
 interface CodeCellProps {
   cell: NotebookCell;
-  index: number;
   cellState: CellState;
   onRun: () => void;
   pyodideReady: boolean;
 }
 
-function CodeCell({ cell, index: _index, cellState, onRun, pyodideReady }: CodeCellProps) {
+function CodeCell({ cell, cellState, onRun, pyodideReady }: CodeCellProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const source = getSourceText(cell.source);
 
@@ -533,7 +532,6 @@ def setup_matplotlib():
               <CodeCell
                 key={index}
                 cell={cell}
-                index={index}
                 cellState={cellStates.get(index) || { output: '', error: null, isRunning: false, executionCount: null }}
                 onRun={() => runCell(index, getSourceText(cell.source))}
                 pyodideReady={pyodideReady || !pyodideLoading}
