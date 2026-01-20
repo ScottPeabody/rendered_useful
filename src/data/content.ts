@@ -830,12 +830,28 @@ export const projects: Project[] = [
   {
     slug: 'jupyter-notebooks',
     title: 'Jupyter Notebooks Integration',
-    description: 'Run interactive Jupyter notebooks directly in MDX articles using JupyterLite—no server required, all in the browser via WebAssembly.',
+    description: 'Run interactive Jupyter notebooks directly in MDX articles using JupyterLite. No server required, all in the browser via WebAssembly.',
     author: 'scott-peabody',
     date: '2026-01-19T12:00:00',
     tags: ['notebooks', 'data-science', 'python', 'integration'],
     communities: ['creative-coding', 'opensource', 'learners'],
     techStack: ['JupyterLite', 'Pyodide', 'WebAssembly', 'React', 'TypeScript'],
+    type: 'integration',
+    status: 'completed',
+    featured: true,
+    concepts: ['reactivity'],
+    languages: ['typescript', 'python'],
+    locations: ['github', 'the-web'],
+  },
+  {
+    slug: 'python-in-mdx',
+    title: 'Python in MDX',
+    description: 'Run Python code directly in articles using Pyodide. Interactive examples with matplotlib visualizations. No server required.',
+    author: 'scott-peabody',
+    date: '2026-01-20T12:00:00',
+    tags: ['python', 'data-science', 'visualization', 'integration'],
+    communities: ['creative-coding', 'opensource', 'learners'],
+    techStack: ['Pyodide', 'WebAssembly', 'Matplotlib', 'NumPy', 'React', 'TypeScript'],
     type: 'integration',
     status: 'completed',
     featured: true,
@@ -853,7 +869,7 @@ export const notebooks: Notebook[] = [
   {
     slug: 'getting-started-python',
     title: 'Getting Started with Python',
-    description: 'Learn Python basics in an interactive notebook. Variables, data types, loops, functions, and more—all running in your browser.',
+    description: 'Learn Python basics in an interactive notebook. Variables, data types, loops, functions, and more. All running in your browser.',
     author: 'scott-peabody',
     date: '2026-01-19T12:00:00',
     tags: ['python', 'beginner', 'tutorial'],
@@ -947,7 +963,7 @@ export const posts: Post[] = [
     title: 'Added Fullscreen Mode to Excalidraw',
     content: `Just shipped a small but useful feature: fullscreen mode for the Excalidraw editor.
 
-The implementation is straightforward—fixed positioning with a z-index overlay:
+The implementation is straightforward - fixed positioning with a z-index overlay:
 
 \`\`\`typescript
 const [isFullscreen, setIsFullscreen] = useState(false);

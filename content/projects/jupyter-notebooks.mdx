@@ -1,6 +1,6 @@
 ---
 title: Jupyter Notebooks Integration
-description: Run interactive Jupyter notebooks directly in MDX articles—choose between rendered mode (lightweight) or full JupyterLite interface.
+description: Run interactive Jupyter notebooks directly in MDX articles. Choose between rendered mode (lightweight) or full JupyterLite interface.
 ---
 
 import { Callout, TechStack } from '../../src/components/mdx'
@@ -9,7 +9,7 @@ import JupyterLiteEmbed from '../../src/components/ui/JupyterLiteEmbed'
 
 # Jupyter Notebooks Integration
 
-Run interactive Python notebooks directly in your browser. No installation, no server—just pure browser-based computing powered by WebAssembly.
+Run interactive Python notebooks directly in your browser. No installation, no server, just pure browser-based computing powered by WebAssembly.
 
 <TechStack 
   items={['JupyterLite', 'Pyodide', 'WebAssembly', 'uv/uvx', 'React']} 
@@ -66,7 +66,7 @@ Each notebook gets its own folder. This allows:
 
 ### Build Process
 
-We use **uvx** (from [uv](https://github.com/astral-sh/uv)) to build JupyterLite. No Python virtual environment needed—uvx handles isolation automatically.
+We use **uvx** (from [uv](https://github.com/astral-sh/uv)) to build JupyterLite. No Python virtual environment needed - uvx handles isolation automatically.
 
 ```bash
 # Local build
@@ -140,14 +140,14 @@ The iframe uses `sandbox` to prevent JupyterLite from hijacking browser back/for
 ```
 
 **Mode Options:**
-- `mode="notebook"` — Single-document view, no file browser tabs leaking between pages
-- `mode="lab"` — Full JupyterLab with file browser (tabs persist in storage)
+- `mode="notebook"` - Single-document view, no file browser tabs leaking between pages
+- `mode="lab"` - Full JupyterLab with file browser (tabs persist in storage)
 
 ---
 
 ## Component: PyodideNotebook
 
-Renders notebooks using Pyodide directly—no iframe, lighter weight.
+Renders notebooks using Pyodide directly. No iframe, lighter weight.
 
 ### Notebook Parsing
 
@@ -356,8 +356,8 @@ The `jupyter-lite.json` in the project root configures JupyterLite:
 }
 ```
 
-- `disableRecovery: true` — Prevents restoring previous sessions (reduces tab leakage)
-- `collaborative: false` — No real-time collaboration features
+- `disableRecovery: true` - Prevents restoring previous sessions (reduces tab leakage)
+- `collaborative: false` - No real-time collaboration features
 
 ---
 
@@ -365,11 +365,11 @@ The `jupyter-lite.json` in the project root configures JupyterLite:
 
 Both modes support Pyodide's package ecosystem:
 
-- **NumPy** — Numerical computing
-- **Pandas** — Data manipulation  
-- **Matplotlib** — Visualization (with inline rendering)
-- **Scikit-learn** — Machine learning
-- **SciPy** — Scientific computing
+- **NumPy** - Numerical computing
+- **Pandas** - Data manipulation  
+- **Matplotlib** - Visualization (with inline rendering)
+- **Scikit-learn** - Machine learning
+- **SciPy** - Scientific computing
 
 <Callout type="warning">
 Some libraries with native C extensions aren't available in Pyodide. Check the [Pyodide packages list](https://pyodide.org/en/stable/usage/packages-in-pyodide.html) for compatibility.
@@ -377,4 +377,4 @@ Some libraries with native C extensions aren't available in Pyodide. Check the [
 
 ---
 
-Interactive notebooks make learning and sharing code truly accessible. No more "install this first" barriers—just click and code.
+Interactive notebooks make learning and sharing code truly accessible. No more "install this first" barriers, just click and code.

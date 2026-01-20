@@ -10,7 +10,7 @@ readingTime: 10
 
 import { Callout } from '@/components/mdx'
 
-When I wrote about [building open platforms](/articles/building-open-platforms), I talked about the magic of early social media—how platforms felt like tools *you* controlled. Personal spaces is my attempt to bring some of that back.
+When I wrote about [building open platforms](/articles/building-open-platforms), I talked about the magic of early social media, how platforms felt like tools *you* controlled. Personal spaces is my attempt to bring some of that back.
 
 The idea is simple: give every contributor their own corner of the platform. A place where they can post updates, organize their work into feeds, and express themselves with custom themes and layouts.
 
@@ -18,7 +18,7 @@ The idea is simple: give every contributor their own corner of the platform. A p
 
 This feature required rethinking how we organize the site. Previously, "Space" was a navbar item that grouped various discovery features. But now "Spaces" means something specific: personal spaces for contributors. Using the same word for two different concepts would be confusing.
 
-So I moved those discovery features under **Explore** and repurposed the concept. Now "Spaces" refers exclusively to personal spaces, and you find them through contributor profiles. When you visit an author's page, you see a **Spaces** section showing all their spaces—both their main identity and any aliases.
+So I moved those discovery features under **Explore** and repurposed the concept. Now "Spaces" refers exclusively to personal spaces, and you find them through contributor profiles. When you visit an author's page, you see a **Spaces** section showing all their spaces, both their main identity and any aliases.
 
 This makes the mental model cleaner: Explore is for discovering content, Spaces are where users can curate and manage their own content.
 
@@ -79,7 +79,7 @@ The `alias` field is the key innovation here. It lets a single author have multi
 
 Most platforms either show you everything chronologically (overwhelming) or use an algorithm to decide what you see (opaque and manipulative). Feeds are a middle ground.
 
-You organize your own content into categories. Readers can follow the feeds they care about. No algorithm deciding what's "relevant"—just transparent, user-controlled organization.
+You organize your own content into categories. Readers can follow the feeds they care about. No algorithm deciding what's "relevant", just transparent, user-controlled organization.
 
 ```typescript
 const feeds: Feed[] = [
@@ -290,7 +290,7 @@ Personal spaces is live, but this is very much a first draft and there are many 
 
 ### More Robust Defaults
 
-The current theme and layout presets are pretty basic. Six themes, six layouts—enough to prove the concept, but not enough for real variety. I want to expand both:
+The current theme and layout presets are pretty basic. Six themes, six layouts - enough to prove the concept, but not enough for real variety. I want to expand both:
 
 **Themes**: The existing themes (terminal, cyberpunk, retro, ocean, paper, sunset) only vary colors. Future themes should explore:
 - Typography choices (serif vs sans, monospace options)
@@ -306,7 +306,7 @@ The current theme and layout presets are pretty basic. Six themes, six layouts�
 
 ### Safe Arbitrary Customization
 
-The ultimate goal is letting users define their own themes and layouts—but safely. This is the hard problem that killed MySpace customization. Raw CSS and HTML injection is a security nightmare.
+The ultimate goal is letting users define their own themes and layouts, but safely. This is the hard problem that killed MySpace customization. Raw CSS and HTML injection is a security nightmare.
 
 I'm thinking about approaches like:
 - **A theme builder UI** that only exposes safe properties

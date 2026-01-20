@@ -1,0 +1,770 @@
+---
+title: Python in MDX
+description: Run Python code directly in articles using Pyodide. No server required, everything runs in your browser via WebAssembly.
+---
+
+import { PythonRunner as Python } from '../../src/components/mdx'
+
+# Python in MDX
+
+Write executable Python code blocks directly in your articles. Click **Run** to execute. The first run loads Pyodide (~10MB), then subsequent runs are instant.
+
+## Basic Example
+
+<Python title="Hello Python" code={`
+message = "Hello from Python! 🐍"
+print(message)
+
+# Math works too
+import math
+print(f"π = {math.pi}")
+print(f"e = {math.e}")
+`} />
+
+## Data Processing
+
+Python's list comprehensions and built-in functions make data processing elegant:
+
+<Python title="List Operations" code={`
+# Generate some data
+numbers = list(range(1, 21))
+print(f"Numbers: {numbers}")
+
+# Filter evens
+evens = [n for n in numbers if n % 2 == 0]
+print(f"Evens: {evens}")
+
+# Square them
+squares = [n**2 for n in evens]
+print(f"Squared: {squares}")
+
+# Statistics
+print(f"\\nSum: {sum(squares)}")
+print(f"Average: {sum(squares) / len(squares)}")
+print(f"Max: {max(squares)}")
+`} />
+
+## Visualizations with Matplotlib
+
+The real fun begins with visualizations. Matplotlib figures are automatically captured and displayed inline.
+
+### Sine Wave
+
+<Python title="Sine Wave" code={`
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.linspace(0, 4 * np.pi, 200)
+y = np.sin(x)
+
+plt.figure(figsize=(10, 4))
+plt.plot(x, y, 'b-', linewidth=2)
+plt.fill_between(x, y, alpha=0.3)
+plt.title('Sine Wave')
+plt.xlabel('x')
+plt.ylabel('sin(x)')
+plt.grid(True, alpha=0.3)
+plt.show()
+`} />
+
+### Spirograph Pattern
+
+<Python title="Spirograph" code={`
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Spirograph parameters
+R, r, d = 5, 3, 5
+t = np.linspace(0, 20 * np.pi, 2000)
+
+x = (R - r) * np.cos(t) + d * np.cos((R - r) / r * t)
+y = (R - r) * np.sin(t) - d * np.sin((R - r) / r * t)
+
+plt.figure(figsize=(8, 8))
+plt.plot(x, y, linewidth=0.5, color='#8b5cf6')
+plt.axis('equal')
+plt.axis('off')
+plt.title('Spirograph (R=5, r=3, d=5)', fontsize=14)
+plt.tight_layout()
+plt.show()
+`} />
+
+### Random Walk
+
+<Python title="2D Random Walk" code={`
+import numpy as np
+import matplotlib.pyplot as plt
+
+np.random.seed(42)
+n_steps = 1000
+
+# Generate random steps
+angles = np.random.uniform(0, 2 * np.pi, n_steps)
+x = np.cumsum(np.cos(angles))
+y = np.cumsum(np.sin(angles))
+
+plt.figure(figsize=(8, 8))
+colors = np.linspace(0, 1, n_steps)
+plt.scatter(x, y, c=colors, cmap='viridis', s=1, alpha=0.7)
+plt.plot(x[0], y[0], 'go', markersize=10, label='Start')
+plt.plot(x[-1], y[-1], 'ro', markersize=10, label='End')
+plt.legend()
+plt.title(f'2D Random Walk ({n_steps} steps)')
+plt.axis('equal')
+plt.grid(True, alpha=0.3)
+plt.show()
+`} />
+
+### Heatmap
+
+<Python title="Mandelbrot Set" code={`
+import numpy as np
+import matplotlib.pyplot as plt
+
+def mandelbrot(h, w, max_iter=100):
+    y, x = np.ogrid[-1.4:1.4:h*1j, -2:0.8:w*1j]
+    c = x + y*1j
+    z = c
+    divtime = max_iter + np.zeros(z.shape, dtype=int)
+    
+    for i in range(max_iter):
+        z = z**2 + c
+        diverge = z*np.conj(z) > 2**2
+        div_now = diverge & (divtime == max_iter)
+        divtime[div_now] = i
+        z[diverge] = 2
+    
+    return divtime
+
+plt.figure(figsize=(10, 8))
+plt.imshow(mandelbrot(400, 500), cmap='magma', extent=[-2, 0.8, -1.4, 1.4])
+plt.colorbar(label='Iterations')
+plt.title('Mandelbrot Set')
+plt.xlabel('Real')
+plt.ylabel('Imaginary')
+plt.show()
+`} />
+
+### Bar Chart
+
+<Python title="Programming Language Popularity" code={`
+import matplotlib.pyplot as plt
+
+languages = ['Python', 'JavaScript', 'TypeScript', 'Rust', 'Go', 'Java']
+popularity = [100, 95, 78, 45, 42, 65]
+colors = ['#3776ab', '#f7df1e', '#3178c6', '#dea584', '#00add8', '#ed8b00']
+
+plt.figure(figsize=(10, 5))
+bars = plt.bar(languages, popularity, color=colors, edgecolor='white', linewidth=2)
+plt.ylabel('Popularity Score')
+plt.title('Programming Language Popularity (Totally Scientific™)')
+plt.ylim(0, 110)
+
+# Add value labels
+for bar, val in zip(bars, popularity):
+    plt.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 2, 
+             str(val), ha='center', fontsize=11)
+
+plt.tight_layout()
+plt.show()
+`} />
+
+### Animated-Style Plot (Multiple Frames)
+
+<Python title="Lissajous Curves" code={`
+import numpy as np
+import matplotlib.pyplot as plt
+
+fig, axes = plt.subplots(2, 3, figsize=(12, 8))
+t = np.linspace(0, 2 * np.pi, 1000)
+
+params = [(1, 2), (2, 3), (3, 4), (3, 5), (4, 5), (5, 6)]
+
+for ax, (a, b) in zip(axes.flat, params):
+    x = np.sin(a * t)
+    y = np.sin(b * t)
+    ax.plot(x, y, linewidth=1.5, color='#22d3ee')
+    ax.set_title(f'a={a}, b={b}')
+    ax.set_aspect('equal')
+    ax.axis('off')
+
+plt.suptitle('Lissajous Curves', fontsize=16)
+plt.tight_layout()
+plt.show()
+`} />
+
+---
+
+## Generative Art & Simulations
+
+### Lorenz Attractor
+
+The famous "butterfly effect" - a chaotic system that never repeats but stays bounded:
+
+<Python title="Lorenz Attractor" code={`
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+def lorenz(xyz, s=10, r=28, b=2.667):
+    x, y, z = xyz
+    return np.array([s*(y - x), x*(r - z) - y, x*y - b*z])
+
+dt = 0.01
+num_steps = 10000
+
+xs, ys, zs = np.empty(num_steps), np.empty(num_steps), np.empty(num_steps)
+xs[0], ys[0], zs[0] = 0.1, 0, 0
+
+for i in range(1, num_steps):
+    d = lorenz([xs[i-1], ys[i-1], zs[i-1]]) * dt
+    xs[i] = xs[i-1] + d[0]
+    ys[i] = ys[i-1] + d[1]
+    zs[i] = zs[i-1] + d[2]
+
+fig = plt.figure(figsize=(10, 8))
+ax = fig.add_subplot(111, projection='3d')
+ax.plot(xs, ys, zs, lw=0.5, color='#8b5cf6')
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
+ax.set_title('Lorenz Attractor')
+plt.tight_layout()
+plt.show()
+`} />
+
+### Conway's Game of Life
+
+Cellular automata - simple rules create complex emergent behavior:
+
+<Python title="Game of Life" code={`
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
+
+def life_step(grid):
+    neighbors = (
+        np.roll(np.roll(grid, 1, 0), 1, 1) + np.roll(np.roll(grid, 1, 0), -1, 1) +
+        np.roll(np.roll(grid, -1, 0), 1, 1) + np.roll(np.roll(grid, -1, 0), -1, 1) +
+        np.roll(grid, 1, 0) + np.roll(grid, -1, 0) +
+        np.roll(grid, 1, 1) + np.roll(grid, -1, 1)
+    )
+    return ((grid == 1) & ((neighbors == 2) | (neighbors == 3))) | ((grid == 0) & (neighbors == 3))
+
+np.random.seed(42)
+size = 50
+grid = np.random.choice([0, 1], size=(size, size), p=[0.85, 0.15])
+
+frames = [grid.copy()]
+for _ in range(100):
+    grid = life_step(grid).astype(int)
+    frames.append(grid.copy())
+
+fig, axes = plt.subplots(2, 4, figsize=(12, 6))
+cmap = ListedColormap(['#1a1a2e', '#22d3ee'])
+steps = [0, 10, 25, 50, 75, 100, 90, 80]
+
+for ax, step in zip(axes.flat, steps):
+    ax.imshow(frames[step], cmap=cmap)
+    ax.set_title(f'Step {step}')
+    ax.axis('off')
+
+plt.suptitle("Conway's Game of Life", fontsize=14)
+plt.tight_layout()
+plt.show()
+`} />
+
+### Fractal Tree (L-System)
+
+Recursive branching creates natural-looking trees:
+
+<Python title="Fractal Tree" code={`
+import numpy as np
+import matplotlib.pyplot as plt
+
+def draw_tree(ax, x, y, angle, length, depth, max_depth):
+    if depth > max_depth or length < 1:
+        return
+    
+    x2 = x + length * np.cos(np.radians(angle))
+    y2 = y + length * np.sin(np.radians(angle))
+    
+    t = depth / max_depth
+    color = (0.4 * (1-t) + 0.2 * t, 0.25 * (1-t) + 0.7 * t, 0.1 * (1-t) + 0.3 * t)
+    linewidth = max(1, (max_depth - depth) * 0.8)
+    
+    ax.plot([x, x2], [y, y2], color=color, linewidth=linewidth)
+    
+    spread = 25 + np.random.uniform(-5, 5)
+    shrink = 0.7 + np.random.uniform(-0.05, 0.05)
+    
+    draw_tree(ax, x2, y2, angle + spread, length * shrink, depth + 1, max_depth)
+    draw_tree(ax, x2, y2, angle - spread, length * shrink, depth + 1, max_depth)
+
+np.random.seed(123)
+fig, ax = plt.subplots(figsize=(10, 10))
+ax.set_facecolor('#1a1a2e')
+fig.patch.set_facecolor('#1a1a2e')
+
+draw_tree(ax, 0, 0, 90, 60, 0, 10)
+
+ax.set_aspect('equal')
+ax.axis('off')
+ax.set_title('Fractal Tree (L-System)', color='white', fontsize=14)
+plt.tight_layout()
+plt.show()
+`} />
+
+### Julia Set
+
+A companion to the Mandelbrot. Each point in the Mandelbrot defines a unique Julia set:
+
+<Python title="Julia Set" code={`
+import numpy as np
+import matplotlib.pyplot as plt
+
+def julia(h, w, c, max_iter=200):
+    y, x = np.ogrid[-1.5:1.5:h*1j, -1.5:1.5:w*1j]
+    z = x + y*1j
+    divtime = max_iter + np.zeros(z.shape, dtype=int)
+    
+    for i in range(max_iter):
+        z = z**2 + c
+        diverge = np.abs(z) > 2
+        div_now = diverge & (divtime == max_iter)
+        divtime[div_now] = i
+        z[diverge] = 2
+    
+    return divtime
+
+fig, axes = plt.subplots(2, 2, figsize=(10, 10))
+c_values = [
+    (-0.7 + 0.27015j, 'c = -0.7 + 0.27015i'),
+    (-0.8 + 0.156j, 'c = -0.8 + 0.156i'),
+    (-0.4 + 0.6j, 'c = -0.4 + 0.6i'),
+    (0.285 + 0.01j, 'c = 0.285 + 0.01i'),
+]
+
+for ax, (c, title) in zip(axes.flat, c_values):
+    img = julia(400, 400, c)
+    ax.imshow(img, cmap='twilight_shifted', extent=[-1.5, 1.5, -1.5, 1.5])
+    ax.set_title(title, fontsize=10)
+    ax.axis('off')
+
+plt.suptitle('Julia Sets', fontsize=14)
+plt.tight_layout()
+plt.show()
+`} />
+
+### Fourier Circle Drawing
+
+Approximate any path using rotating circles (epicycles):
+
+<Python title="Fourier Epicycles" code={`
+import numpy as np
+import matplotlib.pyplot as plt
+
+t = np.linspace(0, 2*np.pi, 1000)
+n_terms = 15
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+
+y_total = np.zeros_like(t)
+colors = plt.cm.viridis(np.linspace(0, 1, n_terms))
+
+for i, n in enumerate(range(1, n_terms*2, 2)):
+    y_term = (4/np.pi) * np.sin(n * t) / n
+    y_total += y_term
+    if i < 5:
+        ax1.plot(t, y_total, color=colors[i], alpha=0.5, label=f'{i+1} terms')
+
+ax1.plot(t, y_total, 'cyan', linewidth=2, label=f'{n_terms} terms')
+ax1.legend(loc='upper right')
+ax1.set_title('Building a Square Wave')
+ax1.set_xlabel('t')
+ax1.set_ylabel('amplitude')
+ax1.grid(True, alpha=0.3)
+
+theta = np.linspace(0, 2*np.pi, 100)
+x_center, y_center = 0, 0
+for n in range(1, 8, 2):
+    radius = (4/np.pi) / n
+    circle_x = x_center + radius * np.cos(theta)
+    circle_y = y_center + radius * np.sin(theta)
+    ax2.plot(circle_x, circle_y, alpha=0.5, color='#22d3ee', linewidth=2)
+    x_center += radius * np.cos(n * np.pi/3)
+    y_center += radius * np.sin(n * np.pi/3)
+
+ax2.set_aspect('equal')
+ax2.set_title('Epicycles (Rotating Circles)')
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+`} />
+
+---
+
+## Interactive Charts with Bokeh
+
+Bokeh creates truly interactive visualizations. Hover for details, zoom, pan, and click to interact. These run entirely in your browser.
+
+### Live Demo: Galaxy Collision
+
+This visualization loads automatically with no code to distract from the experience. Hover over stars to see which galaxy they belong to!
+
+<Python title="🌌 Galaxy Collision" autoRun showCode={false} maxOutputHeight={600} code={`
+import numpy as np
+from bokeh.plotting import figure, show
+from bokeh.models import ColumnDataSource
+from bokeh.palettes import Turbo256
+from bokeh.transform import linear_cmap
+
+np.random.seed(42)
+
+def spiral_galaxy(n_stars, center, rotation, arm_tightness=0.5, spread=0.3):
+    theta = np.random.uniform(0, 4*np.pi, n_stars)
+    r = theta * arm_tightness + np.random.normal(0, spread, n_stars)
+    x = center[0] + r * np.cos(theta + rotation) + np.random.normal(0, 0.2, n_stars)
+    y = center[1] + r * np.sin(theta + rotation) + np.random.normal(0, 0.2, n_stars)
+    brightness = 1 / (1 + np.sqrt((x - center[0])**2 + (y - center[1])**2) * 0.3)
+    return x, y, brightness
+
+x1, y1, b1 = spiral_galaxy(2000, (-2, 0), 0, 0.4, 0.25)
+x2, y2, b2 = spiral_galaxy(1500, (3, 1), np.pi/3, 0.5, 0.2)
+
+x = np.concatenate([x1, x2])
+y = np.concatenate([y1, y2])
+brightness = np.concatenate([b1 * 0.8, b2])
+galaxy = np.concatenate([['Andromeda'] * len(x1), ['Milky Way'] * len(x2)])
+sizes = brightness * 8 + 2
+
+source = ColumnDataSource(data=dict(x=x, y=y, brightness=brightness, galaxy=galaxy, size=sizes))
+
+p = figure(title="Galactic Collision - Hover over stars!", 
+           width=900, height=550,
+           tools="pan,wheel_zoom,box_zoom,reset,hover",
+           background_fill_color="#0a0a15",
+           x_range=(-8, 8), y_range=(-5, 5))
+
+p.scatter('x', 'y', source=source, size='size', 
+          color=linear_cmap('brightness', Turbo256, 0, 1), alpha=0.7, line_color=None)
+
+p.hover.tooltips = [("Galaxy", "@galaxy"), ("Brightness", "@brightness{0.2f}")]
+p.xgrid.visible = False
+p.ygrid.visible = False
+p.xaxis.visible = False
+p.yaxis.visible = False
+p.title.text_color = "white"
+p.title.text_font_size = "16px"
+p.outline_line_color = None
+
+show(p)
+`} />
+
+### Neural Network Visualization
+
+<Python title="Neural Network Architecture" maxOutputHeight={550} code={`
+import numpy as np
+from bokeh.plotting import figure, show
+from bokeh.models import ColumnDataSource
+from bokeh.palettes import Viridis256
+
+np.random.seed(123)
+
+# Define network architecture
+layers = [4, 8, 6, 4, 2]  # neurons per layer
+layer_names = ['Input', 'Hidden 1', 'Hidden 2', 'Hidden 3', 'Output']
+
+# Generate node positions
+nodes_x, nodes_y, nodes_layer, nodes_idx, nodes_activation = [], [], [], [], []
+for i, n_neurons in enumerate(layers):
+    x = i * 2
+    y_positions = np.linspace(-(n_neurons-1)/2, (n_neurons-1)/2, n_neurons)
+    for j, y in enumerate(y_positions):
+        nodes_x.append(x)
+        nodes_y.append(y)
+        nodes_layer.append(layer_names[i])
+        nodes_idx.append(j)
+        nodes_activation.append(np.random.uniform(0.1, 1.0))
+
+# Generate edges (connections between adjacent layers)
+edges_x0, edges_y0, edges_x1, edges_y1, edges_weight = [], [], [], [], []
+node_idx = 0
+for i in range(len(layers) - 1):
+    n_current = layers[i]
+    n_next = layers[i + 1]
+    for j in range(n_current):
+        for k in range(n_next):
+            # Current node position
+            curr_y = np.linspace(-(n_current-1)/2, (n_current-1)/2, n_current)[j]
+            next_y = np.linspace(-(n_next-1)/2, (n_next-1)/2, n_next)[k]
+            edges_x0.append(i * 2)
+            edges_y0.append(curr_y)
+            edges_x1.append((i + 1) * 2)
+            edges_y1.append(next_y)
+            edges_weight.append(np.random.uniform(0.1, 1.0))
+
+p = figure(title="Neural Network Architecture - Hover for details", 
+           width=850, height=500,
+           tools="pan,wheel_zoom,reset,hover",
+           background_fill_color="#1a1a2e",
+           x_range=(-1, 9), y_range=(-5, 5))
+
+# Draw edges first (behind nodes)
+for x0, y0, x1, y1, w in zip(edges_x0, edges_y0, edges_x1, edges_y1, edges_weight):
+    p.line([x0, x1], [y0, y1], line_width=w*2, color='#4a5568', alpha=0.3)
+
+# Draw nodes
+node_source = ColumnDataSource(data=dict(
+    x=nodes_x, y=nodes_y, layer=nodes_layer, 
+    idx=nodes_idx, activation=nodes_activation,
+    color=[Viridis256[int(a * 200)] for a in nodes_activation]
+))
+
+p.scatter('x', 'y', source=node_source, size=20, color='color', 
+          line_color='white', line_width=2, alpha=0.9)
+
+p.hover.tooltips = [("Layer", "@layer"), ("Neuron", "@idx"), ("Activation", "@activation{0.2f}")]
+p.xgrid.visible = False
+p.ygrid.visible = False
+p.xaxis.visible = False
+p.yaxis.visible = False
+p.title.text_color = "white"
+p.outline_line_color = None
+
+show(p)
+print("✨ Hover over neurons to see activation values!")
+`} />
+
+### Linked Plots (Brushing)
+
+<Python title="Linked Scatter & Histogram" maxOutputHeight={500} code={`
+import numpy as np
+from bokeh.plotting import figure, show
+from bokeh.models import ColumnDataSource
+from bokeh.layouts import row
+from bokeh.palettes import Category10
+
+np.random.seed(42)
+
+# Generate correlated data with clusters
+n = 500
+cluster_ids = np.random.choice([0, 1, 2], n, p=[0.4, 0.35, 0.25])
+colors = [Category10[3][i] for i in cluster_ids]
+
+x = np.where(cluster_ids == 0, np.random.normal(2, 1, n),
+     np.where(cluster_ids == 1, np.random.normal(5, 0.8, n),
+              np.random.normal(8, 1.2, n)))
+y = x * 0.5 + np.random.normal(0, 1, n) + cluster_ids * 2
+
+source = ColumnDataSource(data=dict(x=x, y=y, color=colors))
+
+# Scatter plot
+p1 = figure(title="Scatter (box/lasso select points)", 
+            width=450, height=400,
+            tools="pan,wheel_zoom,box_select,lasso_select,reset",
+            background_fill_color="#1a1a2e")
+p1.scatter('x', 'y', source=source, color='color', size=6, alpha=0.6,
+           selection_color='yellow', selection_alpha=1,
+           nonselection_alpha=0.1)
+
+# Histogram
+hist, edges = np.histogram(x, bins=30)
+p2 = figure(title="X Distribution", 
+            width=400, height=400,
+            tools="",
+            background_fill_color="#1a1a2e")
+p2.quad(top=hist, bottom=0, left=edges[:-1], right=edges[1:],
+        fill_color='#22d3ee', line_color='white', alpha=0.7)
+
+for p in [p1, p2]:
+    p.title.text_color = "white"
+    p.xaxis.axis_label_text_color = "white"
+    p.yaxis.axis_label_text_color = "white"
+    p.xaxis.major_label_text_color = "white"
+    p.yaxis.major_label_text_color = "white"
+
+layout = row(p1, p2)
+show(layout)
+print("✨ Use box select or lasso on the scatter plot!")
+`} />
+
+### Streaming Stock Chart Style
+
+<Python title="Candlestick Chart" maxOutputHeight={500} code={`
+import numpy as np
+from bokeh.plotting import figure, show
+from bokeh.models import ColumnDataSource, HoverTool
+
+np.random.seed(42)
+
+# Generate fake stock data
+n_days = 60
+dates = np.arange(n_days)
+
+# Random walk for price
+returns = np.random.normal(0.001, 0.02, n_days)
+close = 100 * np.cumprod(1 + returns)
+
+# Generate OHLC from close
+open_price = np.roll(close, 1)
+open_price[0] = 100
+high = np.maximum(open_price, close) * (1 + np.abs(np.random.normal(0, 0.01, n_days)))
+low = np.minimum(open_price, close) * (1 - np.abs(np.random.normal(0, 0.01, n_days)))
+
+# Determine up/down days
+inc = close > open_price
+dec = open_price > close
+
+source = ColumnDataSource(data=dict(
+    date=dates, open=open_price, high=high, low=low, close=close
+))
+
+p = figure(title="PYTH Stock - 60 Day Chart", 
+           width=850, height=450,
+           tools="pan,wheel_zoom,box_zoom,reset,hover",
+           background_fill_color="#1a1a2e",
+           x_range=(0, n_days))
+
+# Wicks (high-low lines)
+p.segment(dates, high, dates, low, color="white", line_width=1)
+
+# Up candles (green)
+p.vbar(dates[inc], 0.6, open_price[inc], close[inc], 
+       fill_color="#22c55e", line_color="#22c55e")
+
+# Down candles (red)  
+p.vbar(dates[dec], 0.6, open_price[dec], close[dec],
+       fill_color="#ef4444", line_color="#ef4444")
+
+p.hover.tooltips = [
+    ("Day", "@date"),
+    ("Open", "$@open{0.2f}"),
+    ("High", "$@high{0.2f}"),
+    ("Low", "$@low{0.2f}"),
+    ("Close", "$@close{0.2f}")
+]
+
+p.xaxis.axis_label = "Trading Day"
+p.yaxis.axis_label = "Price ($)"
+p.title.text_color = "white"
+p.xaxis.axis_label_text_color = "white"
+p.yaxis.axis_label_text_color = "white"
+p.xaxis.major_label_text_color = "white"
+p.yaxis.major_label_text_color = "white"
+p.xgrid.grid_line_alpha = 0.3
+p.ygrid.grid_line_alpha = 0.3
+
+show(p)
+print("✨ Hover over candles for OHLC data. Zoom in on interesting areas!")
+`} />
+
+### Heatmap with Hover
+
+<Python title="Correlation Heatmap" maxOutputHeight={600} code={`
+import numpy as np
+from bokeh.plotting import figure, show
+from bokeh.models import ColumnDataSource, HoverTool, ColorBar, LinearColorMapper
+from bokeh.palettes import RdBu11
+from bokeh.transform import transform
+
+np.random.seed(42)
+
+# Generate correlation matrix for fake features
+features = ['Revenue', 'Users', 'Engagement', 'Retention', 'NPS', 'Churn', 'Growth']
+n = len(features)
+
+# Create a realistic-ish correlation matrix
+base = np.random.uniform(-0.3, 0.3, (n, n))
+corr = (base + base.T) / 2  # Make symmetric
+np.fill_diagonal(corr, 1)  # Diagonal is 1
+
+# Add some logical correlations
+corr[0, 1] = corr[1, 0] = 0.85  # Revenue-Users
+corr[1, 2] = corr[2, 1] = 0.72  # Users-Engagement
+corr[3, 5] = corr[5, 3] = -0.68  # Retention-Churn
+corr[0, 6] = corr[6, 0] = 0.91  # Revenue-Growth
+
+# Flatten for Bokeh
+x_coords, y_coords, values, x_labels, y_labels = [], [], [], [], []
+for i, f1 in enumerate(features):
+    for j, f2 in enumerate(features):
+        x_coords.append(f1)
+        y_coords.append(f2)
+        values.append(corr[i, j])
+        x_labels.append(f1)
+        y_labels.append(f2)
+
+source = ColumnDataSource(data=dict(
+    x=x_coords, y=y_coords, value=values,
+    value_str=[f'{v:.2f}' for v in values]
+))
+
+mapper = LinearColorMapper(palette=list(reversed(RdBu11)), low=-1, high=1)
+
+p = figure(title="Feature Correlation Matrix",
+           width=600, height=550,
+           x_range=features, y_range=list(reversed(features)),
+           tools="hover",
+           background_fill_color="#1a1a2e")
+
+p.rect(x='x', y='y', width=0.95, height=0.95, source=source,
+       fill_color=transform('value', mapper),
+       line_color=None)
+
+color_bar = ColorBar(color_mapper=mapper, location=(0, 0),
+                     title='Correlation', title_text_color='white',
+                     major_label_text_color='white')
+p.add_layout(color_bar, 'right')
+
+p.hover.tooltips = [("Features", "@x vs @y"), ("Correlation", "@value_str")]
+p.xaxis.major_label_orientation = 0.7
+p.title.text_color = "white"
+p.xaxis.major_label_text_color = "white"
+p.yaxis.major_label_text_color = "white"
+p.xgrid.visible = False
+p.ygrid.visible = False
+
+show(p)
+print("✨ Hover to see exact correlation values!")
+`} />
+
+---
+
+## How It Works
+
+The `<Python>` component uses [Pyodide](https://pyodide.org/) to run Python in WebAssembly:
+
+1. **First run** loads Pyodide (~10MB) from CDN
+2. **Shared instance** - all Python blocks on a page share the same runtime
+3. **Matplotlib integration** - figures captured as PNG and displayed inline
+4. **Package support** - NumPy, Pandas, SciPy, Bokeh, and more
+
+### Usage in MDX
+
+```jsx
+<Python title="My Code" code={`
+import numpy as np
+print(np.array([1, 2, 3]))
+`} />
+```
+
+### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `code` | string | - | Python code to run |
+| `title` | string | "Python" | Header label |
+| `autoRun` | boolean | false | Run on page load |
+| `lineNumbers` | boolean | true | Show line numbers |
+| `maxOutputHeight` | number | 400 | Max output area height (px) |
+
+## Try It Yourself
+
+<Python title="Playground" code={`
+# Try something!
+# NumPy and Matplotlib are available
+
+print("Edit this code and click Run!")
+`} />
