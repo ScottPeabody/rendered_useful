@@ -23,20 +23,23 @@ export default function BlogPage() {
   }
 
   const filteredArticles = useMemo(() => {
-    return articles.filter((article) => {
-      // Search filter
-      const matchesSearch =
-        !searchQuery ||
-        article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        article.description.toLowerCase().includes(searchQuery.toLowerCase())
+    return articles
+      .filter((article) => {
+        // Search filter
+        const matchesSearch =
+          !searchQuery ||
+          article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          article.description.toLowerCase().includes(searchQuery.toLowerCase())
 
-      // Tag filter
-      const matchesTags =
-        selectedTags.length === 0 ||
-        selectedTags.some((tag) => article.tags.includes(tag))
+        // Tag filter
+        const matchesTags =
+          selectedTags.length === 0 ||
+          selectedTags.some((tag) => article.tags.includes(tag))
 
-      return matchesSearch && matchesTags
-    })
+        return matchesSearch && matchesTags
+      })
+      // Sort by date (newest first)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
   }, [searchQuery, selectedTags])
 
   const toggleTag = (tag: string) => {

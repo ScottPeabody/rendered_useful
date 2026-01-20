@@ -84,12 +84,13 @@ export default function ContentList({
   const endIndex = startIndex + pageSize
   const currentItems = sortedItems.slice(startIndex, endIndex)
 
-  // Reset to page 1 if items change
-  useMemo(() => {
-    if (currentPage > Math.ceil(sortedItems.length / pageSize)) {
-      setCurrentPage(1)
-    }
-  }, [sortedItems.length, pageSize, currentPage])
+  // Reset to page 1 if items change and current page is out of bounds
+  const maxPage = Math.ceil(sortedItems.length / pageSize) || 1
+  const safePage = currentPage > maxPage ? 1 : currentPage
+  if (safePage !== currentPage) {
+    // This will trigger a re-render with the corrected page
+    setTimeout(() => setCurrentPage(1), 0)
+  }
 
   const goToPage = (page: number) => {
     setCurrentPage(Math.max(1, Math.min(page, totalPages)))

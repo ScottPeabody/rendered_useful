@@ -33,26 +33,29 @@ export default function NotebooksPage() {
   ]
 
   const filteredNotebooks = useMemo(() => {
-    return notebooks.filter((notebook) => {
-      // Don't show drafts
-      if (notebook.draft) return false
-      
-      // Search filter
-      const matchesSearch =
-        !searchQuery ||
-        notebook.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        notebook.description.toLowerCase().includes(searchQuery.toLowerCase())
+    return notebooks
+      .filter((notebook) => {
+        // Don't show drafts
+        if (notebook.draft) return false
+        
+        // Search filter
+        const matchesSearch =
+          !searchQuery ||
+          notebook.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          notebook.description.toLowerCase().includes(searchQuery.toLowerCase())
 
-      // Tag filter
-      const matchesTags =
-        selectedTags.length === 0 ||
-        selectedTags.some((tag) => notebook.tags?.includes(tag))
+        // Tag filter
+        const matchesTags =
+          selectedTags.length === 0 ||
+          selectedTags.some((tag) => notebook.tags?.includes(tag))
 
-      // Kernel filter
-      const matchesKernel = selectedKernel === 'all' || notebook.kernelLanguage === selectedKernel
+        // Kernel filter
+        const matchesKernel = selectedKernel === 'all' || notebook.kernelLanguage === selectedKernel
 
-      return matchesSearch && matchesTags && matchesKernel
-    })
+        return matchesSearch && matchesTags && matchesKernel
+      })
+      // Sort by date (newest first)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
   }, [searchQuery, selectedTags, selectedKernel])
 
   const toggleTag = (tag: string) => {

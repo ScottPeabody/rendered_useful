@@ -34,23 +34,26 @@ export default function ProjectsPage() {
   ]
 
   const filteredProjects = useMemo(() => {
-    return projects.filter((project) => {
-      // Search filter
-      const matchesSearch =
-        !searchQuery ||
-        project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.description.toLowerCase().includes(searchQuery.toLowerCase())
+    return projects
+      .filter((project) => {
+        // Search filter
+        const matchesSearch =
+          !searchQuery ||
+          project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          project.description.toLowerCase().includes(searchQuery.toLowerCase())
 
-      // Tag filter
-      const matchesTags =
-        selectedTags.length === 0 ||
-        selectedTags.some((tag) => project.tags.includes(tag))
+        // Tag filter
+        const matchesTags =
+          selectedTags.length === 0 ||
+          selectedTags.some((tag) => project.tags.includes(tag))
 
-      // Type filter
-      const matchesType = selectedType === 'all' || project.type === selectedType
+        // Type filter
+        const matchesType = selectedType === 'all' || project.type === selectedType
 
-      return matchesSearch && matchesTags && matchesType
-    })
+        return matchesSearch && matchesTags && matchesType
+      })
+      // Sort by date (newest first)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
   }, [searchQuery, selectedTags, selectedType])
 
   const toggleTag = (tag: string) => {
