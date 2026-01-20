@@ -634,7 +634,7 @@ def _clear_bokeh_figures():
                       position: 'fixed',
                       top: '50%',
                       left: '50%',
-                      transform: 'translate(-50%, -50%) scale(1.15)',
+                      transform: 'translate(-50%, -50%)',
                       zIndex: 51,
                       minHeight: 100,
                     } : { minHeight: 100 }}

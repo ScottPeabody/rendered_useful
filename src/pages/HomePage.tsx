@@ -1,44 +1,19 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowRight, Sparkles, Code2, Users, BookOpen, Folder, Grid, List } from 'lucide-react'
+import { ArrowRight, Sparkles, Code2, Users, BookOpen, Folder, FileCode } from 'lucide-react'
 import Button from '../components/ui/Button'
-import Card from '../components/ui/Card'
 import Tag from '../components/ui/Tag'
 import AuthorCard from '../components/ui/AuthorCard'
+import ContentList from '../components/ui/ContentList'
 import {
-  getRecentArticles,
+  articles,
   authors,
   tags,
   projects,
+  notebooks,
 } from '../data/content'
 
-type ViewMode = 'grid' | 'list'
-
 export default function HomePage() {
-  const recentArticles = getRecentArticles(6)
-  const [articleViewMode, setArticleViewModeState] = useState<ViewMode>(() => {
-    if (typeof window !== 'undefined') {
-      return (localStorage.getItem('homeArticleViewMode') as ViewMode) || 'grid'
-    }
-    return 'grid'
-  })
-  const [projectViewMode, setProjectViewModeState] = useState<ViewMode>(() => {
-    if (typeof window !== 'undefined') {
-      return (localStorage.getItem('homeProjectViewMode') as ViewMode) || 'grid'
-    }
-    return 'grid'
-  })
-
-  const setArticleViewMode = (mode: ViewMode) => {
-    setArticleViewModeState(mode)
-    localStorage.setItem('homeArticleViewMode', mode)
-  }
-
-  const setProjectViewMode = (mode: ViewMode) => {
-    setProjectViewModeState(mode)
-    localStorage.setItem('homeProjectViewMode', mode)
-  }
 
   return (
     <div className="pt-16">
@@ -103,7 +78,11 @@ export default function HomePage() {
               </div>
               <div className="flex items-center gap-2">
                 <BookOpen size={18} className="text-[var(--color-accent-secondary)]" />
-                <span>{recentArticles.length} Articles</span>
+                <span>{articles.length} Articles</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <FileCode size={18} className="text-[var(--color-accent-primary)]" />
+                <span>{notebooks.length} Notebooks</span>
               </div>
             </motion.div>
           </motion.div>
@@ -114,124 +93,66 @@ export default function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-[var(--color-text-primary)]">Articles</h2>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] p-1">
-              <button
-                onClick={() => setArticleViewMode('grid')}
-                className={`p-2 rounded-md transition-colors ${
-                  articleViewMode === 'grid'
-                    ? 'bg-[var(--color-accent-primary)] text-white'
-                    : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
-                }`}
-              >
-                <Grid size={18} />
-              </button>
-              <button
-                onClick={() => setArticleViewMode('list')}
-                className={`p-2 rounded-md transition-colors ${
-                  articleViewMode === 'list'
-                    ? 'bg-[var(--color-accent-primary)] text-white'
-                    : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
-                }`}
-              >
-                <List size={18} />
-              </button>
-            </div>
-            <Link
-              to="/articles"
-              className="flex items-center gap-1 text-sm text-[var(--color-accent-primary)] hover:text-[var(--color-accent-secondary)] transition-colors"
-            >
-              View all <ArrowRight size={16} />
-            </Link>
-          </div>
+          <Link
+            to="/articles"
+            className="flex items-center gap-1 text-sm text-[var(--color-accent-primary)] hover:text-[var(--color-accent-secondary)] transition-colors"
+          >
+            View all <ArrowRight size={16} />
+          </Link>
         </div>
 
-        <div
-          className={
-            articleViewMode === 'grid'
-              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
-              : 'flex flex-col gap-4'
-          }
-        >
-          {recentArticles.map((article, index) => (
-            <motion.div
-              key={article.slug}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.05 }}
-            >
-              <Card
-                contentType="article"
-                variant={articleViewMode === 'list' ? 'list' : 'card'}
-                {...article}
-                authorSlug={article.author}
-              />
-            </motion.div>
-          ))}
-        </div>
+        <ContentList
+          items={articles}
+          contentType="article"
+          pageSize={6}
+          showPagination={true}
+          showViewToggle={true}
+          viewModeStorageKey="homeArticleViewMode"
+        />
       </section>
 
       {/* Projects Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-[var(--color-text-primary)]">Projects</h2>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] p-1">
-              <button
-                onClick={() => setProjectViewMode('grid')}
-                className={`p-2 rounded-md transition-colors ${
-                  projectViewMode === 'grid'
-                    ? 'bg-[var(--color-accent-primary)] text-white'
-                    : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
-                }`}
-              >
-                <Grid size={18} />
-              </button>
-              <button
-                onClick={() => setProjectViewMode('list')}
-                className={`p-2 rounded-md transition-colors ${
-                  projectViewMode === 'list'
-                    ? 'bg-[var(--color-accent-primary)] text-white'
-                    : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
-                }`}
-              >
-                <List size={18} />
-              </button>
-            </div>
-            <Link
-              to="/projects"
-              className="flex items-center gap-1 text-sm text-[var(--color-accent-primary)] hover:text-[var(--color-accent-secondary)] transition-colors"
-            >
-              View all <ArrowRight size={16} />
-            </Link>
-          </div>
+          <Link
+            to="/projects"
+            className="flex items-center gap-1 text-sm text-[var(--color-accent-primary)] hover:text-[var(--color-accent-secondary)] transition-colors"
+          >
+            View all <ArrowRight size={16} />
+          </Link>
         </div>
 
-        <div
-          className={
-            projectViewMode === 'grid'
-              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
-              : 'flex flex-col gap-4'
-          }
-        >
-          {projects.slice(0, 6).map((project, index) => (
-            <motion.div
-              key={project.slug}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.05 }}
-            >
-              <Card
-                contentType="project"
-                variant={projectViewMode === 'list' ? 'list' : 'card'}
-                {...project}
-                authorSlug={project.author}
-              />
-            </motion.div>
-          ))}
+        <ContentList
+          items={projects}
+          contentType="project"
+          pageSize={6}
+          showPagination={true}
+          showViewToggle={true}
+          viewModeStorageKey="homeProjectViewMode"
+        />
+      </section>
+
+      {/* Notebooks Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-[var(--color-text-primary)]">Notebooks</h2>
+          <Link
+            to="/notebooks"
+            className="flex items-center gap-1 text-sm text-[var(--color-accent-primary)] hover:text-[var(--color-accent-secondary)] transition-colors"
+          >
+            View all <ArrowRight size={16} />
+          </Link>
         </div>
+
+        <ContentList
+          items={notebooks}
+          contentType="notebook"
+          pageSize={6}
+          showPagination={true}
+          showViewToggle={true}
+          viewModeStorageKey="homeNotebookViewMode"
+        />
       </section>
 
       {/* Community Info Section */}
