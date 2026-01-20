@@ -2,19 +2,13 @@ import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { Grid, List, ChevronLeft, ChevronRight } from 'lucide-react'
 import Card from './Card'
+import type { Article, Project, Notebook } from '../../types'
 
 type ContentType = 'article' | 'project' | 'notebook'
 type ViewMode = 'grid' | 'list'
 
-interface ContentItem {
-  slug: string
-  title: string
-  description: string
-  date: string
-  author: string
-  tags: string[]
-  [key: string]: unknown
-}
+// Union type for all content items
+type ContentItem = Article | Project | Notebook
 
 interface ContentListProps {
   /** Items to display */
@@ -184,8 +178,19 @@ export default function ContentList({
             <Card
               contentType={contentType}
               variant={viewMode === 'list' ? 'list' : 'card'}
-              {...item}
+              title={item.title}
+              description={item.description}
+              slug={item.slug}
+              tags={item.tags ?? []}
               authorSlug={item.author}
+              date={item.date}
+              coverImage={'coverImage' in item ? item.coverImage : undefined}
+              featured={item.featured}
+              readingTime={'readingTime' in item ? item.readingTime : undefined}
+              demoUrl={'demoUrl' in item ? item.demoUrl : undefined}
+              githubUrl={'githubUrl' in item ? item.githubUrl : undefined}
+              techStack={'techStack' in item ? item.techStack : undefined}
+              type={'type' in item ? item.type : undefined}
             />
           </Wrapper>
         ))}
