@@ -1,0 +1,113 @@
+---
+title: "But Can It Run DOOM?"
+description: "Yes. Yes it can. Play the original 1993 DOOM right in your browser using DOSBox compiled to WebAssembly. No installation required."
+slug: doom
+author: scott-peabody
+date: 2026-01-21T12:00:00Z
+tags:
+  - doom
+  - game
+  - wasm
+  - retro
+  - classic
+type: game
+techStack:
+  - js-dos
+  - DOSBox
+  - WebAssembly
+  - React
+featured: true
+---
+
+# But Can It Run DOOM?
+
+The eternal question for any new technology. And the answer is: **yes**.
+
+This is the original 1993 DOOM shareware running entirely in your browser via DOSBox compiled to WebAssembly. No plugins, no downloads, no installation.
+
+<Dos 
+  bundleUrl="/games/doom.jsdos"
+  title="DOOM"
+  year="1993"
+  icon="🔥"
+  description="The classic first-person shooter that defined a genre. Fight through hordes of demons from Hell."
+  accentColor="bg-red-700 hover:bg-red-600"
+  controls="Arrow keys to move, Ctrl to shoot, Space to open doors, 1-7 for weapons"
+  downloadSize="5MB"
+/>
+
+## How It Works
+
+1. **js-dos v8** - DOSBox compiled to WebAssembly, loaded from CDN
+2. **DosRunner Component** - A generic React component for running any DOS game
+3. **DOOM Shareware Bundle** - Pre-configured `.jsdos` bundle with autostart
+4. **Your Browser** - Running a 1993 DOS game in 2026
+
+The entire DOS environment runs client-side. Your browser is now a 486.
+
+## The DosRunner Component
+
+This page uses our generic `<Dos />` component, which can run any DOS game:
+
+```mdx
+<Dos 
+  bundleUrl="/games/doom.jsdos"
+  title="DOOM"
+  year="1993"
+  icon="🔥"
+  description="The classic first-person shooter..."
+  accentColor="bg-red-700 hover:bg-red-600"
+  controls="Arrow keys to move, Ctrl to shoot..."
+  downloadSize="5MB"
+/>
+```
+
+The same component could run other classics:
+- Prince of Persia
+- Wolfenstein 3D  
+- Commander Keen
+- Oregon Trail
+
+Just download a `.jsdos` bundle and configure the component.
+
+## Controls
+
+| Key | Action |
+|-----|--------|
+| Arrow Keys | Move / Turn |
+| Ctrl | Fire |
+| Space | Open doors / Use |
+| Shift | Run |
+| Alt + Arrow | Strafe |
+| 1-7 | Select weapon |
+| Tab | Map |
+| Esc | Menu |
+
+## Why DOOM?
+
+DOOM (1993) by id Software is one of the most influential games ever made. It popularized the first-person shooter genre and was technically groundbreaking for its time.
+
+The "Can it run DOOM?" meme exists because:
+- DOOM has been ported to everything (calculators, ATMs, pregnancy tests, thermostats)
+- It represents a baseline test for any computing platform
+- The source code was released in 1997, enabling endless ports
+
+## Technical Notes
+
+- Uses js-dos v8 loaded dynamically from CDN
+- Game bundle (`.jsdos`) hosted locally in `/public/games/`
+- `autoStart: true` bypasses the js-dos login/save screen
+- Runs the shareware version (Episode 1: Knee-Deep in the Dead)
+- Full game would require owning the WAD files
+- Audio may require user interaction to start (browser autoplay policy)
+- Fullscreen supported via container element (not iframe)
+
+## The Shareware Legacy
+
+In 1993, id Software distributed DOOM as shareware - the first episode was free, and you could buy the full game if you liked it. This distribution model helped DOOM become a phenomenon.
+
+The shareware version is still legally free to distribute, which is why we can run it here.
+
+---
+
+*"In the first age, in the first battle, when the shadows first lengthened..."*

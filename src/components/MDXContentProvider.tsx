@@ -2,6 +2,7 @@ import { MDXProvider } from '@mdx-js/react'
 import type { ReactNode, ComponentType, HTMLAttributes, ImgHTMLAttributes, AnchorHTMLAttributes, TableHTMLAttributes } from 'react'
 import { Callout, TechStack, Image, Video, Audio, Todo, Mermaid, PythonRunner, RustRunner } from './mdx'
 import RubiksCube from './games/RubiksCube'
+import DosRunner from './games/DosRunner'
 
 type MDXComponentProps = HTMLAttributes<HTMLElement>
 type MDXImgProps = ImgHTMLAttributes<HTMLImageElement>
@@ -19,6 +20,7 @@ const mdxComponents: Record<string, ComponentType<any>> = {
   Todo,
   Mermaid,
   RubiksCube,
+  Dos: DosRunner,
   Python: PythonRunner,
   Rust: RustRunner,
 

@@ -762,6 +762,22 @@ export const articles: Article[] = [
 
 export const projects: Project[] = [
   {
+    slug: 'doom',
+    title: 'But Can It Run DOOM?',
+    description: 'Yes. Yes it can. Play the original 1993 DOOM right in your browser using DOSBox compiled to WebAssembly.',
+    author: 'scott-peabody',
+    date: '2026-01-21T12:00:00',
+    tags: ['doom', 'game', 'wasm', 'retro', 'classic'],
+    communities: ['gamedev', 'creative-coding'],
+    techStack: ['js-dos', 'DOSBox', 'WebAssembly', 'React'],
+    type: 'game',
+    status: 'completed',
+    featured: true,
+    concepts: ['game-development'],
+    languages: ['typescript'],
+    locations: ['the-web'],
+  },
+  {
     slug: 'rust-runner',
     title: 'Rust Runner',
     description: 'Compile and run Rust code directly in MDX articles using the Rust Playground API. Features syntax highlighting, fullscreen mode, and support for Rust 2015/2018/2021 editions.',
