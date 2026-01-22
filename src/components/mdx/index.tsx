@@ -13,9 +13,10 @@ import { Strudel, StrudelEmbed } from './Strudel'
 import { ExcalidrawEditor } from './ExcalidrawEditor'
 import { JupyterLiteEmbed } from './JupyterLiteEmbed'
 import { PythonRunner } from './PythonRunner'
+import RustRunner from './RustRunner'
 
  
-export { Callout, TechStack, Image, Video, Audio, Todo, ThemeSelector, LayoutSelector, Mermaid, CodePlayground, Strudel, StrudelEmbed, ExcalidrawEditor, JupyterLiteEmbed, PythonRunner }
+export { Callout, TechStack, Image, Video, Audio, Todo, ThemeSelector, LayoutSelector, Mermaid, CodePlayground, Strudel, StrudelEmbed, ExcalidrawEditor, JupyterLiteEmbed, PythonRunner, RustRunner }
 
 interface MDXProps {
   children?: ReactNode
