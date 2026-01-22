@@ -1,0 +1,339 @@
+---
+title: "Running Rust in the Browser"
+description: "Compile and run Rust code directly in MDX articles using the Rust Playground API. Learn Rust basics with interactive examples."
+slug: rust-in-browser
+author: scott-peabody
+date: 2026-01-20T12:00:00Z
+tags:
+  - rust
+  - wasm
+  - webassembly
+  - systems-programming
+  - interactive
+concepts:
+  - code-execution
+  - browser-apis
+languages:
+  - rust
+featured: true
+---
+
+# Running Rust in the Browser
+
+Rust is a systems programming language focused on safety, speed, and concurrency. With our `<Rust>` component, you can compile and run Rust code directly in your browser using the [Rust Playground](https://play.rust-lang.org/) API.
+
+## Hello, Rust!
+
+Let's start with the classic:
+
+<Rust
+  title="Hello World"
+  code={`fn main() {
+    println!("Hello, Rust!");
+    println!("Running in the browser via the Playground API");
+}`}
+/>
+
+## Variables and Types
+
+Rust has powerful type inference but also lets you be explicit:
+
+<Rust
+  title="Variables and Types"
+  code={`fn main() {
+    // Immutable by default
+    let x = 5;
+    println!("x = {}", x);
+    
+    // Mutable with 'mut'
+    let mut y = 10;
+    println!("y = {}", y);
+    y = 20;
+    println!("y is now {}", y);
+    
+    // Explicit types
+    let z: i32 = 42;
+    let pi: f64 = 3.14159;
+    let is_rust_cool: bool = true;
+    
+    println!("z = {}, pi = {}, rust is cool: {}", z, pi, is_rust_cool);
+}`}
+/>
+
+## Ownership and Borrowing
+
+Rust's killer feature is its ownership system, preventing memory bugs at compile time:
+
+<Rust
+  title="Ownership Example"
+  code={`fn main() {
+    // String is heap-allocated and owned
+    let s1 = String::from("hello");
+    
+    // This would move ownership (s1 becomes invalid):
+    // let s2 = s1;
+    
+    // Instead, we can clone:
+    let s2 = s1.clone();
+    println!("s1 = {}, s2 = {}", s1, s2);
+    
+    // Or borrow with references:
+    let len = calculate_length(&s1);
+    println!("The length of '{}' is {}", s1, len);
+}
+
+fn calculate_length(s: &String) -> usize {
+    s.len()
+}`}
+/>
+
+## Structs and Implementations
+
+Define your own types with structs:
+
+<Rust
+  title="Structs"
+  code={`struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+impl Rectangle {
+    fn new(width: u32, height: u32) -> Self {
+        Rectangle { width, height }
+    }
+    
+    fn area(&self) -> u32 {
+        self.width * self.height
+    }
+    
+    fn can_hold(&self, other: &Rectangle) -> bool {
+        self.width > other.width && self.height > other.height
+    }
+}
+
+fn main() {
+    let rect1 = Rectangle::new(30, 50);
+    let rect2 = Rectangle::new(10, 40);
+    
+    println!("rect1 area: {} sq pixels", rect1.area());
+    println!("Can rect1 hold rect2? {}", rect1.can_hold(&rect2));
+}`}
+/>
+
+## Pattern Matching
+
+Rust's `match` is incredibly powerful:
+
+<Rust
+  title="Pattern Matching"
+  code={`enum Color {
+    Red,
+    Green,
+    Blue,
+    RGB(u8, u8, u8),
+    Hex(String),
+}
+
+fn describe_color(color: Color) -> String {
+    match color {
+        Color::Red => String::from("Pure red"),
+        Color::Green => String::from("Pure green"),
+        Color::Blue => String::from("Pure blue"),
+        Color::RGB(r, g, b) => format!("RGB({}, {}, {})", r, g, b),
+        Color::Hex(code) => format!("Hex code: {}", code),
+    }
+}
+
+fn main() {
+    let colors = vec![
+        Color::Red,
+        Color::RGB(255, 128, 0),
+        Color::Hex(String::from("#1a1a2e")),
+    ];
+    
+    for color in colors {
+        println!("{}", describe_color(color));
+    }
+}`}
+/>
+
+## Iterators and Closures
+
+Rust has first-class support for functional programming:
+
+<Rust
+  title="Iterators"
+  code={`fn main() {
+    let numbers = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    
+    // Filter and map with closures
+    let even_squares: Vec<i32> = numbers
+        .iter()
+        .filter(|&x| x % 2 == 0)
+        .map(|x| x * x)
+        .collect();
+    
+    println!("Even squares: {:?}", even_squares);
+    
+    // Fold/reduce
+    let sum: i32 = numbers.iter().sum();
+    let product: i32 = numbers.iter().product();
+    
+    println!("Sum: {}, Product: {}", sum, product);
+    
+    // Chaining
+    let result: i32 = (1..=100)
+        .filter(|x| x % 3 == 0)
+        .take(5)
+        .sum();
+    
+    println!("Sum of first 5 multiples of 3: {}", result);
+}`}
+/>
+
+## Error Handling with Result
+
+Rust uses `Result` for recoverable errors:
+
+<Rust
+  title="Error Handling"
+  code={`use std::num::ParseIntError;
+
+fn parse_and_double(s: &str) -> Result<i32, ParseIntError> {
+    let n: i32 = s.parse()?;  // ? propagates errors
+    Ok(n * 2)
+}
+
+fn main() {
+    let inputs = vec!["42", "not a number", "123"];
+    
+    for input in inputs {
+        match parse_and_double(input) {
+            Ok(result) => println!("'{}' doubled is {}", input, result),
+            Err(e) => println!("'{}' failed: {}", input, e),
+        }
+    }
+}`}
+/>
+
+## A More Complex Example: Fibonacci
+
+Let's implement multiple Fibonacci approaches:
+
+<Rust
+  title="Fibonacci Implementations"
+  edition="2021"
+  mode="release"
+  code={`use std::collections::HashMap;
+
+// Recursive (slow)
+fn fib_recursive(n: u64) -> u64 {
+    match n {
+        0 => 0,
+        1 => 1,
+        _ => fib_recursive(n - 1) + fib_recursive(n - 2),
+    }
+}
+
+// Iterative (fast)
+fn fib_iterative(n: u64) -> u64 {
+    let mut a = 0;
+    let mut b = 1;
+    for _ in 0..n {
+        let temp = a;
+        a = b;
+        b = temp + b;
+    }
+    a
+}
+
+// Memoized
+fn fib_memoized(n: u64, cache: &mut HashMap<u64, u64>) -> u64 {
+    if let Some(&result) = cache.get(&n) {
+        return result;
+    }
+    let result = match n {
+        0 => 0,
+        1 => 1,
+        _ => fib_memoized(n - 1, cache) + fib_memoized(n - 2, cache),
+    };
+    cache.insert(n, result);
+    result
+}
+
+fn main() {
+    let n = 30;
+    
+    // Iterative is instant
+    println!("fib_iterative({}) = {}", n, fib_iterative(n));
+    
+    // Memoized is also fast
+    let mut cache = HashMap::new();
+    println!("fib_memoized({}) = {}", n, fib_memoized(n, &mut cache));
+    
+    // Recursive would be slow for large n, let's use smaller
+    println!("fib_recursive(20) = {}", fib_recursive(20));
+    
+    // First 15 Fibonacci numbers
+    println!("\\nFirst 15 Fibonacci numbers:");
+    let fibs: Vec<u64> = (0..15).map(fib_iterative).collect();
+    println!("{:?}", fibs);
+}`}
+/>
+
+## WebAssembly Target
+
+While this demo runs Rust natively via the Playground API, Rust can also compile to WebAssembly for true in-browser execution. A WASM-compiled Rust function runs at near-native speed!
+
+Here's what WASM-compatible Rust looks like:
+
+<Rust
+  title="WASM-Ready Code"
+  code={`// This code pattern works with wasm-bindgen
+// for true WebAssembly compilation
+
+#[no_mangle]
+pub extern "C" fn add(a: i32, b: i32) -> i32 {
+    a + b
+}
+
+#[no_mangle]
+pub extern "C" fn factorial(n: u64) -> u64 {
+    (1..=n).product()
+}
+
+#[no_mangle]
+pub extern "C" fn is_prime(n: u64) -> bool {
+    if n < 2 {
+        return false;
+    }
+    for i in 2..=((n as f64).sqrt() as u64) {
+        if n % i == 0 {
+            return false;
+        }
+    }
+    true
+}
+
+fn main() {
+    // Demo the functions
+    println!("add(5, 3) = {}", add(5, 3));
+    println!("factorial(10) = {}", factorial(10));
+    println!("is_prime(17) = {}", is_prime(17));
+    println!("is_prime(18) = {}", is_prime(18));
+    
+    // Find primes
+    let primes: Vec<u64> = (2..50).filter(|&n| is_prime(n)).collect();
+    println!("Primes under 50: {:?}", primes);
+}`}
+/>
+
+## What's Next?
+
+- Explore the [Rust Book](https://doc.rust-lang.org/book/) for comprehensive learning
+- Try [Rustlings](https://github.com/rust-lang/rustlings) for hands-on exercises
+- Build WebAssembly apps with [wasm-pack](https://rustwasm.github.io/wasm-pack/)
+- Check out [Yew](https://yew.rs/) for Rust-based web frontends
+
+Rust's combination of safety, speed, and expressiveness makes it perfect for everything from CLI tools to operating systems to WebAssembly modules!

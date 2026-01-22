@@ -1,0 +1,97 @@
+---
+title: "Rust Runner"
+description: "Compile and run Rust code directly in MDX articles using the Rust Playground API. Features syntax highlighting, fullscreen mode, and support for Rust 2015/2018/2021 editions."
+slug: rust-runner
+author: scott-peabody
+date: 2026-01-20T12:00:00Z
+tags:
+  - rust
+  - wasm
+  - webassembly
+  - interactive
+type: integration
+techStack:
+  - React
+  - TypeScript
+  - Rust Playground API
+featured: true
+---
+
+# Rust Runner
+
+Run Rust code directly in the browser via the official [Rust Playground](https://play.rust-lang.org/) API.
+
+## Features
+
+- **Live Compilation** - Code is sent to the Rust Playground and compiled/executed
+- **Syntax Highlighting** - Basic Rust syntax highlighting with keywords, types, macros, and more
+- **Edition Support** - Rust 2015, 2018, and 2021 editions
+- **Debug/Release Modes** - Choose compilation mode
+- **Fullscreen Mode** - Expand for better viewing
+- **Copy to Clipboard** - Easily copy code examples
+
+## Basic Usage
+
+```jsx
+<Rust
+  title="Hello World"
+  code={`fn main() {
+    println!("Hello, Rust!");
+}`}
+/>
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `code` | `string` | required | Rust source code |
+| `title` | `string` | `"Rust"` | Header title |
+| `autoRun` | `boolean` | `false` | Run on mount |
+| `showCode` | `boolean` | `true` | Display source code |
+| `lineNumbers` | `boolean` | `true` | Show line numbers |
+| `edition` | `'2015' \| '2018' \| '2021'` | `'2021'` | Rust edition |
+| `mode` | `'debug' \| 'release'` | `'release'` | Compilation mode |
+| `maxOutputHeight` | `string` | `'300px'` | Max output area height |
+
+## Example: Iterators
+
+<Rust
+  title="Functional Rust"
+  code={`fn main() {
+    let numbers: Vec<i32> = (1..=10)
+        .filter(|x| x % 2 == 0)
+        .map(|x| x * x)
+        .collect();
+    
+    println!("Even squares: {:?}", numbers);
+}`}
+/>
+
+## How It Works
+
+1. User clicks "Run"
+2. Code is sent to `play.rust-lang.org/execute`
+3. Playground compiles and runs the code
+4. stdout/stderr is returned and displayed
+
+The Playground API supports:
+- Stable, Beta, and Nightly channels
+- Debug and Release compilation
+- All Rust editions (2015, 2018, 2021)
+- Most of the standard library
+
+## Limitations
+
+- No file system access
+- No network requests from Rust code
+- Single-file programs only
+- Execution timeout (playground limits)
+- No direct WASM output (yet)
+
+## Future Enhancements
+
+- Direct WASM compilation and execution
+- Custom crate dependencies
+- Persistent code editing
+- Share/link functionality
