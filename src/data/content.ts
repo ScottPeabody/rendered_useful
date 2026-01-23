@@ -443,6 +443,15 @@ export const series: Series[] = [
     tags: ['architecture', 'design', 'vision'],
     createdDate: '2026-01-12',
   },
+  {
+    slug: 'data-visualization',
+    title: 'Data Visualization',
+    description: 'Master the art and science of data visualization. From D3.js fundamentals to advanced interactive charts.',
+    status: 'ongoing',
+    community: 'creative-coding',
+    tags: ['d3', 'charts', 'visualization', 'data'],
+    createdDate: '2026-01-22',
+  },
 ]
 
 export const communities: Community[] = [
@@ -504,6 +513,21 @@ export const authors: Author[] = [
 ]
 
 export const articles: Article[] = [
+  {
+    slug: 'd3-introduction',
+    title: 'Getting Started with D3.js: Interactive Data Visualization',
+    description: 'Learn the fundamentals of D3.js - the powerful JavaScript library for creating dynamic, interactive data visualizations in the browser.',
+    author: 'scott-peabody',
+    date: '2026-01-22T12:00:00',
+    tags: ['d3', 'visualization', 'javascript', 'tutorial', 'charts'],
+    communities: ['creative-coding', 'learners'],
+    series: 'data-visualization',
+    seriesOrder: 1,
+    readingTime: 15,
+    featured: true,
+    concepts: ['data-visualization'],
+    languages: ['javascript', 'english'],
+  },
   {
     slug: 'welcome-to-mdx',
     title: 'Writing Articles with MDX',

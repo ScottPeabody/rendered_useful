@@ -1,6 +1,6 @@
 import { MDXProvider } from '@mdx-js/react'
 import type { ReactNode, ComponentType, HTMLAttributes, ImgHTMLAttributes, AnchorHTMLAttributes, TableHTMLAttributes } from 'react'
-import { Callout, TechStack, Image, Video, Audio, Todo, Mermaid, PythonRunner, RustRunner } from './mdx'
+import { Callout, TechStack, Image, Video, Audio, Todo, Mermaid, PythonRunner, RustRunner, D3Runner } from './mdx'
 import RubiksCube from './games/RubiksCube'
 import DosRunner from './games/DosRunner'
 
@@ -23,6 +23,8 @@ const mdxComponents: Record<string, ComponentType<any>> = {
   Dos: DosRunner,
   Python: PythonRunner,
   Rust: RustRunner,
+  D3: D3Runner,
+  D3Runner,
 
   h1: (props: MDXComponentProps) => (
     <h1 className="text-3xl font-bold text-[var(--color-text-primary)] mt-10 mb-4 first:mt-0" {...props} />
