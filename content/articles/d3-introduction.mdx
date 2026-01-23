@@ -1,0 +1,1202 @@
+---
+title: "Getting Started with D3.js: Interactive Data Visualization"
+description: "Learn the fundamentals of D3.js through hands-on examples. Write real D3 code and see it render instantly."
+slug: d3-introduction
+author: scott-peabody
+date: 2026-01-22T12:00:00Z
+tags:
+  - d3
+  - visualization
+  - javascript
+  - tutorial
+  - charts
+  - science
+series: data-visualization
+seriesOrder: 1
+techStack:
+  - D3.js
+  - React
+  - TypeScript
+  - SVG
+featured: true
+---
+
+# Getting Started with D3.js
+
+D3.js (Data-Driven Documents) is a powerful and flexible JavaScript library for creating data visualizations. Created by Mike Bostock, it's been the gold standard for web-based visualization since 2011.
+
+<Callout type="info">
+  **Interactive Examples Below!** Hover over elements to see tooltips and effects. Click **Run** to re-execute, **Fullscreen** to expand!
+</Callout>
+
+## What Makes D3 Special?
+
+D3 isn't a charting library. It's a toolkit for **binding data to the DOM** and applying transformations:
+
+- **Unlimited flexibility**: Create any visualization imaginable
+- **Web standards**: Uses SVG, Canvas, and HTML directly
+- **No black boxes**: You understand exactly what's happening
+- **Smooth animations**: Built-in transition support
+- **Interactivity**: Full access to DOM events
+
+---
+
+## 1. Bar Chart: Global Temperature Anomalies
+
+Hover over bars to see details!
+
+<D3 title="Global Temperature Anomaly" height={420} showCode={false}>
+{`
+const data = [
+  { year: '1970', value: 0.03, color: '#3b82f6' },
+  { year: '1980', value: 0.26, color: '#f97316' },
+  { year: '1990', value: 0.45, color: '#f97316' },
+  { year: '2000', value: 0.42, color: '#f97316' },
+  { year: '2010', value: 0.72, color: '#ef4444' },
+  { year: '2015', value: 0.90, color: '#ef4444' },
+  { year: '2020', value: 1.02, color: '#dc2626' },
+  { year: '2024', value: 1.29, color: '#b91c1c' },
+];
+
+const margin = { top: 40, right: 30, bottom: 60, left: 60 };
+const innerWidth = width - margin.left - margin.right;
+const innerHeight = height - margin.top - margin.bottom;
+
+const svg = d3.select(container)
+  .append('svg')
+  .attr('width', width)
+  .attr('height', height);
+
+// Tooltip
+const tooltip = d3.select(container)
+  .append('div')
+  .style('position', 'absolute')
+  .style('background', 'rgba(0,0,0,0.9)')
+  .style('border', '1px solid #64748b')
+  .style('border-radius', '6px')
+  .style('padding', '8px 12px')
+  .style('color', 'white')
+  .style('font-size', '13px')
+  .style('font-weight', '500')
+  .style('pointer-events', 'none')
+  .style('opacity', 0)
+  .style('transition', 'opacity 0.15s');
+
+const chart = svg.append('g')
+  .attr('transform', \`translate(\${margin.left},\${margin.top})\`);
+
+// Scales
+const x = d3.scaleBand()
+  .domain(data.map(d => d.year))
+  .range([0, innerWidth])
+  .padding(0.2);
+
+const y = d3.scaleLinear()
+  .domain([0, d3.max(data, d => d.value)])
+  .nice()
+  .range([innerHeight, 0]);
+
+// Gridlines
+chart.append('g')
+  .call(d3.axisLeft(y).ticks(5).tickSize(-innerWidth).tickFormat(() => ''))
+  .selectAll('line').attr('stroke', '#334155').attr('stroke-opacity', 0.5);
+chart.select('.domain').remove();
+
+// Axes
+chart.append('g')
+  .attr('transform', \`translate(0,\${innerHeight})\`)
+  .call(d3.axisBottom(x))
+  .selectAll('text').attr('fill', 'white').attr('font-weight', 500);
+
+chart.append('g')
+  .call(d3.axisLeft(y).ticks(5))
+  .selectAll('text').attr('fill', 'white').attr('font-weight', 500);
+
+chart.selectAll('.domain, .tick line').attr('stroke', '#64748b');
+
+// Bars with animation
+const bars = chart.selectAll('rect')
+  .data(data)
+  .join('rect')
+  .attr('x', d => x(d.year))
+  .attr('width', x.bandwidth())
+  .attr('y', innerHeight)
+  .attr('height', 0)
+  .attr('fill', d => d.color)
+  .attr('rx', 4)
+  .style('cursor', 'pointer');
+
+bars.transition()
+  .duration(800)
+  .delay((d, i) => i * 100)
+  .attr('y', d => y(d.value))
+  .attr('height', d => innerHeight - y(d.value));
+
+// Hover effects
+bars.on('mouseover', function(event, d) {
+  d3.select(this)
+    .transition().duration(150)
+    .attr('opacity', 0.8)
+    .attr('transform', 'translateY(-3px)');
+  
+  tooltip
+    .style('opacity', 1)
+    .html(\`<strong>\${d.year}</strong><br/>+\${d.value.toFixed(2)}°C anomaly\`)
+    .style('left', (event.offsetX + 10) + 'px')
+    .style('top', (event.offsetY - 10) + 'px');
+})
+.on('mousemove', function(event) {
+  tooltip
+    .style('left', (event.offsetX + 10) + 'px')
+    .style('top', (event.offsetY - 10) + 'px');
+})
+.on('mouseout', function() {
+  d3.select(this)
+    .transition().duration(150)
+    .attr('opacity', 1)
+    .attr('transform', 'translateY(0)');
+  tooltip.style('opacity', 0);
+});
+
+// Title
+svg.append('text')
+  .attr('x', width / 2)
+  .attr('y', 24)
+  .attr('text-anchor', 'middle')
+  .attr('fill', 'white')
+  .attr('font-size', '16px')
+  .attr('font-weight', '700')
+  .text('Temperature Anomaly (°C vs 20th Century Avg)');
+
+// Y-axis label
+svg.append('text')
+  .attr('transform', 'rotate(-90)')
+  .attr('x', -height / 2)
+  .attr('y', 16)
+  .attr('text-anchor', 'middle')
+  .attr('fill', 'white')
+  .attr('font-size', '12px')
+  .text('Anomaly (°C)');
+`}
+</D3>
+
+---
+
+## 2. Line Chart: Exoplanet Discoveries
+
+Hover over data points to see values!
+
+<D3 title="Exoplanet Discoveries" height={450} showCode={false}>
+{`
+const series = [
+  { name: 'Transit', color: '#8b5cf6', data: [
+    {x: 2005, y: 6}, {x: 2010, y: 130}, {x: 2012, y: 350}, {x: 2014, y: 1200},
+    {x: 2016, y: 2700}, {x: 2018, y: 3100}, {x: 2020, y: 3400}, {x: 2024, y: 4200}
+  ]},
+  { name: 'Radial Velocity', color: '#06b6d4', data: [
+    {x: 2005, y: 150}, {x: 2010, y: 460}, {x: 2012, y: 580}, {x: 2014, y: 650},
+    {x: 2016, y: 720}, {x: 2018, y: 820}, {x: 2020, y: 920}, {x: 2024, y: 1080}
+  ]},
+  { name: 'Microlensing', color: '#f59e0b', data: [
+    {x: 2005, y: 4}, {x: 2010, y: 12}, {x: 2012, y: 18}, {x: 2014, y: 35},
+    {x: 2016, y: 52}, {x: 2018, y: 85}, {x: 2020, y: 145}, {x: 2024, y: 210}
+  ]},
+];
+
+const margin = { top: 40, right: 120, bottom: 50, left: 60 };
+const innerWidth = width - margin.left - margin.right;
+const innerHeight = height - margin.top - margin.bottom;
+
+const svg = d3.select(container)
+  .append('svg')
+  .attr('width', width)
+  .attr('height', height);
+
+// Tooltip
+const tooltip = d3.select(container)
+  .append('div')
+  .style('position', 'absolute')
+  .style('background', 'rgba(0,0,0,0.9)')
+  .style('border', '1px solid #64748b')
+  .style('border-radius', '6px')
+  .style('padding', '8px 12px')
+  .style('color', 'white')
+  .style('font-size', '13px')
+  .style('font-weight', '500')
+  .style('pointer-events', 'none')
+  .style('opacity', 0)
+  .style('transition', 'opacity 0.15s');
+
+const chart = svg.append('g')
+  .attr('transform', \`translate(\${margin.left},\${margin.top})\`);
+
+const allPoints = series.flatMap(s => s.data);
+
+const x = d3.scaleLinear()
+  .domain(d3.extent(allPoints, d => d.x))
+  .range([0, innerWidth]);
+
+const y = d3.scaleLinear()
+  .domain([0, d3.max(allPoints, d => d.y)])
+  .nice()
+  .range([innerHeight, 0]);
+
+// Gridlines
+chart.append('g')
+  .call(d3.axisLeft(y).ticks(5).tickSize(-innerWidth).tickFormat(() => ''))
+  .selectAll('line').attr('stroke', '#334155').attr('stroke-opacity', 0.5);
+chart.select('.domain').remove();
+
+// Axes
+chart.append('g')
+  .attr('transform', \`translate(0,\${innerHeight})\`)
+  .call(d3.axisBottom(x).tickFormat(d3.format('d')))
+  .selectAll('text').attr('fill', 'white').attr('font-weight', 500);
+
+chart.append('g')
+  .call(d3.axisLeft(y))
+  .selectAll('text').attr('fill', 'white').attr('font-weight', 500);
+
+chart.selectAll('.domain, .tick line').attr('stroke', '#64748b');
+
+// Line generator
+const line = d3.line()
+  .x(d => x(d.x))
+  .y(d => y(d.y))
+  .curve(d3.curveMonotoneX);
+
+// Area generator
+const area = d3.area()
+  .x(d => x(d.x))
+  .y0(innerHeight)
+  .y1(d => y(d.y))
+  .curve(d3.curveMonotoneX);
+
+// Draw series
+series.forEach(s => {
+  // Area fill
+  chart.append('path')
+    .datum(s.data)
+    .attr('fill', s.color)
+    .attr('fill-opacity', 0.1)
+    .attr('d', area);
+
+  // Line with animation
+  const path = chart.append('path')
+    .datum(s.data)
+    .attr('fill', 'none')
+    .attr('stroke', s.color)
+    .attr('stroke-width', 2.5)
+    .attr('d', line);
+
+  const totalLength = path.node().getTotalLength();
+  path.attr('stroke-dasharray', \`\${totalLength} \${totalLength}\`)
+    .attr('stroke-dashoffset', totalLength)
+    .transition().duration(1500).ease(d3.easeLinear)
+    .attr('stroke-dashoffset', 0);
+
+  // Dots with hover
+  const dots = chart.selectAll(\`.dot-\${s.name.replace(/\\s/g, '')}\`)
+    .data(s.data)
+    .join('circle')
+    .attr('class', \`dot-\${s.name.replace(/\\s/g, '')}\`)
+    .attr('cx', d => x(d.x))
+    .attr('cy', d => y(d.y))
+    .attr('r', 0)
+    .attr('fill', s.color)
+    .attr('stroke', 'white')
+    .attr('stroke-width', 2)
+    .style('cursor', 'pointer');
+
+  dots.transition().delay(1500).duration(300).attr('r', 5);
+
+  dots.on('mouseover', function(event, d) {
+    d3.select(this)
+      .transition().duration(150)
+      .attr('r', 10);
+    
+    tooltip
+      .style('opacity', 1)
+      .html(\`<strong>\${s.name}</strong><br/>\${d.x}: \${d.y.toLocaleString()} planets\`)
+      .style('left', (event.offsetX + 15) + 'px')
+      .style('top', (event.offsetY - 10) + 'px');
+  })
+  .on('mouseout', function() {
+    d3.select(this).transition().duration(150).attr('r', 5);
+    tooltip.style('opacity', 0);
+  });
+});
+
+// Legend
+const legend = svg.append('g')
+  .attr('transform', \`translate(\${width - margin.right + 10}, \${margin.top})\`);
+
+series.forEach((s, i) => {
+  const g = legend.append('g').attr('transform', \`translate(0, \${i * 25})\`);
+  g.append('line').attr('x1', 0).attr('x2', 20).attr('stroke', s.color).attr('stroke-width', 2.5);
+  g.append('text').attr('x', 25).attr('y', 4).attr('fill', 'white').attr('font-size', '12px').attr('font-weight', 500).text(s.name);
+});
+
+// Title
+svg.append('text')
+  .attr('x', width / 2).attr('y', 24)
+  .attr('text-anchor', 'middle')
+  .attr('fill', 'white').attr('font-size', '16px').attr('font-weight', '700')
+  .text('Cumulative Exoplanet Discoveries');
+`}
+</D3>
+
+---
+
+## 3. Donut Chart: Human Genome Composition
+
+Hover over slices for details!
+
+<D3 title="Human Genome" height={420} showCode={false}>
+{`
+const data = [
+  { label: 'Intergenic', value: 45, color: '#64748b', desc: 'Non-coding regions between genes' },
+  { label: 'Introns', value: 24, color: '#0ea5e9', desc: 'Non-coding regions within genes' },
+  { label: 'Repeats', value: 21, color: '#a855f7', desc: 'Transposable elements & repeats' },
+  { label: 'Exons', value: 1.5, color: '#22c55e', desc: 'Protein-coding sequences!' },
+  { label: 'Regulatory', value: 8.5, color: '#f59e0b', desc: 'Control gene expression' },
+];
+
+const svg = d3.select(container)
+  .append('svg')
+  .attr('width', width)
+  .attr('height', height);
+
+// Tooltip
+const tooltip = d3.select(container)
+  .append('div')
+  .style('position', 'absolute')
+  .style('background', 'rgba(0,0,0,0.9)')
+  .style('border', '1px solid #64748b')
+  .style('border-radius', '6px')
+  .style('padding', '10px 14px')
+  .style('color', 'white')
+  .style('font-size', '13px')
+  .style('pointer-events', 'none')
+  .style('opacity', 0)
+  .style('transition', 'opacity 0.15s')
+  .style('max-width', '200px');
+
+const radius = Math.min(width, height) / 2 - 60;
+const innerRadius = radius * 0.5;
+
+const chart = svg.append('g')
+  .attr('transform', \`translate(\${width/2},\${height/2 + 20})\`);
+
+const pie = d3.pie().value(d => d.value).sort(null);
+const arc = d3.arc().innerRadius(innerRadius).outerRadius(radius);
+const arcHover = d3.arc().innerRadius(innerRadius).outerRadius(radius + 10);
+const labelArc = d3.arc().innerRadius(radius * 0.75).outerRadius(radius * 0.75);
+
+const arcs = chart.selectAll('path')
+  .data(pie(data))
+  .join('path')
+  .attr('fill', d => d.data.color)
+  .attr('stroke', '#1e293b')
+  .attr('stroke-width', 2)
+  .style('cursor', 'pointer')
+  .attr('d', arc);
+
+// Animate in
+arcs.transition().duration(1000)
+  .attrTween('d', function(d) {
+    const i = d3.interpolate({startAngle: 0, endAngle: 0}, d);
+    return t => arc(i(t));
+  });
+
+// Hover effects
+arcs.on('mouseover', function(event, d) {
+  d3.select(this)
+    .transition().duration(200)
+    .attr('d', arcHover);
+  
+  tooltip
+    .style('opacity', 1)
+    .html(\`<strong style="color:\${d.data.color}">\${d.data.label}</strong><br/>
+           <span style="font-size:18px;font-weight:700">\${d.data.value}%</span><br/>
+           <span style="opacity:0.8;font-size:12px">\${d.data.desc}</span>\`)
+    .style('left', (event.offsetX + 15) + 'px')
+    .style('top', (event.offsetY - 10) + 'px');
+})
+.on('mousemove', function(event) {
+  tooltip
+    .style('left', (event.offsetX + 15) + 'px')
+    .style('top', (event.offsetY - 10) + 'px');
+})
+.on('mouseout', function() {
+  d3.select(this)
+    .transition().duration(200)
+    .attr('d', arc);
+  tooltip.style('opacity', 0);
+});
+
+// Center text
+chart.append('text')
+  .attr('text-anchor', 'middle')
+  .attr('dy', '-0.2em')
+  .attr('fill', 'white')
+  .attr('font-size', '28px')
+  .attr('font-weight', '700')
+  .text('100%');
+
+chart.append('text')
+  .attr('text-anchor', 'middle')
+  .attr('dy', '1.4em')
+  .attr('fill', 'white')
+  .attr('font-size', '12px')
+  .attr('opacity', 0.7)
+  .text('Human Genome');
+
+// Title
+svg.append('text')
+  .attr('x', width / 2).attr('y', 28)
+  .attr('text-anchor', 'middle')
+  .attr('fill', 'white').attr('font-size', '16px').attr('font-weight', '700')
+  .text('Genome Composition (%)');
+
+// Legend
+const legend = svg.append('g')
+  .attr('transform', \`translate(\${width - 130}, 60)\`);
+
+data.forEach((d, i) => {
+  const g = legend.append('g').attr('transform', \`translate(0, \${i * 22})\`);
+  g.append('rect').attr('width', 14).attr('height', 14).attr('rx', 3).attr('fill', d.color);
+  g.append('text').attr('x', 20).attr('y', 11).attr('fill', 'white').attr('font-size', '11px').text(\`\${d.label} (\${d.value}%)\`);
+});
+`}
+</D3>
+
+---
+
+## 4. Scatter Plot: Stellar Mass vs Luminosity
+
+Hover over stars to learn about them!
+
+<D3 title="Stellar Properties" height={480} showCode={false}>
+{`
+const stars = [
+  { x: 0.1, y: 0.001, label: 'Proxima Centauri', cat: 'Red Dwarf', desc: 'Closest star to the Sun' },
+  { x: 0.5, y: 0.08, label: "Barnard's Star", cat: 'Red Dwarf', desc: '2nd closest star system' },
+  { x: 0.8, y: 0.4, label: 'Alpha Cen B', cat: 'Orange Dwarf', desc: 'Part of nearest star system' },
+  { x: 1.0, y: 1.0, label: 'Sun', cat: 'Yellow Dwarf', desc: 'Our star! Age: 4.6 billion years' },
+  { x: 1.4, y: 6, label: 'Procyon A', cat: 'Yellow-White', desc: 'Binary star 11 ly away' },
+  { x: 2.0, y: 25, label: 'Sirius A', cat: 'White Star', desc: 'Brightest star in the night sky' },
+  { x: 2.9, y: 80, label: 'Vega', cat: 'White Star', desc: 'Former North Star' },
+  { x: 8, y: 3000, label: 'Achernar', cat: 'Blue Giant', desc: 'Flattest known star!' },
+  { x: 17, y: 40000, label: 'Spica', cat: 'Blue Giant', desc: 'Binary system, 260 ly away' },
+];
+
+const margin = { top: 40, right: 140, bottom: 60, left: 70 };
+const innerWidth = width - margin.left - margin.right;
+const innerHeight = height - margin.top - margin.bottom;
+
+const svg = d3.select(container)
+  .append('svg')
+  .attr('width', width)
+  .attr('height', height);
+
+// Tooltip
+const tooltip = d3.select(container)
+  .append('div')
+  .style('position', 'absolute')
+  .style('background', 'rgba(0,0,0,0.95)')
+  .style('border', '1px solid #64748b')
+  .style('border-radius', '8px')
+  .style('padding', '12px 16px')
+  .style('color', 'white')
+  .style('font-size', '13px')
+  .style('pointer-events', 'none')
+  .style('opacity', 0)
+  .style('transition', 'opacity 0.15s')
+  .style('max-width', '220px');
+
+const chart = svg.append('g')
+  .attr('transform', \`translate(\${margin.left},\${margin.top})\`);
+
+const x = d3.scaleLog()
+  .domain([0.05, 30])
+  .range([0, innerWidth]);
+
+const y = d3.scaleLog()
+  .domain([0.0005, 100000])
+  .range([innerHeight, 0]);
+
+const categories = [...new Set(stars.map(d => d.cat))];
+const color = d3.scaleOrdinal()
+  .domain(categories)
+  .range(['#ef4444', '#f97316', '#eab308', '#a3e635', '#22d3ee', '#3b82f6']);
+
+// Gridlines
+chart.append('g')
+  .call(d3.axisLeft(y).ticks(5).tickSize(-innerWidth).tickFormat(() => ''))
+  .selectAll('line').attr('stroke', '#334155').attr('stroke-opacity', 0.3);
+chart.append('g')
+  .attr('transform', \`translate(0,\${innerHeight})\`)
+  .call(d3.axisBottom(x).ticks(5).tickSize(-innerHeight).tickFormat(() => ''))
+  .selectAll('line').attr('stroke', '#334155').attr('stroke-opacity', 0.3);
+chart.selectAll('.domain').remove();
+
+// Axes
+chart.append('g')
+  .attr('transform', \`translate(0,\${innerHeight})\`)
+  .call(d3.axisBottom(x).ticks(5, '.1f'))
+  .selectAll('text').attr('fill', 'white').attr('font-weight', 500);
+
+chart.append('g')
+  .call(d3.axisLeft(y).ticks(5, '.0e'))
+  .selectAll('text').attr('fill', 'white').attr('font-weight', 500);
+
+chart.selectAll('.tick line').attr('stroke', '#64748b');
+
+// Trendline (L = M^3.5)
+const trendData = d3.range(0.08, 25, 0.1).map(m => ({x: m, y: Math.pow(m, 3.5)}));
+chart.append('path')
+  .datum(trendData)
+  .attr('fill', 'none')
+  .attr('stroke', 'white')
+  .attr('stroke-opacity', 0.3)
+  .attr('stroke-width', 2)
+  .attr('stroke-dasharray', '6,4')
+  .attr('d', d3.line().x(d => x(d.x)).y(d => y(d.y)));
+
+// Stars
+const dots = chart.selectAll('circle')
+  .data(stars)
+  .join('circle')
+  .attr('cx', d => x(d.x))
+  .attr('cy', d => y(d.y))
+  .attr('r', 0)
+  .attr('fill', d => color(d.cat))
+  .attr('stroke', 'white')
+  .attr('stroke-width', 2)
+  .style('cursor', 'pointer');
+
+dots.transition().duration(600).delay((d, i) => i * 80).attr('r', 10);
+
+// Hover effects
+dots.on('mouseover', function(event, d) {
+  d3.select(this)
+    .transition().duration(150)
+    .attr('r', 16)
+    .attr('stroke-width', 3);
+  
+  tooltip
+    .style('opacity', 1)
+    .html(\`<strong style="font-size:15px;color:\${color(d.cat)}">\${d.label}</strong><br/>
+           <span style="opacity:0.7">\${d.cat}</span><br/>
+           <span style="font-size:12px">Mass: \${d.x}× Solar</span><br/>
+           <span style="font-size:12px">Luminosity: \${d.y.toLocaleString()}× Solar</span><br/>
+           <em style="opacity:0.8;font-size:11px">\${d.desc}</em>\`)
+    .style('left', (event.offsetX + 15) + 'px')
+    .style('top', (event.offsetY - 10) + 'px');
+})
+.on('mousemove', function(event) {
+  tooltip
+    .style('left', (event.offsetX + 15) + 'px')
+    .style('top', (event.offsetY - 10) + 'px');
+})
+.on('mouseout', function() {
+  d3.select(this)
+    .transition().duration(150)
+    .attr('r', 10)
+    .attr('stroke-width', 2);
+  tooltip.style('opacity', 0);
+});
+
+// Legend
+const legend = svg.append('g')
+  .attr('transform', \`translate(\${width - margin.right + 20}, \${margin.top})\`);
+
+categories.forEach((cat, i) => {
+  const g = legend.append('g').attr('transform', \`translate(0, \${i * 24})\`);
+  g.append('circle').attr('r', 7).attr('fill', color(cat)).attr('stroke', 'white').attr('stroke-width', 1);
+  g.append('text').attr('x', 14).attr('y', 4).attr('fill', 'white').attr('font-size', '11px').text(cat);
+});
+
+// Axis labels
+svg.append('text')
+  .attr('x', margin.left + innerWidth / 2).attr('y', height - 12)
+  .attr('text-anchor', 'middle').attr('fill', 'white').attr('font-size', '12px')
+  .text('Mass (Solar Masses)');
+
+svg.append('text')
+  .attr('transform', 'rotate(-90)')
+  .attr('x', -height / 2).attr('y', 16)
+  .attr('text-anchor', 'middle').attr('fill', 'white').attr('font-size', '12px')
+  .text('Luminosity (Solar Luminosities)');
+
+// Title
+svg.append('text')
+  .attr('x', width / 2).attr('y', 24)
+  .attr('text-anchor', 'middle').attr('fill', 'white').attr('font-size', '16px').attr('font-weight', '700')
+  .text('Main Sequence Stars: Mass vs Luminosity');
+`}
+</D3>
+
+---
+
+## 5. Force-Directed Graph: Neural Network
+
+Drag nodes to rearrange! Hover to highlight connections.
+
+<D3 title="Neural Network" height={500} showCode={false}>
+{`
+const nodes = [
+  { id: 'i1', group: 'input', label: 'Input 1' }, 
+  { id: 'i2', group: 'input', label: 'Input 2' }, 
+  { id: 'i3', group: 'input', label: 'Input 3' },
+  { id: 'h1', group: 'hidden', label: 'Hidden 1' }, 
+  { id: 'h2', group: 'hidden', label: 'Hidden 2' }, 
+  { id: 'h3', group: 'hidden', label: 'Hidden 3' }, 
+  { id: 'h4', group: 'hidden', label: 'Hidden 4' },
+  { id: 'o1', group: 'output', label: 'Output 1' }, 
+  { id: 'o2', group: 'output', label: 'Output 2' },
+];
+
+const links = [
+  { source: 'i1', target: 'h1' }, { source: 'i1', target: 'h2' },
+  { source: 'i2', target: 'h2' }, { source: 'i2', target: 'h3' },
+  { source: 'i3', target: 'h3' }, { source: 'i3', target: 'h4' },
+  { source: 'h1', target: 'o1' }, { source: 'h2', target: 'o1' }, { source: 'h2', target: 'o2' },
+  { source: 'h3', target: 'o1' }, { source: 'h3', target: 'o2' }, { source: 'h4', target: 'o2' },
+];
+
+const svg = d3.select(container)
+  .append('svg')
+  .attr('width', width)
+  .attr('height', height);
+
+// Tooltip
+const tooltip = d3.select(container)
+  .append('div')
+  .style('position', 'absolute')
+  .style('background', 'rgba(0,0,0,0.9)')
+  .style('border', '1px solid #64748b')
+  .style('border-radius', '6px')
+  .style('padding', '8px 12px')
+  .style('color', 'white')
+  .style('font-size', '13px')
+  .style('pointer-events', 'none')
+  .style('opacity', 0);
+
+// Glow filter
+const defs = svg.append('defs');
+const filter = defs.append('filter').attr('id', 'glow');
+filter.append('feGaussianBlur').attr('stdDeviation', '3').attr('result', 'blur');
+const merge = filter.append('feMerge');
+merge.append('feMergeNode').attr('in', 'blur');
+merge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+const color = d3.scaleOrdinal()
+  .domain(['input', 'hidden', 'output'])
+  .range(['#06b6d4', '#8b5cf6', '#10b981']);
+
+const simulation = d3.forceSimulation(nodes)
+  .force('link', d3.forceLink(links).id(d => d.id).distance(80))
+  .force('charge', d3.forceManyBody().strength(-400))
+  .force('center', d3.forceCenter(width / 2, height / 2))
+  .force('collision', d3.forceCollide().radius(25));
+
+const link = svg.append('g')
+  .selectAll('line')
+  .data(links)
+  .join('line')
+  .attr('stroke', '#64748b')
+  .attr('stroke-opacity', 0.6)
+  .attr('stroke-width', 2);
+
+const node = svg.append('g')
+  .selectAll('circle')
+  .data(nodes)
+  .join('circle')
+  .attr('r', 18)
+  .attr('fill', d => color(d.group))
+  .attr('stroke', 'white')
+  .attr('stroke-width', 2)
+  .attr('filter', 'url(#glow)')
+  .style('cursor', 'grab')
+  .call(d3.drag()
+    .on('start', (e, d) => { 
+      if (!e.active) simulation.alphaTarget(0.3).restart(); 
+      d.fx = d.x; d.fy = d.y; 
+    })
+    .on('drag', (e, d) => { d.fx = e.x; d.fy = e.y; })
+    .on('end', (e, d) => { 
+      if (!e.active) simulation.alphaTarget(0); 
+      d.fx = null; d.fy = null; 
+    }));
+
+const labels = svg.append('g')
+  .selectAll('text')
+  .data(nodes)
+  .join('text')
+  .text(d => d.id)
+  .attr('fill', 'white')
+  .attr('font-size', '11px')
+  .attr('font-weight', '600')
+  .attr('text-anchor', 'middle')
+  .attr('dy', 35)
+  .style('pointer-events', 'none');
+
+simulation.on('tick', () => {
+  link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+      .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+  node.attr('cx', d => d.x).attr('cy', d => d.y);
+  labels.attr('x', d => d.x).attr('y', d => d.y);
+});
+
+// Hover effects - highlight connections
+node.on('mouseover', function(event, d) {
+  const connected = new Set([d.id]);
+  links.forEach(l => {
+    if (l.source.id === d.id) connected.add(l.target.id);
+    if (l.target.id === d.id) connected.add(l.source.id);
+  });
+  
+  node.transition().duration(150)
+    .attr('opacity', n => connected.has(n.id) ? 1 : 0.2)
+    .attr('r', n => n.id === d.id ? 24 : connected.has(n.id) ? 20 : 18);
+  link.transition().duration(150)
+    .attr('stroke-opacity', l => l.source.id === d.id || l.target.id === d.id ? 1 : 0.1)
+    .attr('stroke-width', l => l.source.id === d.id || l.target.id === d.id ? 3 : 2);
+  labels.attr('opacity', n => connected.has(n.id) ? 1 : 0.2);
+  
+  const connections = links.filter(l => l.source.id === d.id || l.target.id === d.id).length;
+  tooltip
+    .style('opacity', 1)
+    .html(\`<strong style="color:\${color(d.group)}">\${d.label}</strong><br/>
+           Layer: \${d.group}<br/>
+           Connections: \${connections}\`)
+    .style('left', (event.offsetX + 15) + 'px')
+    .style('top', (event.offsetY - 10) + 'px');
+})
+.on('mouseout', () => {
+  node.transition().duration(150).attr('opacity', 1).attr('r', 18);
+  link.transition().duration(150).attr('stroke-opacity', 0.6).attr('stroke-width', 2);
+  labels.attr('opacity', 1);
+  tooltip.style('opacity', 0);
+});
+
+// Title
+svg.append('text')
+  .attr('x', width / 2).attr('y', 28)
+  .attr('text-anchor', 'middle').attr('fill', 'white').attr('font-size', '16px').attr('font-weight', '700')
+  .text('Neural Network: 3-4-2 Architecture');
+
+// Legend
+const legend = svg.append('g').attr('transform', \`translate(\${width - 100}, 50)\`);
+['input', 'hidden', 'output'].forEach((g, i) => {
+  const item = legend.append('g').attr('transform', \`translate(0, \${i * 28})\`);
+  item.append('circle').attr('r', 8).attr('fill', color(g)).attr('filter', 'url(#glow)');
+  item.append('text').attr('x', 16).attr('y', 4).attr('fill', 'white').attr('font-size', '12px').text(g);
+});
+`}
+</D3>
+
+---
+
+## 6. Epicyclic Gearing Animation
+
+Click to pause/resume the animation!
+
+<D3 title="Planetary Gears" height={500} showCode={false}>
+{`
+const svg = d3.select(container)
+  .append('svg')
+  .attr('width', width)
+  .attr('height', height)
+  .attr('viewBox', '-0.55 -0.55 1.1 1.1')
+  .style('cursor', 'pointer');
+
+// State
+let paused = false;
+let animationId = null;
+
+// Background
+const defs = svg.append('defs');
+const grad = defs.append('radialGradient').attr('id', 'bg');
+grad.append('stop').attr('offset', '0%').attr('stop-color', '#1e293b');
+grad.append('stop').attr('offset', '100%').attr('stop-color', '#0f172a');
+
+svg.append('circle').attr('r', 0.52).attr('fill', 'url(#bg)');
+
+// Status indicator
+const statusText = svg.append('text')
+  .attr('x', 0).attr('y', 0.48)
+  .attr('text-anchor', 'middle')
+  .attr('fill', 'white')
+  .attr('font-size', '0.03px')
+  .attr('opacity', 0.6)
+  .text('Click to pause');
+
+// Gear path generator
+function gear(teeth, radius, annulus = false) {
+  const n = teeth;
+  const toothR = 0.008;
+  let r2 = Math.abs(radius), r0 = r2 - toothR, r1 = r2 + toothR, r3 = 0.02;
+  if (annulus) { r3 = r0; r0 = r1; r1 = r3; r3 = r2 + toothR * 3; }
+  const da = Math.PI / n;
+  let a = -Math.PI / 2 + (annulus ? da : 0);
+  const p = ['M', r0 * Math.cos(a), r0 * Math.sin(a)];
+  for (let i = 0; i < n; i++) {
+    p.push('A', r0, r0, '0 0 1', r0 * Math.cos(a += da), r0 * Math.sin(a));
+    p.push('L', r2 * Math.cos(a), r2 * Math.sin(a));
+    p.push('L', r1 * Math.cos(a += da/3), r1 * Math.sin(a));
+    p.push('A', r1, r1, '0 0 1', r1 * Math.cos(a += da/3), r1 * Math.sin(a));
+    p.push('L', r2 * Math.cos(a += da/3), r2 * Math.sin(a));
+    p.push('L', r0 * Math.cos(a), r0 * Math.sin(a));
+  }
+  p.push('M0', -r3, 'A', r3, r3, '0 0 0 0', r3, 'A', r3, r3, '0 0 0 0', -r3, 'Z');
+  return p.join(' ');
+}
+
+const sunT = 16, planetT = 32, ringT = 80;
+const mod = 0.00625;
+const sunR = sunT * mod, planetR = planetT * mod;
+const orbitR = sunR + planetR;
+
+// Gear data
+const gears = [
+  { teeth: ringT, radius: -(sunR + 2*planetR), annulus: true, color: '#475569', ox: 0, oy: 0, name: 'Ring Gear' },
+  { teeth: sunT, radius: sunR, color: '#f59e0b', ox: 0, oy: 0, name: 'Sun Gear' },
+  { teeth: planetT, radius: -planetR, color: '#06b6d4', ox: 0, oy: -orbitR, name: 'Planet 1' },
+  { teeth: planetT, radius: -planetR, color: '#8b5cf6', ox: orbitR * Math.cos(Math.PI/6), oy: orbitR * 0.5, name: 'Planet 2' },
+  { teeth: planetT, radius: -planetR, color: '#10b981', ox: -orbitR * Math.cos(Math.PI/6), oy: orbitR * 0.5, name: 'Planet 3' },
+];
+
+const paths = svg.selectAll('path.gear')
+  .data(gears)
+  .join('path')
+  .attr('class', 'gear')
+  .attr('d', d => gear(d.teeth, d.radius, d.annulus))
+  .attr('fill', d => d.color)
+  .attr('stroke', 'rgba(255,255,255,0.3)')
+  .attr('stroke-width', 0.002);
+
+// Highlight on hover
+paths.on('mouseover', function(event, d) {
+  d3.select(this).attr('fill-opacity', 0.8);
+}).on('mouseout', function() {
+  d3.select(this).attr('fill-opacity', 1);
+});
+
+svg.append('circle').attr('r', 0.01).attr('fill', 'white');
+
+const speed = 0.02;
+const carrierRatio = sunT / (sunT + ringT);
+let angle = 0;
+
+function animate() {
+  if (!paused) {
+    angle += speed;
+    const carrierAngle = angle * carrierRatio;
+
+    paths.attr('transform', (d, i) => {
+      if (i === 0) return null;
+      if (i === 1) return \`rotate(\${angle * (ringT / sunT) * 0.5 * (180/Math.PI)})\`;
+      const spin = -carrierAngle * (ringT / d.teeth) * (180/Math.PI);
+      const cos = Math.cos(carrierAngle), sin = Math.sin(carrierAngle);
+      const x = d.ox * cos - d.oy * sin;
+      const y = d.ox * sin + d.oy * cos;
+      return \`translate(\${x},\${y}) rotate(\${spin})\`;
+    });
+  }
+  animationId = requestAnimationFrame(animate);
+}
+animate();
+
+// Click to toggle
+svg.on('click', () => {
+  paused = !paused;
+  statusText.text(paused ? 'Click to resume' : 'Click to pause');
+});
+`}
+</D3>
+
+---
+
+## 7. Arc Diagram: Protein Interactions
+
+Change the sort order and watch the smooth animation!
+
+<D3 title="Signaling Pathway" height={600} showCode={false}>
+{`
+const nodes = [
+  { id: 'EGFR', group: 'Receptor', desc: 'Epidermal Growth Factor Receptor' }, 
+  { id: 'RAS', group: 'GTPase', desc: 'Small GTPase protein' },
+  { id: 'RAF', group: 'Kinase', desc: 'Serine/threonine kinase' }, 
+  { id: 'MEK', group: 'Kinase', desc: 'MAPK kinase' }, 
+  { id: 'ERK', group: 'Kinase', desc: 'Extracellular signal-regulated kinase' },
+  { id: 'PI3K', group: 'Kinase', desc: 'Phosphoinositide 3-kinase' }, 
+  { id: 'AKT', group: 'Kinase', desc: 'Protein kinase B' }, 
+  { id: 'mTOR', group: 'Kinase', desc: 'Mammalian target of rapamycin' },
+  { id: 'p53', group: 'TF', desc: 'Tumor suppressor protein' }, 
+  { id: 'MYC', group: 'TF', desc: 'Proto-oncogene' },
+];
+
+const links = [
+  { source: 'EGFR', target: 'RAS' }, { source: 'EGFR', target: 'PI3K' },
+  { source: 'RAS', target: 'RAF' }, { source: 'RAS', target: 'PI3K' },
+  { source: 'RAF', target: 'MEK' }, { source: 'MEK', target: 'ERK' },
+  { source: 'ERK', target: 'MYC' }, { source: 'ERK', target: 'p53' },
+  { source: 'PI3K', target: 'AKT' }, { source: 'AKT', target: 'mTOR' },
+  { source: 'mTOR', target: 'MYC' },
+];
+
+const margin = { top: 70, right: 20, bottom: 40, left: 100 };
+const step = 48;
+const h = (nodes.length - 1) * step + margin.top + margin.bottom;
+
+// Compute degree for sorting
+const degree = d3.rollup(
+  links.flatMap(({source, target}) => [{node: source}, {node: target}]),
+  v => v.length,
+  ({node}) => node
+);
+
+// Pre-compute all sort orders
+const orders = new Map([
+  ['group', d3.sort(nodes, d => d.group, d => d.id).map(d => d.id)],
+  ['name', d3.sort(nodes.map(d => d.id))],
+  ['degree', d3.sort(nodes, d => degree.get(d.id) || 0, d => d.id).map(d => d.id).reverse()],
+]);
+
+const groups = [...new Set(nodes.map(d => d.group))];
+const color = d3.scaleOrdinal().domain(groups).range(['#06b6d4', '#8b5cf6', '#10b981', '#f59e0b']);
+const groupMap = new Map(nodes.map(d => [d.id, d.group]));
+
+// Initial scale and Y position map (mutable - will be interpolated)
+const y = d3.scalePoint(orders.get('group'), [margin.top, h - margin.bottom]);
+const Y = new Map(nodes.map(({id}) => [id, y(id)]));
+
+// Arc path generator using current Y positions
+function arc(d) {
+  const y1 = Y.get(d.source);
+  const y2 = Y.get(d.target);
+  const r = Math.abs(y2 - y1) / 2;
+  return \`M\${margin.left},\${y1}A\${r},\${r} 0,0,\${y1 < y2 ? 1 : 0} \${margin.left},\${y2}\`;
+}
+
+const svg = d3.select(container)
+  .append('svg')
+  .attr('width', width)
+  .attr('height', h)
+  .attr('viewBox', \`0 0 \${width} \${h}\`);
+
+// Ensure container has relative positioning for absolute children
+d3.select(container).style('position', 'relative');
+
+// Glow filter
+const defs = svg.append('defs');
+const filter = defs.append('filter').attr('id', 'arc-glow');
+filter.append('feGaussianBlur').attr('stdDeviation', '3').attr('result', 'blur');
+const feMerge = filter.append('feMerge');
+feMerge.append('feMergeNode').attr('in', 'blur');
+feMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+// Tooltip
+const tooltip = d3.select(container)
+  .append('div')
+  .style('position', 'absolute')
+  .style('background', 'rgba(0,0,0,0.95)')
+  .style('border', '1px solid #64748b')
+  .style('border-radius', '6px')
+  .style('padding', '10px 14px')
+  .style('color', 'white')
+  .style('font-size', '13px')
+  .style('pointer-events', 'none')
+  .style('opacity', 0)
+  .style('z-index', 10);
+
+// Dropdown selector (positioned in top-right of container)
+const selectContainer = d3.select(container)
+  .append('div')
+  .style('position', 'absolute')
+  .style('top', '50px')
+  .style('right', '20px')
+  .style('display', 'flex')
+  .style('align-items', 'center')
+  .style('gap', '8px')
+  .style('z-index', '5');
+
+selectContainer.append('label')
+  .attr('for', 'order-select')
+  .style('color', 'rgba(255,255,255,0.7)')
+  .style('font-size', '12px')
+  .text('Order:');
+
+const select = selectContainer.append('select')
+  .attr('id', 'order-select')
+  .style('padding', '5px 10px')
+  .style('border-radius', '4px')
+  .style('border', '1px solid #64748b')
+  .style('background', '#1e293b')
+  .style('color', 'white')
+  .style('font-size', '12px')
+  .style('cursor', 'pointer')
+  .style('outline', 'none')
+  .on('change', function() {
+    updateOrder(this.value);
+  });
+
+['group', 'name', 'degree'].forEach(order => {
+  select.append('option')
+    .attr('value', order)
+    .text(order.charAt(0).toUpperCase() + order.slice(1));
+});
+
+// Create the arcs
+const path = svg.append('g')
+  .attr('fill', 'none')
+  .attr('stroke-width', 2)
+  .selectAll('path')
+  .data(links)
+  .join('path')
+  .attr('stroke', d => groupMap.get(d.source) === groupMap.get(d.target) ? color(groupMap.get(d.source)) : '#94a3b8')
+  .attr('stroke-opacity', 0.7)
+  .attr('filter', 'url(#arc-glow)')
+  .attr('d', arc);
+
+// Create the labels
+const label = svg.append('g')
+  .attr('font-size', '12px')
+  .attr('font-weight', '600')
+  .selectAll('text')
+  .data(nodes)
+  .join('text')
+  .attr('x', margin.left - 10)
+  .attr('y', d => Y.get(d.id))
+  .attr('dy', '0.35em')
+  .attr('text-anchor', 'end')
+  .attr('fill', d => color(d.group))
+  .style('cursor', 'pointer')
+  .text(d => d.id);
+
+// Create the dots
+const dot = svg.append('g')
+  .selectAll('circle')
+  .data(nodes)
+  .join('circle')
+  .attr('cx', margin.left)
+  .attr('cy', d => Y.get(d.id))
+  .attr('r', 6)
+  .attr('fill', d => color(d.group))
+  .attr('stroke', 'white')
+  .attr('stroke-width', 2)
+  .attr('filter', 'url(#arc-glow)')
+  .style('cursor', 'pointer');
+
+// Hover effects
+function highlight(id) {
+  const connected = new Set([id]);
+  links.forEach(l => {
+    if (l.source === id) connected.add(l.target);
+    if (l.target === id) connected.add(l.source);
+  });
+  
+  dot.transition().duration(150)
+    .attr('opacity', d => connected.has(d.id) ? 1 : 0.15)
+    .attr('r', d => d.id === id ? 10 : connected.has(d.id) ? 7 : 6);
+  label.transition().duration(150)
+    .attr('opacity', d => connected.has(d.id) ? 1 : 0.15)
+    .attr('font-size', d => d.id === id ? '14px' : '12px');
+  path.transition().duration(150)
+    .attr('stroke-opacity', d => d.source === id || d.target === id ? 1 : 0.05)
+    .attr('stroke-width', d => d.source === id || d.target === id ? 3.5 : 2);
+}
+
+function unhighlight() {
+  dot.transition().duration(150).attr('opacity', 1).attr('r', 6);
+  label.transition().duration(150).attr('opacity', 1).attr('font-size', '12px');
+  path.transition().duration(150).attr('stroke-opacity', 0.7).attr('stroke-width', 2);
+}
+
+dot.on('mouseover', (event, d) => {
+  highlight(d.id);
+  const conn = links.filter(l => l.source === d.id || l.target === d.id).length;
+  tooltip.style('opacity', 1)
+    .html(\`<strong style="color:\${color(d.group)}">\${d.id}</strong><br/>
+           <span style="opacity:0.8">\${d.desc}</span><br/>
+           <span style="font-size:11px">Type: \${d.group} | Connections: \${conn}</span>\`)
+    .style('left', (event.offsetX + 15) + 'px')
+    .style('top', (event.offsetY - 10) + 'px');
+}).on('mouseout', () => { unhighlight(); tooltip.style('opacity', 0); });
+
+label.on('mouseover', (e, d) => highlight(d.id))
+     .on('mouseout', unhighlight);
+
+// Update function - smoothly interpolates Y positions
+function updateOrder(orderKey) {
+  y.domain(orders.get(orderKey));
+  
+  const t = svg.transition().duration(750);
+  
+  // Animate labels
+  label.transition(t)
+    .delay((d, i) => i * 20)
+    .attrTween('y', d => {
+      const from = Y.get(d.id);
+      const to = y(d.id);
+      return t => {
+        const newY = from + (to - from) * t;
+        Y.set(d.id, newY);  // Update mutable Y
+        return newY;
+      };
+    });
+  
+  // Animate dots
+  dot.transition(t)
+    .delay((d, i) => i * 20)
+    .attr('cy', d => y(d.id));
+  
+  // Animate arcs - redraw path using current Y values
+  path.transition(t)
+    .attrTween('d', d => () => arc(d));
+}
+
+// Title
+svg.append('text')
+  .attr('x', width / 2).attr('y', 24)
+  .attr('text-anchor', 'middle').attr('fill', 'white').attr('font-size', '16px').attr('font-weight', '700')
+  .text('Cancer Signaling Pathway');
+`}
+</D3>
+
+---
+
+## The D3 Mental Model
+
+Understanding D3 requires thinking about **data binding**:
+
+```javascript
+d3.select('svg')
+  .selectAll('circle')
+  .data(stars)
+  .join('circle')
+  .attr('cx', d => xScale(d.mass))
+  .attr('cy', d => yScale(d.luminosity))
+  .attr('r', d => sizeScale(d.radius))
+```
+
+The `join()` method handles the **enter-update-exit** pattern:
+- **Enter** creates new elements for new data points
+- **Update** modifies existing elements when data changes
+- **Exit** removes elements for data points that no longer exist
+
+---
+
+<Callout type="success">
+  **All charts are interactive!** Hover over data points for tooltips, drag nodes in the force graph, click the gears to pause. Click **Fullscreen** for a larger canvas!
+</Callout>
+
+## Resources
+
+- [D3.js Official Documentation](https://d3js.org/)
+- [Observable D3 Examples](https://observablehq.com/@d3)
+- [NASA Exoplanet Archive](https://exoplanetarchive.ipac.caltech.edu/)
+- [NOAA Climate Data](https://www.ncei.noaa.gov/)
