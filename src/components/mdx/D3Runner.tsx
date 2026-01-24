@@ -125,22 +125,22 @@ export function D3Runner({
             D3.js
           </span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <button
             onClick={() => setCodeVisible(!codeVisible)}
-            className="text-xs px-2 py-1 rounded bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors"
+            className="text-xs px-2 sm:px-3 py-1.5 rounded bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors"
           >
             {codeVisible ? 'Hide Code' : 'Show Code'}
           </button>
           <button
             onClick={handleRun}
-            className="text-xs px-2 py-1 rounded bg-cyan-600 text-white hover:bg-cyan-500 transition-colors"
+            className="text-xs px-2 sm:px-3 py-1.5 rounded bg-cyan-600 text-white hover:bg-cyan-500 transition-colors"
           >
             Run
           </button>
           <button
             onClick={toggleFullscreen}
-            className="text-xs px-2 py-1 rounded bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors"
+            className="text-xs p-1.5 rounded bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors"
             title={isFullscreen ? 'Exit Fullscreen (Esc)' : 'Fullscreen'}
           >
             {isFullscreen ? (
@@ -167,6 +167,7 @@ export function D3Runner({
               padding: '1rem',
               fontSize: '0.875rem',
               borderRadius: 0,
+              background: 'transparent',
             }}
             codeTagProps={{
               style: {

@@ -388,7 +388,7 @@ export default function RustRunner({
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <button
             onClick={copyCode}
             className="p-1.5 rounded hover:bg-[var(--color-bg-secondary)] transition-colors"
@@ -406,18 +406,18 @@ export default function RustRunner({
           {isRunning ? (
             <button
               onClick={stopExecution}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded text-sm font-medium transition-colors"
+              className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded text-sm font-medium transition-colors"
             >
               <Square size={14} />
-              Stop
+              <span className="hidden sm:inline">Stop</span>
             </button>
           ) : (
             <button
               onClick={runCode}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded text-sm font-medium transition-colors"
+              className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded text-sm font-medium transition-colors"
             >
               <Play size={14} />
-              Run
+              <span className="hidden sm:inline">Run</span>
             </button>
           )}
         </div>
@@ -425,7 +425,7 @@ export default function RustRunner({
 
       {/* Code Display */}
       {showCode && (
-        <div className="bg-[var(--color-bg-secondary)] overflow-x-auto">
+        <div className="overflow-x-auto">
           <pre className="p-4 text-sm font-mono table w-full">
             {renderCode()}
           </pre>

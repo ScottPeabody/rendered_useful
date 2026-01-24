@@ -251,23 +251,23 @@ export function DuckDBRunner({
             <span className="text-xs text-yellow-400 animate-pulse">Initializing...</span>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <button
             onClick={() => setCodeVisible(!codeVisible)}
-            className="text-xs px-2 py-1 rounded bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors"
+            className="text-xs px-2 sm:px-3 py-1.5 rounded bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors"
           >
             {codeVisible ? 'Hide SQL' : 'Show SQL'}
           </button>
           <button
             onClick={handleRun}
             disabled={isLoading || isRunning}
-            className="text-xs px-2 py-1 rounded bg-amber-600 text-white hover:bg-amber-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="text-xs px-2 sm:px-3 py-1.5 rounded bg-amber-600 text-white hover:bg-amber-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isRunning ? 'Running...' : 'Run'}
           </button>
           <button
             onClick={toggleFullscreen}
-            className="text-xs px-2 py-1 rounded bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors"
+            className="text-xs p-1.5 rounded bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors"
             title={isFullscreen ? 'Exit Fullscreen (Esc)' : 'Fullscreen'}
           >
             {isFullscreen ? (
@@ -294,6 +294,12 @@ export function DuckDBRunner({
               padding: '1rem',
               fontSize: '0.875rem',
               borderRadius: 0,
+              background: 'transparent',
+            }}
+            codeTagProps={{
+              style: {
+                background: 'transparent',
+              }
             }}
             showLineNumbers
             lineNumberStyle={{
