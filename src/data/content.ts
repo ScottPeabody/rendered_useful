@@ -796,6 +796,20 @@ export const articles: Article[] = [
     languages: ['typescript', 'javascript', 'english'],
     locations: ['the-web'],
   },
+  {
+    slug: 'duckdb-introduction',
+    title: 'SQL in the Browser with DuckDB',
+    description: 'Run SQL queries directly in your browser with DuckDB WebAssembly. No server needed. Explore data, run analytics, and learn SQL interactively.',
+    author: 'scott-peabody',
+    date: '2026-01-24T12:00:00',
+    tags: ['sql', 'duckdb', 'data', 'analytics', 'interactive', 'wasm'],
+    communities: ['data-science', 'learners'],
+    readingTime: 12,
+    featured: true,
+    concepts: ['data-analytics'],
+    languages: ['sql', 'english'],
+    locations: ['the-web'],
+  },
 ]
 
 export const projects: Project[] = [

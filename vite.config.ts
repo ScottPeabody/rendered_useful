@@ -52,6 +52,9 @@ export default defineConfig({
       }
     }
   },
+  optimizeDeps: {
+    exclude: ['@duckdb/duckdb-wasm'],
+  },
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
