@@ -155,6 +155,11 @@ function CodeCell({ cell, cellState, onRun, pyodideReady }: CodeCellProps) {
                 background: 'transparent',
                 fontSize: '13px',
               }}
+              codeTagProps={{
+                style: {
+                  background: 'transparent',
+                }
+              }}
             >
               {source}
             </SyntaxHighlighter>

@@ -182,6 +182,11 @@ function CodeCell({ cell }: { cell: NotebookCell }) {
                 background: 'transparent',
                 fontSize: '13px',
               }}
+              codeTagProps={{
+                style: {
+                  background: 'transparent',
+                }
+              }}
             >
               {source}
             </SyntaxHighlighter>
