@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback, useLayoutEffect } from 'react'
-import initSqlJs, { Database, SqlJsStatic } from 'sql.js'
+import initSqlJs from 'sql.js'
+import type { Database, SqlJsStatic } from 'sql.js'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
