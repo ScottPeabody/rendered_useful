@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback, useLayoutEffect } from 'react'
 import * as d3 from 'd3'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
@@ -19,48 +19,37 @@ export function D3Runner({
   title,
 }: D3RunnerProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const outputRef = useRef<HTMLDivElement>(null)
   const [error, setError] = useState<string | null>(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [codeVisible, setCodeVisible] = useState(showCode)
-  const [containerWidth, setContainerWidth] = useState(propWidth || 700)
+  const [runCounter, setRunCounter] = useState(0)
+  const lastErrorRef = useRef<string | null>(null)
 
-  // Update width on resize
-  useEffect(() => {
-    if (propWidth) {
-      setContainerWidth(propWidth)
-      return
-    }
-
-    const updateWidth = () => {
-      if (containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect()
-        setContainerWidth(Math.floor(rect.width) - 32) // Account for padding
-      }
-    }
-
-    updateWidth()
-    window.addEventListener('resize', updateWidth)
-    return () => window.removeEventListener('resize', updateWidth)
-  }, [propWidth, isFullscreen])
-
-  const runCode = useCallback(() => {
-    if (!containerRef.current) return
+  // Run D3 code - this mutates the DOM directly
+  // useLayoutEffect is appropriate for synchronous DOM manipulation
+  useLayoutEffect(() => {
+    const container = outputRef.current
+    if (!container) return
 
     // Clear previous content
-    const container = containerRef.current.querySelector('.d3-output')
-    if (container) {
-      container.innerHTML = ''
+    container.innerHTML = ''
+
+    // Calculate dimensions
+    const getCurrentWidth = () => {
+      if (propWidth) return propWidth
+      if (isFullscreen) return window.innerWidth - 48
+      if (containerRef.current) {
+        return Math.floor(containerRef.current.getBoundingClientRect().width) - 32
+      }
+      return 700
     }
 
-    setError(null)
-
+    let newError: string | null = null
     try {
-      // Create a function that runs the D3 code with access to d3 and container
       const code = children.trim()
-      
-      // Provide useful variables to the code
       const currentHeight = isFullscreen ? window.innerHeight - 120 : height
-      const currentWidth = isFullscreen ? window.innerWidth - 48 : containerWidth
+      const currentWidth = getCurrentWidth()
 
       const fn = new Function(
         'd3',
@@ -75,14 +64,33 @@ export function D3Runner({
 
       fn(d3, container, currentWidth, currentHeight)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      newError = err instanceof Error ? err.message : 'An error occurred'
     }
-  }, [children, height, containerWidth, isFullscreen])
 
-  // Run code when dependencies change
+    // Only update state if error changed to avoid unnecessary renders
+    if (newError !== lastErrorRef.current) {
+      lastErrorRef.current = newError
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setError(newError)
+    }
+  }, [children, height, propWidth, isFullscreen, runCounter])
+
+  // Manual run handler for button clicks
+  const handleRun = useCallback(() => {
+    setRunCounter(n => n + 1)
+  }, [])
+
+  // Handle resize
   useEffect(() => {
-    runCode()
-  }, [runCode])
+    if (propWidth) return // Fixed width, no need to listen
+
+    const handleResize = () => {
+      setRunCounter(n => n + 1)
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [propWidth])
 
   // Handle fullscreen
   const toggleFullscreen = () => {
@@ -125,7 +133,7 @@ export function D3Runner({
             {codeVisible ? 'Hide Code' : 'Show Code'}
           </button>
           <button
-            onClick={() => runCode()}
+            onClick={handleRun}
             className="text-xs px-2 py-1 rounded bg-cyan-600 text-white hover:bg-cyan-500 transition-colors"
           >
             Run
@@ -180,6 +188,7 @@ export function D3Runner({
 
       {/* Output */}
       <div 
+        ref={outputRef}
         className="d3-output p-4 flex justify-center items-center"
         style={{ minHeight: isFullscreen ? 'calc(100vh - 180px)' : height }}
       />

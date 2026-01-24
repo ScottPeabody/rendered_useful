@@ -782,6 +782,20 @@ export const articles: Article[] = [
     languages: ['rust', 'english'],
     locations: ['the-web'],
   },
+  {
+    slug: 'nivo-introduction',
+    title: 'Data Visualization with Nivo: Exploring the Cosmos',
+    description: 'Build beautiful, interactive data visualizations with Nivo - a React library built on D3. We explore space data through bar charts, line graphs, radar plots, and more.',
+    author: 'scott-peabody',
+    date: '2026-01-23T12:00:00',
+    tags: ['react', 'visualization', 'nivo', 'data', 'space', 'interactive'],
+    communities: ['creative-coding', 'learners'],
+    readingTime: 15,
+    featured: true,
+    concepts: ['data-visualization'],
+    languages: ['typescript', 'javascript', 'english'],
+    locations: ['the-web'],
+  },
 ]
 
 export const projects: Project[] = [

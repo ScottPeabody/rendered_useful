@@ -1,6 +1,6 @@
 import { MDXProvider } from '@mdx-js/react'
 import type { ReactNode, ComponentType, HTMLAttributes, ImgHTMLAttributes, AnchorHTMLAttributes, TableHTMLAttributes } from 'react'
-import { Callout, TechStack, Image, Video, Audio, Todo, Mermaid, PythonRunner, RustRunner, D3Runner } from './mdx'
+import { Callout, TechStack, Image, Video, Audio, Todo, Mermaid, PythonRunner, RustRunner, D3Runner, NivoChart } from './mdx'
 import RubiksCube from './games/RubiksCube'
 import DosRunner from './games/DosRunner'
 
@@ -25,6 +25,8 @@ const mdxComponents: Record<string, ComponentType<any>> = {
   Rust: RustRunner,
   D3: D3Runner,
   D3Runner,
+  Nivo: NivoChart,
+  NivoChart,
 
   h1: (props: MDXComponentProps) => (
     <h1 className="text-3xl font-bold text-[var(--color-text-primary)] mt-10 mb-4 first:mt-0" {...props} />
