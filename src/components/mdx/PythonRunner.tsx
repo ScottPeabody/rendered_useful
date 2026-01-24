@@ -587,6 +587,11 @@ def _clear_bokeh_figures():
                 background: 'transparent',
                 fontSize: '13px',
               }}
+              codeTagProps={{
+                style: {
+                  background: 'transparent',
+                }
+              }}
               lineNumberStyle={{
                 minWidth: '2em',
                 paddingRight: '1em',
