@@ -1,0 +1,559 @@
+---
+title: "Data Visualization with Nivo: Exploring the Cosmos"
+description: "Build beautiful, interactive data visualizations with Nivo - a React library built on D3. We'll explore space data through bar charts, line graphs, radar plots, and more."
+date: "2026-01-23T12:00:00"
+author: "scott-peabody"
+tags: ["react", "visualization", "nivo", "data", "space", "interactive"]
+communities: ["creative-coding", "learners"]
+readingTime: 15
+featured: true
+---
+
+# Data Visualization with Nivo: Exploring the Cosmos
+
+[Nivo](https://nivo.rocks/) is a rich set of data visualization components built on top of D3 and React. Unlike raw D3 (which we covered in our [D3 Introduction](/articles/d3-introduction)), Nivo provides declarative React components that handle the complexity for you.
+
+<Callout type="info">
+  **MIT Licensed & Open Source**: Nivo is fully open source with 13.9k+ GitHub stars. Check out the [source code](https://github.com/plouc/nivo).
+</Callout>
+
+Let's explore space data through various chart types!
+
+---
+
+## 1. Bar Chart: Exoplanet Discoveries by Method
+
+How do astronomers find planets around distant stars? Different detection methods have varying success rates.
+
+<Nivo
+  type="bar"
+  title="Exoplanet Detection Methods"
+  height={400}
+  colors="cosmic"
+  data={[
+    { method: 'Transit', count: 4142, pct: 76 },
+    { method: 'Radial Velocity', count: 1052, pct: 19 },
+    { method: 'Direct Imaging', count: 67, pct: 1.2 },
+    { method: 'Microlensing', count: 209, pct: 3.8 },
+    { method: 'Timing', count: 32, pct: 0.6 },
+    { method: 'Astrometry', count: 3, pct: 0.05 },
+  ]}
+  keys={['count']}
+  indexBy="method"
+  margin={{ top: 50, right: 130, bottom: 50, left: 120 }}
+  padding={0.3}
+  layout="horizontal"
+  valueScale={{ type: 'linear' }}
+  indexScale={{ type: 'band', round: true }}
+  borderRadius={4}
+  borderWidth={1}
+  borderColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
+  axisTop={null}
+  axisRight={null}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: 'Confirmed Exoplanets',
+    legendPosition: 'middle',
+    legendOffset: 40
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+  }}
+  labelSkipWidth={12}
+  labelSkipHeight={12}
+  labelTextColor={{ from: 'color', modifiers: [['darker', 3]] }}
+  legends={[
+    {
+      dataFrom: 'keys',
+      anchor: 'bottom-right',
+      direction: 'column',
+      translateX: 120,
+      itemWidth: 100,
+      itemHeight: 20,
+      itemTextColor: '#cbd5e1',
+      symbolSize: 12,
+      symbolShape: 'circle',
+    }
+  ]}
+/>
+
+The **Transit method** dominates thanks to missions like Kepler and TESS, which watch for the tiny dimming when a planet crosses in front of its star.
+
+---
+
+## 2. Line Chart: Space Mission Timeline
+
+Tracking humanity's journey beyond Earth - cumulative successful missions to different destinations.
+
+<Nivo
+  type="line"
+  title="Cumulative Space Missions by Decade"
+  height={450}
+  colors="nebula"
+  data={[
+    {
+      id: 'Moon',
+      data: [
+        { x: '1960s', y: 8 },
+        { x: '1970s', y: 15 },
+        { x: '1980s', y: 16 },
+        { x: '1990s', y: 18 },
+        { x: '2000s', y: 24 },
+        { x: '2010s', y: 32 },
+        { x: '2020s', y: 45 },
+      ]
+    },
+    {
+      id: 'Mars',
+      data: [
+        { x: '1960s', y: 2 },
+        { x: '1970s', y: 7 },
+        { x: '1980s', y: 9 },
+        { x: '1990s', y: 12 },
+        { x: '2000s', y: 18 },
+        { x: '2010s', y: 26 },
+        { x: '2020s', y: 38 },
+      ]
+    },
+    {
+      id: 'Venus',
+      data: [
+        { x: '1960s', y: 4 },
+        { x: '1970s', y: 16 },
+        { x: '1980s', y: 20 },
+        { x: '1990s', y: 21 },
+        { x: '2000s', y: 23 },
+        { x: '2010s', y: 25 },
+        { x: '2020s', y: 27 },
+      ]
+    },
+    {
+      id: 'Outer Planets',
+      data: [
+        { x: '1960s', y: 0 },
+        { x: '1970s', y: 4 },
+        { x: '1980s', y: 6 },
+        { x: '1990s', y: 8 },
+        { x: '2000s', y: 10 },
+        { x: '2010s', y: 12 },
+        { x: '2020s', y: 14 },
+      ]
+    },
+  ]}
+  margin={{ top: 50, right: 140, bottom: 50, left: 60 }}
+  xScale={{ type: 'point' }}
+  yScale={{ type: 'linear', min: 0, max: 'auto', stacked: false }}
+  curve="monotoneX"
+  axisTop={null}
+  axisRight={null}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    legend: 'Decade',
+    legendOffset: 36,
+    legendPosition: 'middle'
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    legend: 'Cumulative Missions',
+    legendOffset: -50,
+    legendPosition: 'middle'
+  }}
+  pointSize={10}
+  pointColor={{ theme: 'background' }}
+  pointBorderWidth={2}
+  pointBorderColor={{ from: 'serieColor' }}
+  pointLabelYOffset={-12}
+  enableArea={true}
+  areaOpacity={0.15}
+  useMesh={true}
+  legends={[
+    {
+      anchor: 'bottom-right',
+      direction: 'column',
+      translateX: 100,
+      itemWidth: 80,
+      itemHeight: 20,
+      itemTextColor: '#cbd5e1',
+      symbolSize: 12,
+      symbolShape: 'circle',
+    }
+  ]}
+/>
+
+The 2020s are showing a dramatic increase in lunar missions as commercial spaceflight matures and nations return to the Moon.
+
+---
+
+## 3. Pie Chart: ISS Crew Daily Schedule
+
+How do astronauts spend their day aboard the International Space Station?
+
+<Nivo
+  type="pie"
+  title="ISS Crew Daily Time Allocation"
+  height={450}
+  colors="cosmic"
+  data={[
+    { id: 'Sleep', label: 'Sleep', value: 8.5 },
+    { id: 'Work/Research', label: 'Work/Research', value: 6.5 },
+    { id: 'Exercise', label: 'Exercise', value: 2.5 },
+    { id: 'Meals', label: 'Meals', value: 2.0 },
+    { id: 'Maintenance', label: 'Maintenance', value: 2.0 },
+    { id: 'Personal Time', label: 'Personal Time', value: 1.5 },
+    { id: 'Conferences', label: 'Conferences', value: 1.0 },
+  ]}
+  margin={{ top: 40, right: 120, bottom: 80, left: 120 }}
+  innerRadius={0.5}
+  padAngle={0.7}
+  cornerRadius={3}
+  activeOuterRadiusOffset={8}
+  borderWidth={1}
+  borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
+  arcLinkLabelsSkipAngle={5}
+  arcLinkLabelsTextColor="#cbd5e1"
+  arcLinkLabelsThickness={2}
+  arcLinkLabelsColor={{ from: 'color' }}
+  arcLabelsSkipAngle={10}
+  arcLabelsTextColor={{ from: 'color', modifiers: [['darker', 3]] }}
+  legends={[
+    {
+      anchor: 'bottom',
+      direction: 'row',
+      translateY: 56,
+      itemWidth: 100,
+      itemHeight: 18,
+      itemTextColor: '#cbd5e1',
+      symbolSize: 12,
+      symbolShape: 'circle',
+    }
+  ]}
+/>
+
+Astronauts must exercise **2.5 hours daily** to combat muscle and bone loss in microgravity. The strict schedule ensures crew health while maximizing scientific research time.
+
+---
+
+## 4. Radar Chart: Habitability Factors
+
+Comparing potential habitability factors across different exoplanets and moons.
+
+<Nivo
+  type="radar"
+  title="Habitability Comparison"
+  height={500}
+  colors="aurora"
+  data={[
+    { factor: 'Temperature', 'Earth': 100, 'Mars': 45, 'Europa': 20, 'Titan': 15, 'Proxima b': 70 },
+    { factor: 'Atmosphere', 'Earth': 100, 'Mars': 30, 'Europa': 5, 'Titan': 85, 'Proxima b': 60 },
+    { factor: 'Water', 'Earth': 100, 'Mars': 35, 'Europa': 95, 'Titan': 70, 'Proxima b': 50 },
+    { factor: 'Radiation Shield', 'Earth': 100, 'Mars': 20, 'Europa': 10, 'Titan': 90, 'Proxima b': 40 },
+    { factor: 'Gravity', 'Earth': 100, 'Mars': 38, 'Europa': 13, 'Titan': 14, 'Proxima b': 110 },
+    { factor: 'Energy Sources', 'Earth': 100, 'Mars': 70, 'Europa': 60, 'Titan': 40, 'Proxima b': 80 },
+  ]}
+  keys={['Earth', 'Mars', 'Europa', 'Titan', 'Proxima b']}
+  indexBy="factor"
+  margin={{ top: 70, right: 80, bottom: 40, left: 80 }}
+  borderColor={{ from: 'color' }}
+  gridLabelOffset={36}
+  dotSize={10}
+  dotColor={{ theme: 'background' }}
+  dotBorderWidth={2}
+  dotBorderColor={{ from: 'color' }}
+  legends={[
+    {
+      anchor: 'top-left',
+      direction: 'column',
+      translateX: -50,
+      translateY: -40,
+      itemWidth: 80,
+      itemHeight: 20,
+      itemTextColor: '#cbd5e1',
+      symbolSize: 12,
+      symbolShape: 'circle',
+    }
+  ]}
+/>
+
+Earth scores 100 on all factors (our baseline). Europa's subsurface ocean gives it high water scores despite frigid surface conditions. Titan's thick atmosphere provides excellent radiation protection.
+
+---
+
+## 5. Heatmap: Stellar Classification
+
+The Hertzsprung-Russell diagram shows stars plotted by temperature and luminosity. Here's a simplified heatmap showing star counts by spectral class and luminosity class.
+
+<Nivo
+  type="heatmap"
+  title="Stars by Spectral Type"
+  height={400}
+  data={[
+    { id: 'O (Hot Blue)', data: [{ x: 'Supergiants', y: 12 }, { x: 'Giants', y: 8 }, { x: 'Main Seq', y: 45 }, { x: 'Dwarfs', y: 2 }] },
+    { id: 'B (Blue-White)', data: [{ x: 'Supergiants', y: 28 }, { x: 'Giants', y: 35 }, { x: 'Main Seq', y: 180 }, { x: 'Dwarfs', y: 15 }] },
+    { id: 'A (White)', data: [{ x: 'Supergiants', y: 18 }, { x: 'Giants', y: 42 }, { x: 'Main Seq', y: 320 }, { x: 'Dwarfs', y: 85 }] },
+    { id: 'F (Yellow-White)', data: [{ x: 'Supergiants', y: 22 }, { x: 'Giants', y: 68 }, { x: 'Main Seq', y: 580 }, { x: 'Dwarfs', y: 120 }] },
+    { id: 'G (Yellow)', data: [{ x: 'Supergiants', y: 15 }, { x: 'Giants', y: 95 }, { x: 'Main Seq', y: 720 }, { x: 'Dwarfs', y: 180 }] },
+    { id: 'K (Orange)', data: [{ x: 'Supergiants', y: 8 }, { x: 'Giants', y: 145 }, { x: 'Main Seq', y: 950 }, { x: 'Dwarfs', y: 420 }] },
+    { id: 'M (Red)', data: [{ x: 'Supergiants', y: 3 }, { x: 'Giants', y: 85 }, { x: 'Main Seq', y: 2800 }, { x: 'Dwarfs', y: 1200 }] },
+  ]}
+  margin={{ top: 60, right: 90, bottom: 60, left: 120 }}
+  valueFormat=">-.0s"
+  axisTop={{
+    tickSize: 5,
+    tickPadding: 5,
+    legend: '',
+    legendOffset: 46
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+  }}
+  colors={{
+    type: 'sequential',
+    scheme: 'plasma',
+  }}
+  emptyColor="#1e293b"
+  legends={[
+    {
+      anchor: 'bottom',
+      translateX: 0,
+      translateY: 30,
+      length: 400,
+      thickness: 8,
+      direction: 'row',
+      tickPosition: 'after',
+      tickSize: 3,
+      tickSpacing: 4,
+      tickOverlap: false,
+      title: 'Star Count',
+      titleAlign: 'start',
+      titleOffset: 4
+    }
+  ]}
+/>
+
+Red dwarfs (M-class main sequence) are by far the most common stars in our galaxy - they're small, cool, and long-lived.
+
+---
+
+## 6. Stream Chart: Telescope Observation Time
+
+How major space telescopes allocate their observation time across different science categories.
+
+<Nivo
+  type="stream"
+  title="Telescope Time Allocation"
+  height={400}
+  colors="nebula"
+  data={[
+    { telescope: 'Hubble 2020', Galaxies: 28, Stars: 22, Exoplanets: 18, Cosmology: 15, SolarSystem: 12, Other: 5 },
+    { telescope: 'Hubble 2021', Galaxies: 25, Stars: 20, Exoplanets: 22, Cosmology: 16, SolarSystem: 11, Other: 6 },
+    { telescope: 'Hubble 2022', Galaxies: 24, Stars: 19, Exoplanets: 25, Cosmology: 15, SolarSystem: 10, Other: 7 },
+    { telescope: 'JWST 2023', Galaxies: 32, Stars: 18, Exoplanets: 28, Cosmology: 12, SolarSystem: 6, Other: 4 },
+    { telescope: 'JWST 2024', Galaxies: 30, Stars: 16, Exoplanets: 32, Cosmology: 14, SolarSystem: 5, Other: 3 },
+    { telescope: 'JWST 2025', Galaxies: 28, Stars: 15, Exoplanets: 35, Cosmology: 15, SolarSystem: 4, Other: 3 },
+  ]}
+  keys={['Galaxies', 'Stars', 'Exoplanets', 'Cosmology', 'SolarSystem', 'Other']}
+  margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
+  axisTop={null}
+  axisRight={null}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: -45,
+    legend: '',
+    legendOffset: 36
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    legend: 'Observation Hours (%)',
+    legendOffset: -50
+  }}
+  offsetType="diverging"
+  order="ascending"
+  borderColor={{ theme: 'background' }}
+  fillOpacity={0.85}
+  borderWidth={1}
+  dotSize={8}
+  dotBorderWidth={2}
+  legends={[
+    {
+      anchor: 'bottom-right',
+      direction: 'column',
+      translateX: 100,
+      itemWidth: 80,
+      itemHeight: 20,
+      itemTextColor: '#cbd5e1',
+      symbolSize: 12,
+      symbolShape: 'circle',
+    }
+  ]}
+/>
+
+JWST has dramatically increased exoplanet observation time compared to Hubble, taking advantage of its infrared capabilities to study planetary atmospheres.
+
+---
+
+## 7. Bump Chart: Space Agency Rankings
+
+Tracking the relative ranking of space agencies by annual launch count over recent years.
+
+<Nivo
+  type="bump"
+  title="Space Agency Launch Rankings"
+  height={400}
+  colors="cosmic"
+  data={[
+    { id: 'SpaceX', data: [{ x: '2020', y: 2 }, { x: '2021', y: 1 }, { x: '2022', y: 1 }, { x: '2023', y: 1 }, { x: '2024', y: 1 }, { x: '2025', y: 1 }] },
+    { id: 'China (CASC)', data: [{ x: '2020', y: 1 }, { x: '2021', y: 2 }, { x: '2022', y: 2 }, { x: '2023', y: 2 }, { x: '2024', y: 2 }, { x: '2025', y: 2 }] },
+    { id: 'Russia', data: [{ x: '2020', y: 3 }, { x: '2021', y: 3 }, { x: '2022', y: 4 }, { x: '2023', y: 4 }, { x: '2024', y: 4 }, { x: '2025', y: 5 }] },
+    { id: 'Rocket Lab', data: [{ x: '2020', y: 5 }, { x: '2021', y: 5 }, { x: '2022', y: 5 }, { x: '2023', y: 3 }, { x: '2024', y: 3 }, { x: '2025', y: 3 }] },
+    { id: 'ULA', data: [{ x: '2020', y: 4 }, { x: '2021', y: 4 }, { x: '2022', y: 3 }, { x: '2023', y: 5 }, { x: '2024', y: 5 }, { x: '2025', y: 4 }] },
+  ]}
+  margin={{ top: 40, right: 100, bottom: 40, left: 60 }}
+  lineWidth={3}
+  activeLineWidth={6}
+  inactiveLineWidth={2}
+  inactiveOpacity={0.3}
+  startLabel={false}
+  endLabel={true}
+  pointSize={10}
+  activePointSize={16}
+  inactivePointSize={6}
+  pointBorderWidth={3}
+  activePointBorderWidth={3}
+  pointColor={{ theme: 'background' }}
+  pointBorderColor={{ from: 'serie.color' }}
+  axisTop={null}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    legend: 'Rank',
+    legendPosition: 'middle',
+    legendOffset: -40
+  }}
+/>
+
+SpaceX has dominated launch counts since 2021 with their reusable Falcon 9. Rocket Lab's Electron has risen to become a major player in the small satellite market.
+
+---
+
+## 8. Chord Diagram: Inter-Agency Collaboration
+
+Space agencies frequently collaborate on missions. This chord diagram shows the strength of partnerships.
+
+<Nivo
+  type="chord"
+  title="Space Agency Collaborations"
+  height={500}
+  colors="aurora"
+  data={[
+    [0, 45, 32, 28, 15, 8],
+    [45, 0, 38, 42, 12, 5],
+    [32, 38, 0, 25, 18, 10],
+    [28, 42, 25, 0, 8, 3],
+    [15, 12, 18, 8, 0, 22],
+    [8, 5, 10, 3, 22, 0],
+  ]}
+  keys={['NASA', 'ESA', 'JAXA', 'CSA', 'ISRO', 'CNSA']}
+  margin={{ top: 60, right: 60, bottom: 90, left: 60 }}
+  padAngle={0.02}
+  innerRadiusRatio={0.96}
+  innerRadiusOffset={0.02}
+  arcOpacity={1}
+  arcBorderWidth={1}
+  arcBorderColor={{ from: 'color', modifiers: [['darker', 0.4]] }}
+  ribbonOpacity={0.5}
+  ribbonBorderWidth={1}
+  ribbonBorderColor={{ from: 'color', modifiers: [['darker', 0.4]] }}
+  enableLabel={true}
+  label="id"
+  labelOffset={12}
+  labelRotation={-90}
+  labelTextColor={{ from: 'color', modifiers: [['darker', 1]] }}
+  activeRibbonOpacity={0.75}
+  inactiveRibbonOpacity={0.25}
+  legends={[
+    {
+      anchor: 'bottom',
+      direction: 'row',
+      translateY: 70,
+      itemWidth: 80,
+      itemHeight: 14,
+      itemTextColor: '#cbd5e1',
+      symbolSize: 12,
+      symbolShape: 'circle',
+    }
+  ]}
+/>
+
+NASA-ESA and NASA-CSA (Canada) partnerships are particularly strong, with collaborations on ISS, Hubble, JWST, and Artemis programs.
+
+---
+
+## Supported Chart Types
+
+The `<Nivo>` component supports all major Nivo chart types:
+
+| Type | Description |
+|------|-------------|
+| `bar` | Vertical/horizontal bar charts, grouped or stacked |
+| `line` | Line charts with optional areas |
+| `pie` | Pie and donut charts |
+| `radar` | Radar/spider charts |
+| `scatterplot` | Scatter plots |
+| `heatmap` | Heat maps |
+| `stream` | Stacked area/stream graphs |
+| `bump` | Bump charts for rankings |
+| `areabump` | Area bump charts |
+| `chord` | Chord diagrams |
+| `funnel` | Funnel charts |
+| `treemap` | Tree maps |
+| `sunburst` | Sunburst charts |
+| `sankey` | Sankey diagrams |
+| `network` | Network graphs |
+| `swarmplot` | Swarm plots |
+| `waffle` | Waffle charts |
+| `calendar` | Calendar heatmaps |
+| `marimekko` | Marimekko charts |
+| `radialbar` | Radial bar charts |
+| `circlepacking` | Circle packing |
+| `bullet` | Bullet charts |
+
+---
+
+## Color Schemes
+
+Built-in color schemes optimized for our dark theme:
+
+- `cosmic` - Default cyan/purple/amber palette
+- `nebula` - Vibrant pinks and purples
+- `deepspace` - Dark blues and purples
+- `solar` - Yellows to deep reds
+- `aurora` - Teals and cyans
+- `stellar` - Warm yellows and ambers
+
+Or pass a custom array: `colors={['#ff6b6b', '#4ecdc4', '#45b7d1']}`
+
+---
+
+<Callout type="success">
+  **All charts are interactive!** Hover for tooltips, click legends to filter. Use the fullscreen button for detailed exploration.
+</Callout>
+
+## Resources
+
+- [Nivo Documentation](https://nivo.rocks/)
+- [Nivo GitHub](https://github.com/plouc/nivo) (MIT License)
+- [NASA Exoplanet Archive](https://exoplanetarchive.ipac.caltech.edu/)
+- [Space Mission Database](https://nssdc.gsfc.nasa.gov/)
