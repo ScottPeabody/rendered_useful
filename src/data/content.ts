@@ -810,6 +810,20 @@ export const articles: Article[] = [
     languages: ['sql', 'english'],
     locations: ['the-web'],
   },
+  {
+    slug: 'sqlite-introduction',
+    title: 'SQLite in the Browser',
+    description: 'Run SQLite queries directly in your browser with WebAssembly. Learn SQL fundamentals with interactive examples. No installation required.',
+    author: 'scott-peabody',
+    date: '2026-01-24T14:00:00',
+    tags: ['sql', 'sqlite', 'database', 'interactive', 'wasm', 'learning'],
+    communities: ['learners', 'data-science'],
+    readingTime: 10,
+    featured: true,
+    concepts: ['data-analytics'],
+    languages: ['sql', 'english'],
+    locations: ['the-web'],
+  },
 ]
 
 export const projects: Project[] = [

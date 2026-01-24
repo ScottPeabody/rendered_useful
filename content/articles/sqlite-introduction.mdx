@@ -1,0 +1,383 @@
+---
+title: "SQLite in the Browser"
+description: "Run SQLite queries directly in your browser with WebAssembly. Learn SQL fundamentals with interactive examples. No installation required."
+date: "2026-01-24T14:00:00"
+author: "scott-peabody"
+tags: ["sql", "sqlite", "database", "interactive", "wasm", "learning"]
+communities: ["learners", "data-science"]
+readingTime: 10
+featured: true
+---
+
+# SQLite in the Browser
+
+[SQLite](https://sqlite.org/) is the most widely deployed database in the world. Thanks to WebAssembly, you can now run it directly in your browser with [sql.js](https://sql.js.org/).
+
+<Callout type="info">
+  **Completely Local**: All queries run in your browser. No data is sent to any server. Perfect for learning SQL.
+</Callout>
+
+## Your First Query
+
+Let's start with SQL basics:
+
+<SQLite title="Hello SQLite">
+{`SELECT 'Hello, SQLite!' AS greeting, 1 + 1 AS math`}
+</SQLite>
+
+Click **Run** to execute. SQLite loads via WebAssembly and runs entirely in your browser.
+
+---
+
+## Creating Tables
+
+Let's create a table and insert some data:
+
+<SQLite title="Create and Populate a Table" setup={`
+CREATE TABLE IF NOT EXISTS employees (
+  id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL,
+  department TEXT,
+  salary REAL,
+  hire_date TEXT
+);
+
+INSERT OR REPLACE INTO employees VALUES 
+  (1, 'Alice Chen', 'Engineering', 95000, '2022-03-15'),
+  (2, 'Bob Smith', 'Marketing', 72000, '2021-08-01'),
+  (3, 'Carol Davis', 'Engineering', 88000, '2023-01-10'),
+  (4, 'David Lee', 'Sales', 65000, '2022-11-20'),
+  (5, 'Eva Martinez', 'Engineering', 102000, '2020-06-05'),
+  (6, 'Frank Wilson', 'Marketing', 78000, '2023-04-18'),
+  (7, 'Grace Kim', 'Sales', 71000, '2021-09-12'),
+  (8, 'Henry Brown', 'Operations', 58000, '2022-07-22');
+`}>
+{`SELECT * FROM employees ORDER BY salary DESC`}
+</SQLite>
+
+The `setup` prop runs SQL before your query, perfect for creating test data.
+
+---
+
+## Filtering with WHERE
+
+Use WHERE to filter results:
+
+<SQLite title="Filter by Department" setup={`
+CREATE TABLE IF NOT EXISTS employees (
+  id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL,
+  department TEXT,
+  salary REAL,
+  hire_date TEXT
+);
+
+INSERT OR REPLACE INTO employees VALUES 
+  (1, 'Alice Chen', 'Engineering', 95000, '2022-03-15'),
+  (2, 'Bob Smith', 'Marketing', 72000, '2021-08-01'),
+  (3, 'Carol Davis', 'Engineering', 88000, '2023-01-10'),
+  (4, 'David Lee', 'Sales', 65000, '2022-11-20'),
+  (5, 'Eva Martinez', 'Engineering', 102000, '2020-06-05'),
+  (6, 'Frank Wilson', 'Marketing', 78000, '2023-04-18'),
+  (7, 'Grace Kim', 'Sales', 71000, '2021-09-12'),
+  (8, 'Henry Brown', 'Operations', 58000, '2022-07-22');
+`}>
+{`SELECT name, salary 
+FROM employees 
+WHERE department = 'Engineering' 
+  AND salary > 90000
+ORDER BY salary DESC`}
+</SQLite>
+
+---
+
+## Aggregate Functions
+
+SQL has powerful built-in aggregates:
+
+<SQLite title="Department Statistics" setup={`
+CREATE TABLE IF NOT EXISTS employees (
+  id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL,
+  department TEXT,
+  salary REAL,
+  hire_date TEXT
+);
+
+INSERT OR REPLACE INTO employees VALUES 
+  (1, 'Alice Chen', 'Engineering', 95000, '2022-03-15'),
+  (2, 'Bob Smith', 'Marketing', 72000, '2021-08-01'),
+  (3, 'Carol Davis', 'Engineering', 88000, '2023-01-10'),
+  (4, 'David Lee', 'Sales', 65000, '2022-11-20'),
+  (5, 'Eva Martinez', 'Engineering', 102000, '2020-06-05'),
+  (6, 'Frank Wilson', 'Marketing', 78000, '2023-04-18'),
+  (7, 'Grace Kim', 'Sales', 71000, '2021-09-12'),
+  (8, 'Henry Brown', 'Operations', 58000, '2022-07-22');
+`}>
+{`SELECT 
+  department,
+  COUNT(*) AS employee_count,
+  ROUND(AVG(salary), 2) AS avg_salary,
+  MIN(salary) AS min_salary,
+  MAX(salary) AS max_salary,
+  SUM(salary) AS total_payroll
+FROM employees
+GROUP BY department
+ORDER BY avg_salary DESC`}
+</SQLite>
+
+---
+
+## JOINing Tables
+
+Combine data from multiple tables:
+
+<SQLite title="Join Example" setup={`
+CREATE TABLE IF NOT EXISTS products (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  category TEXT,
+  price REAL
+);
+
+CREATE TABLE IF NOT EXISTS orders (
+  id INTEGER PRIMARY KEY,
+  product_id INTEGER,
+  quantity INTEGER,
+  order_date TEXT
+);
+
+INSERT OR REPLACE INTO products VALUES
+  (1, 'Laptop', 'Electronics', 999.99),
+  (2, 'Mouse', 'Electronics', 29.99),
+  (3, 'Desk Chair', 'Furniture', 199.99),
+  (4, 'Monitor', 'Electronics', 349.99),
+  (5, 'Keyboard', 'Electronics', 79.99);
+
+INSERT OR REPLACE INTO orders VALUES
+  (1, 1, 2, '2026-01-15'),
+  (2, 2, 5, '2026-01-16'),
+  (3, 4, 1, '2026-01-17'),
+  (4, 1, 1, '2026-01-18'),
+  (5, 3, 3, '2026-01-19'),
+  (6, 5, 10, '2026-01-20');
+`}>
+{`SELECT 
+  p.name AS product,
+  p.category,
+  o.quantity,
+  ROUND(p.price * o.quantity, 2) AS total,
+  o.order_date
+FROM orders o
+JOIN products p ON o.product_id = p.id
+ORDER BY total DESC`}
+</SQLite>
+
+---
+
+## Subqueries
+
+Queries within queries:
+
+<SQLite title="Find Above-Average Salaries" setup={`
+CREATE TABLE IF NOT EXISTS employees (
+  id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL,
+  department TEXT,
+  salary REAL,
+  hire_date TEXT
+);
+
+INSERT OR REPLACE INTO employees VALUES 
+  (1, 'Alice Chen', 'Engineering', 95000, '2022-03-15'),
+  (2, 'Bob Smith', 'Marketing', 72000, '2021-08-01'),
+  (3, 'Carol Davis', 'Engineering', 88000, '2023-01-10'),
+  (4, 'David Lee', 'Sales', 65000, '2022-11-20'),
+  (5, 'Eva Martinez', 'Engineering', 102000, '2020-06-05'),
+  (6, 'Frank Wilson', 'Marketing', 78000, '2023-04-18'),
+  (7, 'Grace Kim', 'Sales', 71000, '2021-09-12'),
+  (8, 'Henry Brown', 'Operations', 58000, '2022-07-22');
+`}>
+{`SELECT name, department, salary,
+  ROUND(salary - (SELECT AVG(salary) FROM employees), 2) AS above_avg
+FROM employees
+WHERE salary > (SELECT AVG(salary) FROM employees)
+ORDER BY salary DESC`}
+</SQLite>
+
+---
+
+## Common Table Expressions (CTEs)
+
+Make complex queries readable with WITH:
+
+<SQLite title="CTE Example" setup={`
+CREATE TABLE IF NOT EXISTS sales (
+  id INTEGER PRIMARY KEY,
+  region TEXT,
+  product TEXT,
+  amount REAL,
+  sale_date TEXT
+);
+
+INSERT OR REPLACE INTO sales VALUES
+  (1, 'North', 'Widget A', 150, '2026-01-01'),
+  (2, 'South', 'Widget B', 200, '2026-01-02'),
+  (3, 'North', 'Widget A', 175, '2026-01-03'),
+  (4, 'East', 'Widget C', 300, '2026-01-04'),
+  (5, 'South', 'Widget A', 125, '2026-01-05'),
+  (6, 'North', 'Widget B', 225, '2026-01-06'),
+  (7, 'East', 'Widget A', 180, '2026-01-07'),
+  (8, 'West', 'Widget C', 350, '2026-01-08'),
+  (9, 'South', 'Widget B', 190, '2026-01-09'),
+  (10, 'North', 'Widget C', 275, '2026-01-10');
+`}>
+{`WITH regional_sales AS (
+  SELECT 
+    region,
+    SUM(amount) AS total_sales,
+    COUNT(*) AS num_transactions
+  FROM sales
+  GROUP BY region
+),
+ranked AS (
+  SELECT 
+    *,
+    RANK() OVER (ORDER BY total_sales DESC) AS sales_rank
+  FROM regional_sales
+)
+SELECT * FROM ranked`}
+</SQLite>
+
+---
+
+## Window Functions
+
+SQLite supports window functions for advanced analytics:
+
+<SQLite title="Running Totals" setup={`
+CREATE TABLE IF NOT EXISTS daily_revenue (
+  date TEXT PRIMARY KEY,
+  revenue REAL
+);
+
+INSERT OR REPLACE INTO daily_revenue VALUES
+  ('2026-01-01', 1200),
+  ('2026-01-02', 1450),
+  ('2026-01-03', 980),
+  ('2026-01-04', 1680),
+  ('2026-01-05', 1320),
+  ('2026-01-06', 890),
+  ('2026-01-07', 1550);
+`}>
+{`SELECT 
+  date,
+  revenue,
+  SUM(revenue) OVER (ORDER BY date) AS running_total,
+  ROUND(AVG(revenue) OVER (ORDER BY date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2) AS moving_avg_3day,
+  RANK() OVER (ORDER BY revenue DESC) AS revenue_rank
+FROM daily_revenue
+ORDER BY date`}
+</SQLite>
+
+---
+
+## CASE Expressions
+
+Conditional logic in SQL:
+
+<SQLite title="Conditional Categories" setup={`
+CREATE TABLE IF NOT EXISTS employees (
+  id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL,
+  department TEXT,
+  salary REAL,
+  hire_date TEXT
+);
+
+INSERT OR REPLACE INTO employees VALUES 
+  (1, 'Alice Chen', 'Engineering', 95000, '2022-03-15'),
+  (2, 'Bob Smith', 'Marketing', 72000, '2021-08-01'),
+  (3, 'Carol Davis', 'Engineering', 88000, '2023-01-10'),
+  (4, 'David Lee', 'Sales', 65000, '2022-11-20'),
+  (5, 'Eva Martinez', 'Engineering', 102000, '2020-06-05'),
+  (6, 'Frank Wilson', 'Marketing', 78000, '2023-04-18'),
+  (7, 'Grace Kim', 'Sales', 71000, '2021-09-12'),
+  (8, 'Henry Brown', 'Operations', 58000, '2022-07-22');
+`}>
+{`SELECT 
+  name,
+  salary,
+  CASE 
+    WHEN salary >= 100000 THEN 'Senior'
+    WHEN salary >= 75000 THEN 'Mid-Level'
+    WHEN salary >= 60000 THEN 'Junior'
+    ELSE 'Entry'
+  END AS level,
+  CASE department
+    WHEN 'Engineering' THEN 'Tech'
+    WHEN 'Marketing' THEN 'Business'
+    WHEN 'Sales' THEN 'Business'
+    ELSE 'Support'
+  END AS division
+FROM employees
+ORDER BY salary DESC`}
+</SQLite>
+
+---
+
+## Date Functions
+
+Working with dates in SQLite:
+
+<SQLite title="Date Calculations" setup={`
+CREATE TABLE IF NOT EXISTS events (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  event_date TEXT
+);
+
+INSERT OR REPLACE INTO events VALUES
+  (1, 'Project Kickoff', '2026-01-15'),
+  (2, 'Design Review', '2026-02-01'),
+  (3, 'Alpha Release', '2026-03-15'),
+  (4, 'Beta Release', '2026-05-01'),
+  (5, 'Launch', '2026-06-15');
+`}>
+{`SELECT 
+  name,
+  event_date,
+  date('now') AS today,
+  julianday(event_date) - julianday('now') AS days_until,
+  strftime('%W', event_date) AS week_number,
+  strftime('%m', event_date) AS month
+FROM events
+ORDER BY event_date`}
+</SQLite>
+
+---
+
+## SQLite vs DuckDB
+
+| Feature | SQLite | DuckDB |
+|---------|--------|--------|
+| Use Case | General purpose, embedded | Analytical workloads |
+| Storage | Row-oriented | Column-oriented |
+| Aggregations | Good | Excellent |
+| PIVOT | Not built-in | Built-in |
+| JSON | Good | Excellent |
+| Size | Tiny (~1MB WASM) | Larger (~8MB WASM) |
+
+Both are excellent choices. SQLite is perfect for learning SQL fundamentals and general-purpose queries. DuckDB excels at analytical queries on larger datasets.
+
+---
+
+## Summary
+
+SQLite in the browser gives you a complete SQL environment for:
+- Learning SQL syntax and concepts
+- Testing queries before running on production
+- Building interactive tutorials
+- Prototyping database schemas
+
+All processing happens locally in your browser. Your data never leaves your machine.

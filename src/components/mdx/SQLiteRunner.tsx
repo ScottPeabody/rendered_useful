@@ -1,71 +1,14 @@
 import { useState, useRef, useEffect, useCallback, useLayoutEffect } from 'react'
-import * as duckdb from '@duckdb/duckdb-wasm'
+import initSqlJs, { Database, SqlJsStatic } from 'sql.js'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
-// Import worker and wasm URLs for Vite bundling
-import duckdb_wasm from '@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url'
-import duckdb_worker from '@duckdb/duckdb-wasm/dist/duckdb-browser-mvp.worker.js?url'
-import duckdb_wasm_eh from '@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url'
-import duckdb_worker_eh from '@duckdb/duckdb-wasm/dist/duckdb-browser-eh.worker.js?url'
-
-// Convert Arrow values to plain JavaScript values
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function arrowToJS(val: any): unknown {
-  if (val === null || val === undefined) {
-    return null
-  }
-  // Handle BigInt
-  if (typeof val === 'bigint') {
-    return Number(val)
-  }
-  // Handle Arrow Decimal (has a toBigInt or similar)
-  if (val?.constructor?.name === 'Decimal') {
-    return Number(val)
-  }
-  // Handle arrays (Arrow lists)
-  if (Array.isArray(val)) {
-    return val.map(arrowToJS)
-  }
-  // Handle Map/Struct types that have toJSON - parse the JSON string
-  if (typeof val?.toJSON === 'function') {
-    try {
-      const json = val.toJSON()
-      // toJSON returns a JSON string, so parse it
-      if (typeof json === 'string') {
-        return JSON.parse(json)
-      }
-      return json
-    } catch {
-      return val.toString()
-    }
-  }
-  // Handle objects with toArray (Arrow vectors)
-  if (typeof val?.toArray === 'function') {
-    return val.toArray().map(arrowToJS)
-  }
-  // Primitives pass through
-  return val
-}
-
-// DuckDB bundles for Vite
-const DUCKDB_BUNDLES: duckdb.DuckDBBundles = {
-  mvp: {
-    mainModule: duckdb_wasm,
-    mainWorker: duckdb_worker,
-  },
-  eh: {
-    mainModule: duckdb_wasm_eh,
-    mainWorker: duckdb_worker_eh,
-  },
-}
-
-interface DuckDBRunnerProps {
+interface SQLiteRunnerProps {
   children: string
   title?: string
   showCode?: boolean
-  // Optional CSV data to load as tables
-  tables?: Record<string, string>
+  // Optional: pre-populate with schema/data
+  setup?: string
 }
 
 interface QueryResult {
@@ -75,76 +18,63 @@ interface QueryResult {
   executionTime: number
 }
 
-// Singleton DuckDB instance
-let dbInstance: duckdb.AsyncDuckDB | null = null
-let dbInitPromise: Promise<duckdb.AsyncDuckDB> | null = null
+// Singleton SQL.js instance
+let sqlPromise: Promise<SqlJsStatic> | null = null
 
-async function getDatabase(): Promise<duckdb.AsyncDuckDB> {
-  if (dbInstance) return dbInstance
-
-  if (dbInitPromise) return dbInitPromise
-
-  dbInitPromise = (async () => {
-    // Select the best bundle for this browser
-    const bundle = await duckdb.selectBundle(DUCKDB_BUNDLES)
-
-    // Instantiate the worker
-    const worker = new Worker(bundle.mainWorker!)
-    const logger = new duckdb.ConsoleLogger()
-
-    // Instantiate the async DB
-    const db = new duckdb.AsyncDuckDB(logger, worker)
-    await db.instantiate(bundle.mainModule)
-
-    dbInstance = db
-    return db
-  })()
-
-  return dbInitPromise
+async function getSqlJs(): Promise<SqlJsStatic> {
+  if (!sqlPromise) {
+    sqlPromise = initSqlJs({
+      locateFile: (file: string) => `https://sql.js.org/dist/${file}`,
+    })
+  }
+  return sqlPromise
 }
 
-export function DuckDBRunner({
+export default function SQLiteRunner({
   children,
   title,
   showCode = true,
-  tables = {},
-}: DuckDBRunnerProps) {
+  setup,
+}: SQLiteRunnerProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [isRunning, setIsRunning] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<QueryResult | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const [codeVisible, setCodeVisible] = useState(showCode)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [runCounter, setRunCounter] = useState(0)
+
+  const dbRef = useRef<Database | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const connRef = useRef<duckdb.AsyncDuckDBConnection | null>(null)
   const lastErrorRef = useRef<string | null>(null)
 
-  // Initialize DuckDB
+  // Initialize SQL.js and database
   useEffect(() => {
     let mounted = true
 
     async function init() {
       try {
-        const db = await getDatabase()
-        const conn = await db.connect()
+        const SQL = await getSqlJs()
 
-        // Load any provided tables
-        for (const [tableName, csvData] of Object.entries(tables)) {
-          await db.registerFileText(`${tableName}.csv`, csvData)
-          await conn.query(`
-            CREATE OR REPLACE TABLE ${tableName} AS 
-            SELECT * FROM read_csv_auto('${tableName}.csv')
-          `)
+        if (!mounted) return
+
+        // Create a new database for this runner
+        const db = new SQL.Database()
+        dbRef.current = db
+
+        // Run setup SQL if provided
+        if (setup) {
+          try {
+            db.run(setup)
+          } catch (err) {
+            console.warn('Setup SQL error:', err)
+          }
         }
 
-        if (mounted) {
-          connRef.current = conn
-          setIsLoading(false)
-        }
+        setIsLoading(false)
       } catch (err) {
         if (mounted) {
-          setError(err instanceof Error ? err.message : 'Failed to initialize DuckDB')
+          setError(err instanceof Error ? err.message : 'Failed to initialize SQLite')
           setIsLoading(false)
         }
       }
@@ -154,12 +84,17 @@ export function DuckDBRunner({
 
     return () => {
       mounted = false
+      // Close the database on unmount
+      if (dbRef.current) {
+        dbRef.current.close()
+        dbRef.current = null
+      }
     }
-  }, [tables])
+  }, [setup])
 
   // Run query
   useLayoutEffect(() => {
-    if (isLoading || !connRef.current || runCounter === 0) return
+    if (isLoading || !dbRef.current || runCounter === 0) return
 
     const runQuery = async () => {
       setIsRunning(true)
@@ -168,33 +103,31 @@ export function DuckDBRunner({
       let newError: string | null = null
 
       try {
-        const conn = connRef.current!
+        const db = dbRef.current!
         const sql = children.trim()
 
-        const arrowResult = await conn.query(sql)
+        // Execute the query
+        const results = db.exec(sql)
         const endTime = performance.now()
 
-        // Convert Arrow result to plain arrays
-        const columns = arrowResult.schema.fields.map(f => f.name)
-        const rows: unknown[][] = []
-
-        // Iterate through each row using the table iterator
-        for (const row of arrowResult) {
-          const rowArray: unknown[] = []
-          for (const col of columns) {
-            // Get the raw value and convert to JS primitive
-            const val = row[col]
-            rowArray.push(arrowToJS(val))
-          }
-          rows.push(rowArray)
+        if (results.length > 0) {
+          const lastResult = results[results.length - 1]
+          setResult({
+            columns: lastResult.columns,
+            rows: lastResult.values,
+            rowCount: lastResult.values.length,
+            executionTime: endTime - startTime,
+          })
+        } else {
+          // Query executed but returned no results (e.g., INSERT, UPDATE, CREATE)
+          const endTime2 = performance.now()
+          setResult({
+            columns: ['Result'],
+            rows: [['Query executed successfully']],
+            rowCount: 1,
+            executionTime: endTime2 - startTime,
+          })
         }
-
-        setResult({
-          columns,
-          rows,
-          rowCount: arrowResult.numRows,
-          executionTime: endTime - startTime,
-        })
       } catch (err) {
         newError = err instanceof Error ? err.message : 'Query failed'
         setResult(null)
@@ -242,12 +175,12 @@ export function DuckDBRunner({
           {title && <span className="text-white font-semibold">{title}</span>}
           <span className="text-xs text-slate-400 bg-slate-800 px-2 py-0.5 rounded flex items-center gap-1">
             <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+              <path d="M12 3C7.58 3 4 4.79 4 7v10c0 2.21 3.58 4 8 4s8-1.79 8-4V7c0-2.21-3.58-4-8-4zm0 2c3.87 0 6 1.5 6 2s-2.13 2-6 2-6-1.5-6-2 2.13-2 6-2zm6 12c0 .5-2.13 2-6 2s-6-1.5-6-2v-2.23c1.61.78 3.72 1.23 6 1.23s4.39-.45 6-1.23V17zm0-4c0 .5-2.13 2-6 2s-6-1.5-6-2v-2.23c1.61.78 3.72 1.23 6 1.23s4.39-.45 6-1.23V13zm0-4c0 .5-2.13 2-6 2s-6-1.5-6-2V6.77c1.61.78 3.72 1.23 6 1.23s4.39-.45 6-1.23V9z"/>
             </svg>
-            DuckDB
+            SQLite
           </span>
           {isLoading && (
-            <span className="text-xs text-yellow-400 animate-pulse">Initializing...</span>
+            <span className="text-xs text-yellow-400 animate-pulse">Loading...</span>
           )}
         </div>
         <div className="flex items-center gap-1 sm:gap-2">
@@ -260,7 +193,7 @@ export function DuckDBRunner({
           <button
             onClick={handleRun}
             disabled={isLoading || isRunning}
-            className="text-xs px-2 sm:px-3 py-1.5 rounded bg-amber-600 text-white hover:bg-amber-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="text-xs px-2 sm:px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isRunning ? 'Running...' : 'Run'}
           </button>
@@ -337,7 +270,7 @@ export function DuckDBRunner({
                     {result.columns.map((col, i) => (
                       <th
                         key={i}
-                        className="px-4 py-2 text-left font-semibold text-slate-300 border-b border-slate-700"
+                        className="px-4 py-2 text-left text-slate-300 font-medium border-b border-slate-700"
                       >
                         {col}
                       </th>
@@ -379,7 +312,7 @@ export function DuckDBRunner({
 
         {isLoading && (
           <div className="text-center py-8 text-slate-500 animate-pulse">
-            Loading DuckDB WebAssembly...
+            Loading SQLite WebAssembly...
           </div>
         )}
       </div>
@@ -392,29 +325,11 @@ function formatCell(value: unknown): string {
   if (value === null || value === undefined) {
     return 'NULL'
   }
-  if (typeof value === 'bigint') {
-    return value.toString()
-  }
   if (typeof value === 'number') {
     return Number.isInteger(value) ? value.toString() : value.toFixed(4)
   }
-  if (value instanceof Date) {
-    return value.toISOString()
-  }
-  if (Array.isArray(value)) {
-    return '[' + value.map(formatCell).join(', ') + ']'
-  }
-  if (typeof value === 'object') {
-    // Handle objects that might contain BigInt
-    try {
-      return JSON.stringify(value, (_, v) => 
-        typeof v === 'bigint' ? v.toString() : v
-      )
-    } catch {
-      return String(value)
-    }
+  if (value instanceof Uint8Array) {
+    return `BLOB(${value.length} bytes)`
   }
   return String(value)
 }
-
-export default DuckDBRunner
