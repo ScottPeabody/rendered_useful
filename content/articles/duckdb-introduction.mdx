@@ -1,0 +1,280 @@
+---
+title: "SQL in the Browser with DuckDB"
+description: "Run SQL queries directly in your browser with DuckDB WebAssembly. No server needed. Explore data, run analytics, and learn SQL interactively."
+date: "2026-01-24T12:00:00"
+author: "scott-peabody"
+tags: ["sql", "duckdb", "data", "analytics", "interactive", "wasm"]
+communities: ["data-science", "learners"]
+readingTime: 12
+featured: true
+---
+
+# SQL in the Browser with DuckDB
+
+[DuckDB](https://duckdb.org/) is an in-process analytical database that runs entirely in your browser via WebAssembly. No server, no setup, just SQL.
+
+<Callout type="info">
+  **MIT Licensed & Open Source**: DuckDB is fully open source and designed for analytical workloads. The WebAssembly build brings the full power of DuckDB to the browser.
+</Callout>
+
+## Getting Started
+
+Let's start with some basics. DuckDB supports standard SQL with powerful analytical extensions.
+
+<DuckDB title="Hello DuckDB">
+{`SELECT 'Hello, DuckDB!' as greeting, 42 as answer`}
+</DuckDB>
+
+Click **Run** to execute the query. DuckDB loads as WebAssembly and runs entirely in your browser.
+
+---
+
+## Generating Data with generate_series
+
+DuckDB has built-in functions to generate sequences, which is great for creating test data:
+
+<DuckDB title="Generate a Sequence">
+{`SELECT * FROM generate_series(1, 10) AS t(number)`}
+</DuckDB>
+
+---
+
+## Working with Dates
+
+Let's generate a date range and do some date arithmetic:
+
+<DuckDB title="Date Range Analysis">
+{`SELECT 
+  date '2026-01-01' + INTERVAL (i) DAY AS date,
+  dayname(date '2026-01-01' + INTERVAL (i) DAY) AS day_of_week,
+  weekofyear(date '2026-01-01' + INTERVAL (i) DAY) AS week_number
+FROM generate_series(0, 13) AS t(i)`}
+</DuckDB>
+
+---
+
+## Aggregate Functions
+
+DuckDB supports all standard SQL aggregates plus many analytical functions:
+
+<DuckDB title="Statistical Aggregates">
+{`WITH numbers AS (
+  SELECT (random() * 100)::INTEGER AS value
+  FROM generate_series(1, 1000)
+)
+SELECT 
+  COUNT(*) AS count,
+  AVG(value)::DECIMAL(10,2) AS mean,
+  MEDIAN(value) AS median,
+  MIN(value) AS min,
+  MAX(value) AS max,
+  STDDEV(value)::DECIMAL(10,2) AS std_dev,
+  PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY value) AS p25,
+  PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY value) AS p75
+FROM numbers`}
+</DuckDB>
+
+---
+
+## Window Functions
+
+DuckDB has excellent support for window functions:
+
+<DuckDB title="Running Totals and Rankings">
+{`WITH sales AS (
+  SELECT 
+    (i % 4) + 1 AS quarter,
+    (random() * 1000 + 500)::INTEGER AS revenue
+  FROM generate_series(1, 12) AS t(i)
+)
+SELECT 
+  quarter,
+  revenue,
+  SUM(revenue) OVER (ORDER BY quarter) AS running_total,
+  AVG(revenue) OVER (ORDER BY quarter ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)::INTEGER AS moving_avg_3,
+  RANK() OVER (ORDER BY revenue DESC) AS rank
+FROM sales
+ORDER BY quarter`}
+</DuckDB>
+
+---
+
+## Pivoting Data
+
+DuckDB supports PIVOT for reshaping data:
+
+<DuckDB title="Pivot Table">
+{`WITH data AS (
+  SELECT 
+    CASE (i % 3) WHEN 0 THEN 'Product A' WHEN 1 THEN 'Product B' ELSE 'Product C' END AS product,
+    CASE (i % 4) WHEN 0 THEN 'Q1' WHEN 1 THEN 'Q2' WHEN 2 THEN 'Q3' ELSE 'Q4' END AS quarter,
+    (random() * 100 + 50)::INTEGER AS sales
+  FROM generate_series(1, 24) AS t(i)
+)
+PIVOT data ON quarter USING SUM(sales) GROUP BY product`}
+</DuckDB>
+
+---
+
+## Common Table Expressions (CTEs)
+
+Complex queries are easier with CTEs:
+
+<DuckDB title="Multi-level CTEs">
+{`WITH 
+  -- Generate employee data
+  employees AS (
+    SELECT 
+      i AS emp_id,
+      'Employee ' || i AS name,
+      CASE (i % 4) 
+        WHEN 0 THEN 'Engineering' 
+        WHEN 1 THEN 'Sales' 
+        WHEN 2 THEN 'Marketing' 
+        ELSE 'Operations' 
+      END AS department,
+      (random() * 50000 + 50000)::INTEGER AS salary
+    FROM generate_series(1, 20) AS t(i)
+  ),
+  -- Calculate department stats
+  dept_stats AS (
+    SELECT 
+      department,
+      COUNT(*) AS emp_count,
+      AVG(salary)::INTEGER AS avg_salary,
+      SUM(salary) AS total_salary
+    FROM employees
+    GROUP BY department
+  )
+SELECT * FROM dept_stats
+ORDER BY total_salary DESC`}
+</DuckDB>
+
+---
+
+## JSON Support
+
+DuckDB has native JSON support:
+
+<DuckDB title="JSON Parsing">
+{`WITH json_data AS (
+  SELECT '{"name": "Alice", "scores": [95, 87, 92], "active": true}' AS json_str
+  UNION ALL
+  SELECT '{"name": "Bob", "scores": [78, 85, 80], "active": false}'
+  UNION ALL
+  SELECT '{"name": "Charlie", "scores": [90, 92, 88], "active": true}'
+)
+SELECT 
+  json_str->>'name' AS name,
+  json_str->'scores'->>0 AS first_score,
+  json_str->'active' AS is_active,
+  json_array_length(json_str->'scores') AS num_scores
+FROM json_data`}
+</DuckDB>
+
+---
+
+## List Aggregation
+
+DuckDB supports array/list operations:
+
+<DuckDB title="List Operations">
+{`WITH data AS (
+  SELECT 
+    (i % 3) + 1 AS group_id,
+    i * 10 AS value
+  FROM generate_series(1, 9) AS t(i)
+)
+SELECT 
+  group_id,
+  LIST(value ORDER BY value) AS values,
+  LIST(value ORDER BY value)[1] AS first_value,
+  LIST(value ORDER BY value)[-1] AS last_value,
+  LEN(LIST(value)) AS count
+FROM data
+GROUP BY group_id
+ORDER BY group_id`}
+</DuckDB>
+
+---
+
+## Recursive CTEs
+
+For hierarchical data:
+
+<DuckDB title="Recursive Hierarchy">
+{`WITH RECURSIVE org_chart AS (
+  -- Base case: CEO
+  SELECT 1 AS id, 'CEO' AS title, NULL::INTEGER AS manager_id, 0 AS level
+  
+  UNION ALL
+  
+  -- Recursive case
+  SELECT 
+    CASE oc.id 
+      WHEN 1 THEN 2
+      WHEN 2 THEN 4
+      ELSE oc.id + 3
+    END AS id,
+    CASE oc.level
+      WHEN 0 THEN 'VP'
+      WHEN 1 THEN 'Director'
+      ELSE 'Manager'
+    END AS title,
+    oc.id AS manager_id,
+    oc.level + 1 AS level
+  FROM org_chart oc
+  WHERE oc.level < 3
+)
+SELECT 
+  id,
+  REPEAT('  ', level) || title AS position,
+  manager_id,
+  level
+FROM org_chart
+ORDER BY level, id
+LIMIT 15`}
+</DuckDB>
+
+---
+
+## Performance Benefits
+
+DuckDB uses columnar storage and vectorized execution, making it incredibly fast for analytical queries. Even in the browser via WebAssembly, it can process millions of rows efficiently.
+
+<DuckDB title="Aggregating 100K Rows">
+{`WITH large_data AS (
+  SELECT 
+    (i % 100) AS category,
+    (random() * 1000)::DECIMAL(10,2) AS amount,
+    date '2020-01-01' + INTERVAL (i % 365) DAY AS date
+  FROM generate_series(1, 100000) AS t(i)
+)
+SELECT 
+  category,
+  COUNT(*) AS transactions,
+  SUM(amount)::DECIMAL(12,2) AS total,
+  AVG(amount)::DECIMAL(10,2) AS avg_amount
+FROM large_data
+GROUP BY category
+ORDER BY total DESC
+LIMIT 10`}
+</DuckDB>
+
+---
+
+## SQL Features Summary
+
+| Feature | Support |
+|---------|---------|
+| Standard SQL | Full |
+| Window Functions | Full |
+| CTEs (WITH clause) | Full |
+| Recursive CTEs | Full |
+| JSON Functions | Full |
+| PIVOT/UNPIVOT | Full |
+| Regular Expressions | Full |
+| Date/Time Functions | Full |
+| List/Array Types | Full |
+
+DuckDB brings serious analytical power to the browser. No data leaves your machine. Perfect for learning SQL, prototyping queries, or quick data exploration.
