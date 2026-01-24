@@ -1,4 +1,4 @@
-# render_useful
+# rendered_useful
 
 A modern, collaborative article and project showcase platform built with React, TypeScript, and MDX. Designed for developers to share projects, write articles, and build together.
 
