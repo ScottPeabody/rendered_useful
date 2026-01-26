@@ -49,53 +49,63 @@ function ScrollToTop() {
 }
 
 function App() {
+  const location = useLocation()
+  const isMosaicsRoute = location.pathname.startsWith('/mosaics')
+
   return (
     <LayoutProvider>
-      <Layout>
-        <ScrollToTop />
+      {isMosaicsRoute ? (
+        // Mosaics render full-screen without Layout
         <Suspense fallback={<LoadingSpinner />}>
           <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/projects/:slug" element={<ProjectPage />} />
-          <Route path="/articles" element={<ArticlesPage />} />
-          <Route path="/articles/:slug" element={<ArticlePage />} />
-          <Route path="/notebooks" element={<NotebooksPage />} />
-          <Route path="/notebooks/:slug" element={<NotebookPage />} />
-          <Route path="/lab" element={<JupyterLabPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/contribute" element={<ContributePage />} />
-          <Route path="/contributors" element={<ContributorsPage />} />
-          <Route path="/author/:slug" element={<AuthorPage />} />
-          <Route path="/tag/:tag" element={<TagPage />} />
-          <Route path="/communities" element={<CommunitiesPage />} />
-          <Route path="/community/:slug" element={<CommunityPage />} />
-          <Route path="/series" element={<SeriesPage />} />
-          <Route path="/series/:slug" element={<SeriesPage />} />
-          <Route path="/events" element={<EventsPage />} />
-          <Route path="/events/:slug" element={<EventsPage />} />
-          <Route path="/concepts" element={<ConceptsPage />} />
-          <Route path="/concepts/:slug" element={<ConceptsPage />} />
-          <Route path="/languages" element={<LanguagesPage />} />
-          <Route path="/languages/:slug" element={<LanguagesPage />} />
-          <Route path="/locations" element={<LocationsPage />} />
-          <Route path="/locations/:slug" element={<LocationsPage />} />
-          {/* Editor */}
-          <Route path="/edit" element={<EditPage />} />
-          <Route path="/edit/:slug" element={<EditPage />} />
-          {/* Mosaics */}
-          <Route path="/mosaics" element={<MosaicsPage />} />
-          <Route path="/mosaics/:id" element={<MosaicsPage />} />
-          <Route path="/mosaics/tag/:tag" element={<MosaicsPage />} />
-          <Route path="/mosaics/community/:community" element={<MosaicsPage />} />
-          {/* Personal spaces - using @ prefix for usernames */}
-          <Route path="/:username" element={<SpacePage />} />
-          <Route path="/:username/posts/:slug" element={<PostPage />} />
-          <Route path="/:username/feeds/:feedSlug" element={<FeedPage />} />
-          <Route path="*" element={<NotFoundPage />} />
+            <Route path="/mosaics" element={<MosaicsPage />} />
+            <Route path="/mosaics/:id" element={<MosaicsPage />} />
+            <Route path="/mosaics/tag/:tag" element={<MosaicsPage />} />
+            <Route path="/mosaics/community/:community" element={<MosaicsPage />} />
           </Routes>
         </Suspense>
-      </Layout>
+      ) : (
+        <Layout>
+          <ScrollToTop />
+          <Suspense fallback={<LoadingSpinner />}>
+            <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/projects/:slug" element={<ProjectPage />} />
+            <Route path="/articles" element={<ArticlesPage />} />
+            <Route path="/articles/:slug" element={<ArticlePage />} />
+            <Route path="/notebooks" element={<NotebooksPage />} />
+            <Route path="/notebooks/:slug" element={<NotebookPage />} />
+            <Route path="/lab" element={<JupyterLabPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/contribute" element={<ContributePage />} />
+            <Route path="/contributors" element={<ContributorsPage />} />
+            <Route path="/author/:slug" element={<AuthorPage />} />
+            <Route path="/tag/:tag" element={<TagPage />} />
+            <Route path="/communities" element={<CommunitiesPage />} />
+            <Route path="/community/:slug" element={<CommunityPage />} />
+            <Route path="/series" element={<SeriesPage />} />
+            <Route path="/series/:slug" element={<SeriesPage />} />
+            <Route path="/events" element={<EventsPage />} />
+            <Route path="/events/:slug" element={<EventsPage />} />
+            <Route path="/concepts" element={<ConceptsPage />} />
+            <Route path="/concepts/:slug" element={<ConceptsPage />} />
+            <Route path="/languages" element={<LanguagesPage />} />
+            <Route path="/languages/:slug" element={<LanguagesPage />} />
+            <Route path="/locations" element={<LocationsPage />} />
+            <Route path="/locations/:slug" element={<LocationsPage />} />
+            {/* Editor */}
+            <Route path="/edit" element={<EditPage />} />
+            <Route path="/edit/:slug" element={<EditPage />} />
+            {/* Personal spaces - using @ prefix for usernames */}
+            <Route path="/:username" element={<SpacePage />} />
+            <Route path="/:username/posts/:slug" element={<PostPage />} />
+            <Route path="/:username/feeds/:feedSlug" element={<FeedPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </Suspense>
+        </Layout>
+      )}
     </LayoutProvider>
   )
 }
