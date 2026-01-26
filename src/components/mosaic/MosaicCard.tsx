@@ -1,4 +1,5 @@
 import { type ReactNode, useState, useRef, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import type {
   Mosaic,
   MosaicBackground,
@@ -9,6 +10,9 @@ import type {
   GalleryContent,
   VideoContent,
   PollContent,
+  ArticlePreviewContent,
+  ProjectSpotlightContent,
+  NotebookCellContent,
 } from '../../types/mosaic';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -498,6 +502,155 @@ function PollMosaic({ content }: { content: PollContent }) {
   );
 }
 
+// Article Preview content renderer
+function ArticlePreviewMosaic({ content }: { content: ArticlePreviewContent }) {
+  return (
+    <div className="flex flex-col h-full">
+      {/* Cover image */}
+      {content.coverImage && content.showImage !== false && (
+        <div className="h-1/2 overflow-hidden">
+          <img
+            src={content.coverImage}
+            alt={content.title || 'Article cover'}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+      
+      {/* Content */}
+      <div className={`flex-1 flex flex-col justify-center p-8 ${content.coverImage && content.showImage !== false ? '' : 'h-full'}`}>
+        <div className="text-sm opacity-75 mb-2 flex items-center gap-2">
+          <span>📄</span>
+          <span>Article</span>
+        </div>
+        <h2 className="text-2xl md:text-3xl font-bold mb-4 leading-tight">
+          {content.title || 'Untitled Article'}
+        </h2>
+        {content.excerpt && (
+          <p className="text-base md:text-lg opacity-80 line-clamp-3 mb-6">
+            {content.excerpt}
+          </p>
+        )}
+        <Link
+          to={`/articles/${content.slug}`}
+          className="inline-flex items-center gap-2 px-6 py-3 bg-white/20 hover:bg-white/30 rounded-full text-sm font-medium transition-colors w-fit"
+        >
+          Read Article
+          <span>→</span>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+// Project Spotlight content renderer
+function ProjectSpotlightMosaic({ content }: { content: ProjectSpotlightContent }) {
+  return (
+    <div className="flex flex-col h-full">
+      {/* Thumbnail/Demo */}
+      {content.thumbnail && (
+        <div className="h-1/2 overflow-hidden relative">
+          <img
+            src={content.thumbnail}
+            alt={content.title || 'Project thumbnail'}
+            className="w-full h-full object-cover"
+          />
+          {content.showDemo && content.demoUrl && (
+            <a
+              href={content.demoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute bottom-4 right-4 px-4 py-2 bg-black/50 backdrop-blur rounded-full text-sm hover:bg-black/70 transition-colors"
+            >
+              ▶ Live Demo
+            </a>
+          )}
+        </div>
+      )}
+      
+      {/* Content */}
+      <div className={`flex-1 flex flex-col justify-center p-8 ${content.thumbnail ? '' : 'h-full'}`}>
+        <div className="text-sm opacity-75 mb-2 flex items-center gap-2">
+          <span>🚀</span>
+          <span>Project</span>
+        </div>
+        <h2 className="text-2xl md:text-3xl font-bold mb-4 leading-tight">
+          {content.title || 'Untitled Project'}
+        </h2>
+        {content.description && (
+          <p className="text-base md:text-lg opacity-80 line-clamp-3 mb-6">
+            {content.description}
+          </p>
+        )}
+        <Link
+          to={`/projects/${content.slug}`}
+          className="inline-flex items-center gap-2 px-6 py-3 bg-white/20 hover:bg-white/30 rounded-full text-sm font-medium transition-colors w-fit"
+        >
+          View Project
+          <span>→</span>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+// Notebook Cell content renderer
+function NotebookCellMosaic({ content }: { content: NotebookCellContent }) {
+  return (
+    <div className="flex flex-col h-full p-6">
+      <div className="text-sm opacity-75 mb-4 flex items-center gap-2">
+        <span>📓</span>
+        <span>Notebook Cell</span>
+        <span className="opacity-50">• Cell {content.cellIndex + 1}</span>
+      </div>
+      
+      {/* Code (if shown) */}
+      {content.showCode && (
+        <div className="mb-4 rounded-lg overflow-hidden bg-black/30 max-h-[30%]">
+          <div className="px-3 py-1.5 bg-white/5 text-xs font-mono opacity-75">
+            In [{content.cellIndex + 1}]:
+          </div>
+          <div className="p-3 text-sm font-mono overflow-auto">
+            {/* Placeholder - would need actual cell content */}
+            <span className="opacity-50">Code cell content...</span>
+          </div>
+        </div>
+      )}
+      
+      {/* Output */}
+      <div className="flex-1 rounded-lg overflow-hidden bg-white/5">
+        <div className="px-3 py-1.5 bg-white/5 text-xs font-mono opacity-75">
+          Out [{content.cellIndex + 1}]:
+        </div>
+        <div className="p-4 overflow-auto h-full">
+          {content.outputSnapshot ? (
+            <img
+              src={content.outputSnapshot}
+              alt="Cell output"
+              className="max-w-full h-auto"
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full opacity-50">
+              <p>Output preview not available</p>
+            </div>
+          )}
+        </div>
+      </div>
+      
+      {/* Link to notebook */}
+      <div className="mt-4">
+        <Link
+          to={`/notebooks/${content.notebookPath.replace(/\.ipynb$/, '')}`}
+          className="inline-flex items-center gap-2 px-6 py-3 bg-white/20 hover:bg-white/30 rounded-full text-sm font-medium transition-colors"
+        >
+          Open Notebook
+          <span>→</span>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 // Content renderer based on type
 function MosaicContent({ mosaic, isActive }: { mosaic: Mosaic; isActive?: boolean }) {
   switch (mosaic.type) {
@@ -515,6 +668,12 @@ function MosaicContent({ mosaic, isActive }: { mosaic: Mosaic; isActive?: boolea
       return <VideoMosaic content={mosaic.content as VideoContent} isActive={isActive} />;
     case 'poll':
       return <PollMosaic content={mosaic.content as PollContent} />;
+    case 'article-preview':
+      return <ArticlePreviewMosaic content={mosaic.content as ArticlePreviewContent} />;
+    case 'project-spotlight':
+      return <ProjectSpotlightMosaic content={mosaic.content as ProjectSpotlightContent} />;
+    case 'notebook-cell':
+      return <NotebookCellMosaic content={mosaic.content as NotebookCellContent} />;
     default:
       return (
         <div className="flex items-center justify-center h-full">

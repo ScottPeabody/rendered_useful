@@ -1,7 +1,7 @@
 import { useParams, Link } from 'react-router-dom'
 import { useState, useEffect, type ComponentType } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, ExternalLink, Github, Calendar, AlertTriangle } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Github, Calendar, AlertTriangle, Sparkles } from 'lucide-react'
 import Button from '../components/ui/Button'
 import Tag from '../components/ui/Tag'
 import VersionSelector from '../components/ui/VersionSelector'
@@ -164,6 +164,11 @@ export default function ProjectPage() {
                 View Source
               </Button>
             )}
+            <Link to={`/mosaics/create?type=project-spotlight&slug=${project.slug}`}>
+              <Button variant="outline" icon={<Sparkles size={18} />}>
+                Create Mosaic
+              </Button>
+            </Link>
           </div>
         </motion.div>
 
