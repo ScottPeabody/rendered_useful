@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react';
+import { type ReactNode, useState, useRef, useEffect, useCallback } from 'react';
 import type {
   Mosaic,
   MosaicBackground,
@@ -150,17 +150,43 @@ function ImageMosaic({ content }: { content: ImageContent }) {
   );
 }
 
-// Code content renderer
+// Code content renderer with copy button
 function CodeMosaic({ content }: { content: CodeContent }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(content.code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  }, [content.code]);
+
   return (
     <div className="flex flex-col h-full p-4 overflow-hidden">
-      {content.filename && (
-        <div className="flex items-center gap-2 mb-2 px-3 py-1.5 bg-white/10 rounded-t-lg text-xs font-mono">
-          <span className="opacity-75">📄</span>
-          <span>{content.filename}</span>
+      <div className="flex items-center justify-between mb-2 px-3 py-1.5 bg-white/10 rounded-t-lg">
+        <div className="flex items-center gap-2 text-xs font-mono">
+          {content.filename && (
+            <>
+              <span className="opacity-75">📄</span>
+              <span>{content.filename}</span>
+            </>
+          )}
+          {!content.filename && (
+            <span className="opacity-75">{content.language}</span>
+          )}
         </div>
-      )}
-      <div className="flex-1 overflow-auto rounded-lg">
+        <button
+          onClick={handleCopy}
+          className="flex items-center gap-1.5 px-2 py-1 text-xs rounded bg-white/10 hover:bg-white/20 transition-colors"
+        >
+          <span>{copied ? '✓' : '📋'}</span>
+          <span>{copied ? 'Copied!' : 'Copy'}</span>
+        </button>
+      </div>
+      <div className="flex-1 overflow-auto rounded-b-lg">
         <SyntaxHighlighter
           language={content.language}
           style={oneDark}
@@ -186,11 +212,50 @@ function CodeMosaic({ content }: { content: CodeContent }) {
   );
 }
 
-// Gallery content renderer (simplified - horizontal scroll)
+// Gallery content renderer with swipe navigation
 function GalleryMosaic({ content }: { content: GalleryContent }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  // Track scroll position to update active indicator
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const scrollLeft = container.scrollLeft;
+      const width = container.clientWidth;
+      const newIndex = Math.round(scrollLeft / width);
+      setActiveIndex(newIndex);
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const goToImage = useCallback((index: number) => {
+    if (!scrollRef.current) return;
+    const width = scrollRef.current.clientWidth;
+    scrollRef.current.scrollTo({ left: width * index, behavior: 'smooth' });
+  }, []);
+
+  const goNext = useCallback(() => {
+    const nextIndex = Math.min(activeIndex + 1, content.images.length - 1);
+    goToImage(nextIndex);
+  }, [activeIndex, content.images.length, goToImage]);
+
+  const goPrev = useCallback(() => {
+    const prevIndex = Math.max(activeIndex - 1, 0);
+    goToImage(prevIndex);
+  }, [activeIndex, goToImage]);
+
   return (
     <div className="relative h-full">
-      <div className="flex h-full overflow-x-auto snap-x snap-mandatory scrollbar-hide">
+      <div 
+        ref={scrollRef}
+        className="flex h-full overflow-x-auto snap-x snap-mandatory scrollbar-hide"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      >
         {content.images.map((image, index) => (
           <div key={index} className="flex-none w-full h-full snap-center relative">
             <img
@@ -206,32 +271,184 @@ function GalleryMosaic({ content }: { content: GalleryContent }) {
           </div>
         ))}
       </div>
+
+      {/* Navigation arrows (shown on hover) */}
+      {content.images.length > 1 && (
+        <>
+          {activeIndex > 0 && (
+            <button
+              onClick={goPrev}
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity z-10"
+            >
+              <span className="text-white text-xl">‹</span>
+            </button>
+          )}
+          {activeIndex < content.images.length - 1 && (
+            <button
+              onClick={goNext}
+              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity z-10"
+            >
+              <span className="text-white text-xl">›</span>
+            </button>
+          )}
+        </>
+      )}
+
       {/* Page indicators */}
-      <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5">
+      <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5 z-10">
         {content.images.map((_, index) => (
-          <div
+          <button
             key={index}
-            className={`w-1.5 h-1.5 rounded-full ${index === 0 ? 'bg-white' : 'bg-white/50'}`}
+            onClick={() => goToImage(index)}
+            className={`w-2 h-2 rounded-full transition-all ${
+              index === activeIndex 
+                ? 'bg-white w-4' 
+                : 'bg-white/50 hover:bg-white/75'
+            }`}
           />
         ))}
       </div>
+
+      {/* Counter */}
+      {content.images.length > 1 && (
+        <div className="absolute top-4 right-4 px-2 py-1 rounded-full bg-black/50 text-white text-xs z-10">
+          {activeIndex + 1} / {content.images.length}
+        </div>
+      )}
     </div>
   );
 }
 
-// Video content renderer
+// Video content renderer with controls
 function VideoMosaic({ content, isActive }: { content: VideoContent; isActive?: boolean }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(content.autoplay && isActive);
+  const [isMuted, setIsMuted] = useState(content.muted ?? true);
+  const [progress, setProgress] = useState(0);
+  const [showControls, setShowControls] = useState(false);
+  const hideControlsTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  // Handle autoplay when becoming active
+  useEffect(() => {
+    if (!videoRef.current) return;
+    
+    if (isActive && content.autoplay) {
+      videoRef.current.play().catch(() => {});
+      setIsPlaying(true);
+    } else if (!isActive) {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    }
+  }, [isActive, content.autoplay]);
+
+  // Update progress
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const updateProgress = () => {
+      if (video.duration) {
+        setProgress((video.currentTime / video.duration) * 100);
+      }
+    };
+
+    video.addEventListener('timeupdate', updateProgress);
+    return () => video.removeEventListener('timeupdate', updateProgress);
+  }, []);
+
+  const togglePlay = useCallback(() => {
+    if (!videoRef.current) return;
+    
+    if (isPlaying) {
+      videoRef.current.pause();
+    } else {
+      videoRef.current.play().catch(() => {});
+    }
+    setIsPlaying(!isPlaying);
+  }, [isPlaying]);
+
+  const toggleMute = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!videoRef.current) return;
+    videoRef.current.muted = !isMuted;
+    setIsMuted(!isMuted);
+  }, [isMuted]);
+
+  const handleSeek = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!videoRef.current) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const percent = (e.clientX - rect.left) / rect.width;
+    videoRef.current.currentTime = percent * videoRef.current.duration;
+  }, []);
+
+  const showControlsTemporarily = useCallback(() => {
+    setShowControls(true);
+    if (hideControlsTimeout.current) {
+      clearTimeout(hideControlsTimeout.current);
+    }
+    hideControlsTimeout.current = setTimeout(() => {
+      setShowControls(false);
+    }, 3000);
+  }, []);
+
   return (
-    <div className="relative h-full bg-black">
+    <div 
+      className="relative h-full bg-black"
+      onClick={togglePlay}
+      onMouseMove={showControlsTemporarily}
+      onMouseEnter={showControlsTemporarily}
+    >
       <video
+        ref={videoRef}
         src={content.url}
         poster={content.poster}
-        autoPlay={content.autoplay && isActive}
         loop={content.loop}
-        muted={content.muted}
+        muted={isMuted}
         playsInline
-        className="w-full h-full object-contain"
+        className="w-full h-full object-contain cursor-pointer"
       />
+      
+      {/* Play/Pause indicator */}
+      <div 
+        className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-300 ${
+          !isPlaying || showControls ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        <div className="w-20 h-20 rounded-full bg-black/50 flex items-center justify-center">
+          <span className="text-4xl">{isPlaying ? '⏸️' : '▶️'}</span>
+        </div>
+      </div>
+
+      {/* Bottom controls */}
+      <div 
+        className={`absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent transition-opacity duration-300 ${
+          showControls ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        {/* Progress bar */}
+        <div 
+          className="w-full h-1 bg-white/30 rounded-full mb-3 cursor-pointer"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleSeek(e);
+          }}
+        >
+          <div 
+            className="h-full bg-white rounded-full transition-all"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+        
+        {/* Mute button */}
+        <div className="flex justify-end">
+          <button
+            onClick={toggleMute}
+            className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors"
+          >
+            <span className="text-lg">{isMuted ? '🔇' : '🔊'}</span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
