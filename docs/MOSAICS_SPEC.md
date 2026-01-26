@@ -634,7 +634,6 @@ src/
 ## Implementation Phases
 
 ### Phase 1: Foundation
-- [ ] Database schema & migrations
 - [ ] Basic MosaicCard component
 - [ ] MosaicFeed with vertical scroll
 - [ ] Post, Image, Quote types
