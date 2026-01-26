@@ -142,9 +142,10 @@ export function MosaicCreator() {
         return (content as QuoteContent).text.trim().length > 0;
       case 'code':
         return (content as CodeContent).code.trim().length > 0;
-      case 'poll':
+      case 'poll': {
         const poll = content as PollContent;
         return poll.question.trim().length > 0 && poll.options.filter(o => o.trim()).length >= 2;
+      }
       case 'image':
         return (content as ImageContent).url.trim().length > 0;
       default:

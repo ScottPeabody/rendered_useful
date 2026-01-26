@@ -20,51 +20,6 @@ interface CommentsSheetProps {
   onLikeComment: (commentId: string) => void;
 }
 
-// Mock comments for development
-export const mockComments: Comment[] = [
-  {
-    id: '1',
-    authorId: 'user1',
-    authorName: 'Sarah Chen',
-    authorAvatar: 'https://i.pravatar.cc/100?u=sarah',
-    text: 'This is such a great perspective! Really made me think differently about the problem.',
-    createdAt: new Date(Date.now() - 3600000 * 2),
-    likeCount: 24,
-    isLiked: false,
-    replies: [
-      {
-        id: '1a',
-        authorId: 'user2',
-        authorName: 'Alex Rivera',
-        authorAvatar: 'https://i.pravatar.cc/100?u=alex',
-        text: 'Totally agree! The examples were super helpful.',
-        createdAt: new Date(Date.now() - 3600000),
-        likeCount: 8,
-        isLiked: true,
-      },
-    ],
-  },
-  {
-    id: '2',
-    authorId: 'user3',
-    authorName: 'Jordan Kim',
-    authorAvatar: 'https://i.pravatar.cc/100?u=jordan',
-    text: 'Would love to see more content like this 🔥',
-    createdAt: new Date(Date.now() - 7200000),
-    likeCount: 15,
-    isLiked: false,
-  },
-  {
-    id: '3',
-    authorId: 'user4',
-    authorName: 'Morgan Taylor',
-    text: 'Bookmarking this for later. Such valuable insights!',
-    createdAt: new Date(Date.now() - 86400000),
-    likeCount: 42,
-    isLiked: true,
-  },
-];
-
 function formatTimeAgo(date: Date): string {
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
   

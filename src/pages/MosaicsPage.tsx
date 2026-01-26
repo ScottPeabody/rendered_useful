@@ -54,11 +54,12 @@ export default function MosaicsPage() {
         filtered = filtered.filter(m => m.author.id === '1');
         break;
       case 'for-you':
-      default:
+      default: {
         // Mix of featured and recent
         const featured = getFeaturedMosaics();
         filtered = [...featured, ...filtered.filter(m => !m.isFeatured)];
         break;
+      }
     }
 
     // Apply type filter
@@ -116,7 +117,7 @@ export default function MosaicsPage() {
     }
   }, [likedMosaics, handleLike, triggerHeart]);
 
-  const handleComment = useCallback((_mosaic: Mosaic) => {
+  const handleComment = useCallback(() => {
     setCommentsOpen(true);
   }, []);
 
