@@ -24,14 +24,15 @@ export function MosaicPreview({ type, content, background, theme }: MosaicPrevie
     background,
     theme,
     author: previewAuthor,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
     likeCount: 0,
     commentCount: 0,
     shareCount: 0,
     viewCount: 0,
     isLiked: false,
-    isBookmarked: false,
+    isPublished: false,
+    isFeatured: false,
   };
 
   return (

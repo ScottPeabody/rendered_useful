@@ -27,6 +27,8 @@ interface MosaicCardProps {
   onComment?: () => void;
   onShare?: () => void;
   onAuthorClick?: () => void;
+  compact?: boolean;
+  reducedMotion?: boolean;
 }
 
 // Background renderer
@@ -964,11 +966,13 @@ function ActionBar({
   onLike,
   onComment,
   onShare,
+  reducedMotion = false,
 }: {
   mosaic: Mosaic;
   onLike?: () => void;
   onComment?: () => void;
   onShare?: () => void;
+  reducedMotion?: boolean;
 }) {
   const formatCount = (count: number) => {
     if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
@@ -976,11 +980,15 @@ function ActionBar({
     return count.toString();
   };
 
+  const hoverClass = reducedMotion ? '' : 'hover:scale-110 transition-transform';
+
   return (
     <div className="absolute bottom-4 right-4 flex flex-col gap-4 z-20">
       <button
         onClick={onLike}
-        className="flex flex-col items-center gap-1 hover:scale-110 transition-transform"
+        className={`flex flex-col items-center gap-1 ${hoverClass}`}
+        aria-label={mosaic.isLiked ? 'Unlike' : 'Like'}
+        aria-pressed={mosaic.isLiked}
       >
         <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
           mosaic.isLiked ? 'bg-red-500' : 'bg-white/20'
@@ -992,7 +1000,8 @@ function ActionBar({
 
       <button
         onClick={onComment}
-        className="flex flex-col items-center gap-1 hover:scale-110 transition-transform"
+        className={`flex flex-col items-center gap-1 ${hoverClass}`}
+        aria-label={`${mosaic.commentCount} comments`}
       >
         <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
           <span className="text-xl">💬</span>
@@ -1002,7 +1011,8 @@ function ActionBar({
 
       <button
         onClick={onShare}
-        className="flex flex-col items-center gap-1 hover:scale-110 transition-transform"
+        className={`flex flex-col items-center gap-1 ${hoverClass}`}
+        aria-label="Share"
       >
         <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
           <span className="text-xl">↗️</span>
@@ -1021,8 +1031,31 @@ export function MosaicCard({
   onComment,
   onShare,
   onAuthorClick,
+  compact = false,
+  reducedMotion = false,
 }: MosaicCardProps) {
   const themeClass = mosaic.theme === 'light' ? 'text-gray-900' : 'text-white';
+
+  // Compact mode for grid view - minimal UI
+  if (compact) {
+    return (
+      <div className={`relative w-full h-full ${themeClass}`}>
+        <MosaicBackground background={mosaic.background}>
+          <MosaicContent mosaic={mosaic} isActive={false} />
+        </MosaicBackground>
+        
+        {/* Minimal overlay for grid */}
+        <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium truncate">@{mosaic.author.username}</span>
+            <div className="flex items-center gap-2 text-xs">
+              <span>❤️ {mosaic.likeCount}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`relative w-full h-full ${themeClass}`}>
@@ -1036,6 +1069,7 @@ export function MosaicCard({
         onLike={onLike}
         onComment={onComment}
         onShare={onShare}
+        reducedMotion={reducedMotion}
       />
 
       {/* Tags */}

@@ -15,7 +15,9 @@ const solidColors = [
   '#222f3e', '#576574', '#8395a7', '#c8d6e5',
 ];
 
-const gradientPresets: { from: string; to: string; direction: string }[] = [
+type GradientDirection = 'to-b' | 'to-r' | 'to-br' | 'to-bl' | 'to-t' | 'to-l' | 'to-tr' | 'to-tl';
+
+const gradientPresets: { from: string; to: string; direction: GradientDirection }[] = [
   { from: '#667eea', to: '#764ba2', direction: 'to-br' },
   { from: '#f093fb', to: '#f5576c', direction: 'to-r' },
   { from: '#4facfe', to: '#00f2fe', direction: 'to-r' },

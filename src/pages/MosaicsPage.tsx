@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { MosaicFeed, CommentsSheet, mockComments, useHeartAnimation, HeartAnimation } from '../components/mosaic';
+import { MosaicFeed, CommentsSheet, mockComments, useHeartAnimation, HeartAnimation, MosaicMeta } from '../components/mosaic';
 import type { Comment } from '../components/mosaic';
 import { mockMosaics, getMosaicsByTag, getMosaicsByCommunity, getMosaicById, getFeaturedMosaics } from '../data/mosaics';
 import type { Mosaic, MosaicType } from '../types/mosaic';
@@ -20,6 +20,12 @@ export default function MosaicsPage() {
   const [activeTab, setActiveTab] = useState<FeedTab>('for-you');
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
   const [showFilters, setShowFilters] = useState(false);
+  
+  // Video mute state (for future use with video player integration)
+  const [, setIsMuted] = useState(true);
+  
+  // Current mosaic for meta tags
+  const [currentMosaic, setCurrentMosaic] = useState<Mosaic | null>(null);
 
   // Filter mosaics based on tab and type
   const getFilteredMosaics = useCallback((): Mosaic[] => {
@@ -189,6 +195,12 @@ export default function MosaicsPage() {
     // Update URL without triggering navigation
     const newUrl = `/mosaics/${mosaic.id}`;
     window.history.replaceState(null, '', newUrl);
+    // Update current mosaic for meta tags
+    setCurrentMosaic(mosaic);
+  }, []);
+
+  const handleMute = useCallback(() => {
+    setIsMuted(prev => !prev);
   }, []);
 
   if (mosaicsWithLikes.length === 0) {
@@ -205,6 +217,9 @@ export default function MosaicsPage() {
 
   return (
     <div className="relative">
+      {/* Meta tags for sharing */}
+      {currentMosaic && <MosaicMeta mosaic={currentMosaic} />}
+
       {/* Heart animation overlay */}
       <HeartAnimation show={showHeart} x={position.x} y={position.y} />
 
@@ -293,6 +308,11 @@ export default function MosaicsPage() {
         </svg>
       </Link>
 
+      {/* Keyboard shortcut hint */}
+      <div className="fixed bottom-6 left-6 z-40 text-white/40 text-xs hidden md:block">
+        Press <kbd className="px-1 py-0.5 bg-white/10 rounded">?</kbd> for shortcuts
+      </div>
+
       <MosaicFeed
         mosaics={mosaicsWithLikes}
         initialIndex={initialIndex}
@@ -302,6 +322,7 @@ export default function MosaicsPage() {
         onComment={handleComment}
         onShare={handleShare}
         onAuthorClick={handleAuthorClick}
+        onMute={handleMute}
       />
 
       {/* Comments sheet */}

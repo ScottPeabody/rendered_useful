@@ -1,5 +1,4 @@
-import { type ReactNode } from 'react';
-import type { MosaicType } from '../../types/mosaic';
+import type { MosaicType } from '../../../types/mosaic';
 
 interface MosaicTypeOption {
   type: MosaicType;
@@ -60,7 +59,7 @@ const mosaicTypes: MosaicTypeOption[] = [
     color: 'from-indigo-500 to-violet-500',
   },
   {
-    type: 'link',
+    type: 'article-preview',
     label: 'Link',
     icon: '🔗',
     description: 'Share a link with preview',
