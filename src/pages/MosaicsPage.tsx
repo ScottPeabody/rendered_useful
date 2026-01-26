@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { MosaicFeed } from '../components/mosaic';
+import { MosaicFeed, CommentsSheet, mockComments, useHeartAnimation, HeartAnimation } from '../components/mosaic';
+import type { Comment } from '../components/mosaic';
 import { mockMosaics, getMosaicsByTag, getMosaicsByCommunity, getMosaicById } from '../data/mosaics';
 import type { Mosaic } from '../types/mosaic';
 
@@ -8,6 +9,9 @@ export default function MosaicsPage() {
   const { id, tag, community } = useParams<{ id?: string; tag?: string; community?: string }>();
   const navigate = useNavigate();
   const [likedMosaics, setLikedMosaics] = useState<Set<string>>(new Set());
+  const [commentsOpen, setCommentsOpen] = useState(false);
+  const [comments, setComments] = useState<Comment[]>(mockComments);
+  const { showHeart, position, triggerHeart } = useHeartAnimation();
 
   // Determine which mosaics to show
   let mosaics: Mosaic[] = mockMosaics;
@@ -52,9 +56,69 @@ export default function MosaicsPage() {
     });
   }, []);
 
-  const handleComment = useCallback((mosaic: Mosaic) => {
-    // TODO: Open comment sheet
-    console.log('Open comments for:', mosaic.id);
+  // Double-tap handler with heart animation
+  const handleDoubleTap = useCallback((mosaic: Mosaic, x?: number, y?: number) => {
+    if (!likedMosaics.has(mosaic.id)) {
+      handleLike(mosaic);
+      triggerHeart(x, y);
+    }
+  }, [likedMosaics, handleLike, triggerHeart]);
+
+  const handleComment = useCallback((_mosaic: Mosaic) => {
+    setCommentsOpen(true);
+  }, []);
+
+  const handleAddComment = useCallback((text: string, replyToId?: string) => {
+    const newComment: Comment = {
+      id: `new-${Date.now()}`,
+      authorId: 'current-user',
+      authorName: 'You',
+      text,
+      createdAt: new Date(),
+      likeCount: 0,
+      isLiked: false,
+    };
+
+    if (replyToId) {
+      // Add as reply
+      setComments(prev => prev.map(c => {
+        if (c.id === replyToId) {
+          return { ...c, replies: [...(c.replies || []), newComment] };
+        }
+        return c;
+      }));
+    } else {
+      // Add as top-level comment
+      setComments(prev => [newComment, ...prev]);
+    }
+  }, []);
+
+  const handleLikeComment = useCallback((commentId: string) => {
+    setComments(prev => prev.map(c => {
+      if (c.id === commentId) {
+        return {
+          ...c,
+          isLiked: !c.isLiked,
+          likeCount: c.isLiked ? c.likeCount - 1 : c.likeCount + 1,
+        };
+      }
+      if (c.replies) {
+        return {
+          ...c,
+          replies: c.replies.map(r => {
+            if (r.id === commentId) {
+              return {
+                ...r,
+                isLiked: !r.isLiked,
+                likeCount: r.isLiked ? r.likeCount - 1 : r.likeCount + 1,
+              };
+            }
+            return r;
+          }),
+        };
+      }
+      return c;
+    }));
   }, []);
 
   const handleShare = useCallback((mosaic: Mosaic) => {
@@ -95,6 +159,9 @@ export default function MosaicsPage() {
 
   return (
     <div className="relative">
+      {/* Heart animation overlay */}
+      <HeartAnimation show={showHeart} x={position.x} y={position.y} />
+
       {/* Close button to exit mosaics */}
       <Link
         to="/"
@@ -112,9 +179,19 @@ export default function MosaicsPage() {
         initialIndex={initialIndex}
         onMosaicChange={handleMosaicChange}
         onLike={handleLike}
+        onDoubleTap={handleDoubleTap}
         onComment={handleComment}
         onShare={handleShare}
         onAuthorClick={handleAuthorClick}
+      />
+
+      {/* Comments sheet */}
+      <CommentsSheet
+        isOpen={commentsOpen}
+        onClose={() => setCommentsOpen(false)}
+        comments={comments}
+        onAddComment={handleAddComment}
+        onLikeComment={handleLikeComment}
       />
     </div>
   );

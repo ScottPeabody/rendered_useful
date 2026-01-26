@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { MosaicCard } from './MosaicCard';
+import { useDoubleTap } from './useDoubleTap';
 import type { Mosaic } from '../../types/mosaic';
 
 interface MosaicFeedProps {
@@ -7,6 +8,7 @@ interface MosaicFeedProps {
   initialIndex?: number;
   onMosaicChange?: (mosaic: Mosaic, index: number) => void;
   onLike?: (mosaic: Mosaic) => void;
+  onDoubleTap?: (mosaic: Mosaic, x?: number, y?: number) => void;
   onComment?: (mosaic: Mosaic) => void;
   onShare?: (mosaic: Mosaic) => void;
   onAuthorClick?: (mosaic: Mosaic) => void;
@@ -17,6 +19,7 @@ export function MosaicFeed({
   initialIndex = 0,
   onMosaicChange,
   onLike,
+  onDoubleTap,
   onComment,
   onShare,
   onAuthorClick,
@@ -112,20 +115,16 @@ export function MosaicFeed({
       style={{ scrollSnapType: 'y mandatory' }}
     >
       {mosaics.map((mosaic, index) => (
-        <div
+        <MosaicItemWrapper
           key={mosaic.id}
-          className="h-screen w-full snap-start snap-always"
-          style={{ scrollSnapAlign: 'start' }}
-        >
-          <MosaicCard
-            mosaic={mosaic}
-            isActive={index === activeIndex}
-            onLike={() => onLike?.(mosaic)}
-            onComment={() => onComment?.(mosaic)}
-            onShare={() => onShare?.(mosaic)}
-            onAuthorClick={() => onAuthorClick?.(mosaic)}
-          />
-        </div>
+          mosaic={mosaic}
+          isActive={index === activeIndex}
+          onLike={() => onLike?.(mosaic)}
+          onDoubleTap={(x, y) => onDoubleTap?.(mosaic, x, y)}
+          onComment={() => onComment?.(mosaic)}
+          onShare={() => onShare?.(mosaic)}
+          onAuthorClick={() => onAuthorClick?.(mosaic)}
+        />
       ))}
 
       {/* Progress indicator */}
@@ -141,6 +140,59 @@ export function MosaicFeed({
           />
         ))}
       </div>
+    </div>
+  );
+}
+
+// Wrapper component for double-tap handling
+function MosaicItemWrapper({
+  mosaic,
+  isActive,
+  onLike,
+  onDoubleTap,
+  onComment,
+  onShare,
+  onAuthorClick,
+}: {
+  mosaic: Mosaic;
+  isActive: boolean;
+  onLike: () => void;
+  onDoubleTap: (x?: number, y?: number) => void;
+  onComment: () => void;
+  onShare: () => void;
+  onAuthorClick: () => void;
+}) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const handleDoubleTap = useDoubleTap({
+    onDoubleTap: () => {
+      // Get center of element for heart animation
+      if (wrapperRef.current) {
+        const rect = wrapperRef.current.getBoundingClientRect();
+        const x = 50; // center
+        const y = ((rect.height / 2) / window.innerHeight) * 100;
+        onDoubleTap(x, y);
+      } else {
+        onDoubleTap();
+      }
+    },
+  });
+
+  return (
+    <div
+      ref={wrapperRef}
+      className="h-screen w-full snap-start snap-always"
+      style={{ scrollSnapAlign: 'start' }}
+      onClick={handleDoubleTap}
+    >
+      <MosaicCard
+        mosaic={mosaic}
+        isActive={isActive}
+        onLike={onLike}
+        onComment={onComment}
+        onShare={onShare}
+        onAuthorClick={onAuthorClick}
+      />
     </div>
   );
 }
