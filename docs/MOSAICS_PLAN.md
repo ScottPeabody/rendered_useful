@@ -105,35 +105,38 @@ This plan breaks down the Mosaics feature into implementable phases. Each phase 
 
 ### 3.1 Actions
 - [x] `MosaicActionBar.tsx`
-  - Like button with count
-  - Comment button with count
-  - Share button
+  - [x] Like button with count
+  - [x] Comment button with count
+  - [x] Share button
   - [ ] More menu (report, copy link, etc.)
-- [ ] `useMosaicActions.ts` hook
-  - Local state for likes (mock)
-  - Optimistic updates
+- [x] Like state management in MosaicsPage
+  - [x] Local state for likes
+  - [x] Optimistic updates
   - Ready for backend later
 
 ### 3.2 Comments
-- [ ] `MosaicComments.tsx` - slide-up sheet
-  - Comment list with replies
-  - Add comment form (local state)
-  - Reply to comment
-  - Mock data display
+- [x] `CommentsSheet.tsx` - slide-up sheet
+  - [x] Comment list with nested replies
+  - [x] Add comment form (local state)
+  - [x] Reply to comment
+  - [x] Like comments
+  - [x] Mock data display
+  - [x] Keyboard/click-outside to close
 
 ### 3.3 Gestures
-- [ ] `useDoubleTap.ts` - double tap to like
+- [x] `useDoubleTap.ts` - double tap to like
 - [ ] `useLongPress.ts` - long press for share menu
-- [ ] Heart animation on double-tap
+- [x] `HeartAnimation` component on double-tap
+- [x] `useHeartAnimation` hook for state management
 
 ### 3.4 Polls
 - [x] `PollMosaic.tsx` (basic)
-  - Render options
+  - [x] Render options
   - [ ] Vote handling (local state)
-  - Results display (after voting)
+  - [x] Results display (after voting)
   - [ ] Optional end time
 
-**Deliverable:** Full engagement UI with likes, comments, polls (local state, ready for backend)
+**Deliverable:** Full engagement UI with likes, comments, polls (local state, ready for backend) ✅
 
 ---
 
