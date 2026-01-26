@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { MosaicCard } from './MosaicCard';
-import { useDoubleTap } from './useDoubleTap';
+import { useDoubleTap } from './hooks/useDoubleTap';
 import type { Mosaic } from '../../types/mosaic';
 
 type LayoutMode = 'mobile' | 'centered' | 'grid';
