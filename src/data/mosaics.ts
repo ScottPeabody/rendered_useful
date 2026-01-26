@@ -14,6 +14,9 @@ import type {
   ArticlePreviewContent,
   ProjectSpotlightContent,
   NotebookCellContent,
+  CollageContent,
+  DiagramContent,
+  ThreadContent,
 } from '../types/mosaic';
 
 // Mock authors
@@ -428,6 +431,127 @@ function useLocalStorage<T>(key: string, initial: T) {
     publishedAt: '2026-01-24T16:00:00Z',
     createdAt: '2026-01-24T15:00:00Z',
     updatedAt: '2026-01-24T16:00:00Z',
+  },
+
+  // Collage mosaic
+  {
+    id: '12',
+    author: mockAuthors[1],
+    type: 'collage',
+    content: {
+      layout: '2x2',
+      items: [
+        {
+          type: 'image',
+          content: {
+            url: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400',
+            alt: 'Coding setup',
+          } as ImageContent,
+        },
+        {
+          type: 'text',
+          content: {
+            text: 'Weekend vibes 🎉',
+            fontSize: 'md',
+            alignment: 'center',
+          } as PostContent,
+        },
+        {
+          type: 'image',
+          content: {
+            url: 'https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=400',
+            alt: 'Coffee and code',
+          } as ImageContent,
+        },
+        {
+          type: 'image',
+          content: {
+            url: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400',
+            alt: 'Monitor with code',
+          } as ImageContent,
+        },
+      ],
+    } as CollageContent,
+    background: {
+      type: 'solid',
+      color: '#121212',
+    },
+    theme: 'dark',
+    tags: [mockTags[5]],
+    communities: [mockCommunities[2]],
+    viewCount: 892,
+    likeCount: 156,
+    commentCount: 23,
+    shareCount: 45,
+    isLiked: true,
+    isPublished: true,
+    isFeatured: true,
+    publishedAt: '2026-01-25T09:00:00Z',
+    createdAt: '2026-01-25T08:00:00Z',
+    updatedAt: '2026-01-25T09:00:00Z',
+  },
+
+  // Diagram mosaic (Mermaid)
+  {
+    id: '13',
+    author: mockAuthors[0],
+    type: 'diagram',
+    content: {
+      type: 'mermaid',
+      content: `flowchart TD
+    A[Start] --> B{Is it working?}
+    B -->|Yes| C[Great!]
+    B -->|No| D[Debug]
+    D --> B`,
+      interactive: true,
+    } as DiagramContent,
+    background: {
+      type: 'gradient',
+      from: '#0f2027',
+      to: '#2c5364',
+    },
+    theme: 'dark',
+    tags: [mockTags[4]],
+    communities: [mockCommunities[0]],
+    viewCount: 234,
+    likeCount: 45,
+    commentCount: 7,
+    shareCount: 18,
+    isLiked: false,
+    isPublished: true,
+    isFeatured: false,
+    publishedAt: '2026-01-25T10:00:00Z',
+    createdAt: '2026-01-25T09:30:00Z',
+    updatedAt: '2026-01-25T10:00:00Z',
+  },
+
+  // Thread mosaic
+  {
+    id: '14',
+    author: mockAuthors[2],
+    type: 'thread',
+    content: {
+      pageCount: 5,
+      title: '5 Things I Learned Building My First React App',
+    } as ThreadContent,
+    background: {
+      type: 'gradient',
+      from: '#ff6b6b',
+      to: '#feca57',
+    },
+    theme: 'light',
+    tags: [mockTags[0], mockTags[4]],
+    communities: [mockCommunities[0]],
+    viewCount: 1567,
+    likeCount: 342,
+    commentCount: 89,
+    shareCount: 123,
+    isLiked: true,
+    isPublished: true,
+    isFeatured: true,
+    publishedAt: '2026-01-25T11:00:00Z',
+    createdAt: '2026-01-25T10:00:00Z',
+    updatedAt: '2026-01-25T11:00:00Z',
   },
 ];
 

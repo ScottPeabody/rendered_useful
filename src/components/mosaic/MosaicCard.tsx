@@ -13,6 +13,9 @@ import type {
   ArticlePreviewContent,
   ProjectSpotlightContent,
   NotebookCellContent,
+  CollageContent,
+  DiagramContent,
+  ThreadContent,
 } from '../../types/mosaic';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -651,6 +654,244 @@ function NotebookCellMosaic({ content }: { content: NotebookCellContent }) {
   );
 }
 
+// Collage content renderer
+function CollageMosaic({ content }: { content: CollageContent }) {
+  const getGridClass = () => {
+    switch (content.layout) {
+      case '2x2':
+        return 'grid-cols-2 grid-rows-2';
+      case '1+2':
+        return 'grid-cols-2 grid-rows-2';
+      case '2+1':
+        return 'grid-cols-2 grid-rows-2';
+      case '3x3':
+        return 'grid-cols-3 grid-rows-3';
+      case 'masonry':
+        return 'grid-cols-2 auto-rows-auto';
+      default:
+        return 'grid-cols-2 grid-rows-2';
+    }
+  };
+
+  const getItemClass = (index: number) => {
+    if (content.layout === '1+2' && index === 0) {
+      return 'row-span-2';
+    }
+    if (content.layout === '2+1' && index === 2) {
+      return 'col-span-2';
+    }
+    return '';
+  };
+
+  return (
+    <div className={`h-full w-full grid ${getGridClass()} gap-1`}>
+      {content.items.slice(0, content.layout === '3x3' ? 9 : 4).map((item, index) => (
+        <div
+          key={index}
+          className={`overflow-hidden ${getItemClass(index)}`}
+        >
+          {item.type === 'image' && (
+            <img
+              src={(item.content as ImageContent).url}
+              alt={(item.content as ImageContent).alt}
+              className="w-full h-full object-cover"
+            />
+          )}
+          {item.type === 'text' && (
+            <div className="w-full h-full flex items-center justify-center p-4 bg-white/5">
+              <p className="text-sm text-center">
+                {(item.content as PostContent).text}
+              </p>
+            </div>
+          )}
+          {item.type === 'video' && (
+            <video
+              src={(item.content as VideoContent).url}
+              muted
+              loop
+              autoPlay
+              playsInline
+              className="w-full h-full object-cover"
+            />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Diagram content renderer
+function DiagramMosaic({ content }: { content: DiagramContent }) {
+  const [scale, setScale] = useState(1);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleZoomIn = () => setScale((s) => Math.min(s + 0.25, 3));
+  const handleZoomOut = () => setScale((s) => Math.max(s - 0.25, 0.5));
+  const handleReset = () => {
+    setScale(1);
+    setPosition({ x: 0, y: 0 });
+  };
+
+  return (
+    <div className="relative h-full w-full overflow-hidden" ref={containerRef}>
+      <div className="absolute top-4 right-4 z-10 flex gap-2">
+        <button
+          onClick={handleZoomOut}
+          className="w-8 h-8 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70 transition-colors"
+        >
+          −
+        </button>
+        <button
+          onClick={handleReset}
+          className="px-3 h-8 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70 transition-colors text-xs"
+        >
+          {Math.round(scale * 100)}%
+        </button>
+        <button
+          onClick={handleZoomIn}
+          className="w-8 h-8 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70 transition-colors"
+        >
+          +
+        </button>
+      </div>
+
+      <div
+        className="h-full w-full flex items-center justify-center p-8"
+        style={{
+          transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
+          transition: 'transform 0.2s ease-out',
+        }}
+      >
+        {content.type === 'mermaid' ? (
+          <div className="bg-white/10 rounded-lg p-6 max-w-full overflow-auto">
+            <div className="text-sm opacity-75 mb-2 flex items-center gap-2">
+              <span>📊</span>
+              <span>Mermaid Diagram</span>
+            </div>
+            {/* Mermaid would need dynamic rendering - showing placeholder */}
+            <pre className="text-xs font-mono opacity-75 whitespace-pre-wrap">
+              {content.content}
+            </pre>
+          </div>
+        ) : (
+          <div className="bg-white/10 rounded-lg p-6">
+            <div className="text-sm opacity-75 mb-2 flex items-center gap-2">
+              <span>✏️</span>
+              <span>Excalidraw Diagram</span>
+            </div>
+            {/* Excalidraw would need @excalidraw/excalidraw */}
+            <p className="text-sm opacity-50">Interactive diagram preview</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Thread content renderer (multi-page horizontal scroll)
+function ThreadMosaic({ content }: { content: ThreadContent }) {
+  const [currentPage, setCurrentPage] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const goToPage = useCallback((page: number) => {
+    if (!scrollRef.current) return;
+    const width = scrollRef.current.clientWidth;
+    scrollRef.current.scrollTo({ left: width * page, behavior: 'smooth' });
+    setCurrentPage(page);
+  }, []);
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const scrollLeft = container.scrollLeft;
+      const width = container.clientWidth;
+      const newPage = Math.round(scrollLeft / width);
+      setCurrentPage(newPage);
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Generate placeholder pages based on pageCount
+  const pages = Array.from({ length: content.pageCount }, (_, i) => i);
+
+  return (
+    <div className="relative h-full">
+      {/* Title */}
+      {content.title && (
+        <div className="absolute top-4 left-4 right-4 z-10">
+          <h2 className="text-lg font-semibold">{content.title}</h2>
+        </div>
+      )}
+
+      {/* Scrollable pages */}
+      <div
+        ref={scrollRef}
+        className="h-full w-full flex overflow-x-auto snap-x snap-mandatory scrollbar-hide"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      >
+        {pages.map((pageIndex) => (
+          <div
+            key={pageIndex}
+            className="flex-none w-full h-full snap-center flex items-center justify-center p-8"
+          >
+            <div className="text-center">
+              <p className="text-2xl font-medium mb-2">Page {pageIndex + 1}</p>
+              <p className="text-sm opacity-50">Thread content would go here</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Navigation arrows */}
+      {content.pageCount > 1 && (
+        <>
+          {currentPage > 0 && (
+            <button
+              onClick={() => goToPage(currentPage - 1)}
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70 transition-colors z-10"
+            >
+              ‹
+            </button>
+          )}
+          {currentPage < content.pageCount - 1 && (
+            <button
+              onClick={() => goToPage(currentPage + 1)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70 transition-colors z-10"
+            >
+              ›
+            </button>
+          )}
+        </>
+      )}
+
+      {/* Page indicators */}
+      <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5 z-10">
+        {pages.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => goToPage(index)}
+            className={`w-2 h-2 rounded-full transition-all ${
+              index === currentPage
+                ? 'bg-white w-6'
+                : 'bg-white/50 hover:bg-white/75'
+            }`}
+          />
+        ))}
+      </div>
+
+      {/* Page counter */}
+      <div className="absolute bottom-4 right-4 px-2 py-1 rounded-full bg-black/50 text-xs z-10">
+        {currentPage + 1} / {content.pageCount}
+      </div>
+    </div>
+  );
+}
+
 // Content renderer based on type
 function MosaicContent({ mosaic, isActive }: { mosaic: Mosaic; isActive?: boolean }) {
   switch (mosaic.type) {
@@ -674,6 +915,12 @@ function MosaicContent({ mosaic, isActive }: { mosaic: Mosaic; isActive?: boolea
       return <ProjectSpotlightMosaic content={mosaic.content as ProjectSpotlightContent} />;
     case 'notebook-cell':
       return <NotebookCellMosaic content={mosaic.content as NotebookCellContent} />;
+    case 'collage':
+      return <CollageMosaic content={mosaic.content as CollageContent} />;
+    case 'diagram':
+      return <DiagramMosaic content={mosaic.content as DiagramContent} />;
+    case 'thread':
+      return <ThreadMosaic content={mosaic.content as ThreadContent} />;
     default:
       return (
         <div className="flex items-center justify-center h-full">

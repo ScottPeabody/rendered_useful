@@ -216,34 +216,35 @@ This plan breaks down the Mosaics feature into implementable phases. Each phase 
 
 ---
 
-## Phase 6: Advanced Features (Week 11-12)
+## Phase 6: Advanced Features (Week 11-12) ✅
 
 ### 6.1 Threads
-- [ ] `ThreadMosaic.tsx`
+- [x] `ThreadMosaic.tsx`
   - Horizontal page navigation
   - Page indicators
   - Page creation UI
-- [ ] Multi-page editor
+- [ ] Multi-page editor (deferred)
 
 ### 6.2 Collages
-- [ ] `CollageMosaic.tsx`
-  - Layout templates (2x2, 1+2, etc.)
-  - Custom grid layout
-  - Drag-and-drop editor
+- [x] `CollageMosaic.tsx`
+  - Layout templates (2x2, 1+2, 2+1, 3x3, masonry)
+  - Support for image, text, and video items
+  - Responsive grid layout
 
 ### 6.3 Diagrams
-- [ ] `DiagramMosaic.tsx`
-  - Mermaid rendering
-  - Excalidraw rendering
-  - Interactive zoom/pan
+- [x] `DiagramMosaic.tsx`
+  - Mermaid rendering (placeholder)
+  - Excalidraw rendering (placeholder)
+  - Interactive zoom controls (+/-/reset)
 
 ### 6.4 Feed Logic
-- [ ] View tracking (local)
-- [ ] Filter by tag/community
-- [ ] "For You" vs "Following" feeds (mock)
-- [ ] Sort options
+- [x] Filter by tag/community (URL-based)
+- [x] Feed tabs: "For You", "Following", "Trending", "New"
+- [x] Type filter dropdown (all types)
+- [x] Sort by likes (trending) or date (new)
+- [ ] View tracking (deferred to Phase 7)
 
-**Deliverable:** All mosaic types, feed filtering
+**Deliverable:** All mosaic types implemented, feed filtering complete
 
 ---
 
