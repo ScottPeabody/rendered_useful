@@ -34,6 +34,9 @@ const FeedPage = lazy(() => import('./pages/FeedPage'))
 // Editor
 const EditPage = lazy(() => import('./pages/EditPage'))
 
+// Mosaics
+const MosaicsPage = lazy(() => import('./pages/MosaicsPage'))
+
 // Scroll to top on route change
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -80,6 +83,11 @@ function App() {
           {/* Editor */}
           <Route path="/edit" element={<EditPage />} />
           <Route path="/edit/:slug" element={<EditPage />} />
+          {/* Mosaics */}
+          <Route path="/mosaics" element={<MosaicsPage />} />
+          <Route path="/mosaics/:id" element={<MosaicsPage />} />
+          <Route path="/mosaics/tag/:tag" element={<MosaicsPage />} />
+          <Route path="/mosaics/community/:community" element={<MosaicsPage />} />
           {/* Personal spaces - using @ prefix for usernames */}
           <Route path="/:username" element={<SpacePage />} />
           <Route path="/:username/posts/:slug" element={<PostPage />} />
