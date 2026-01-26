@@ -11,7 +11,7 @@ This plan breaks down the Mosaics feature into implementable phases. Each phase 
 ## Phase 1: Foundation (Week 1-2)
 
 ### 1.1 TypeScript Types
-- [ ] Create `src/types/mosaic.ts`
+- [x] Create `src/types/mosaic.ts`
   - `MosaicType` enum
   - `Mosaic` interface
   - `MosaicPage` interface
@@ -20,59 +20,66 @@ This plan breaks down the Mosaics feature into implementable phases. Each phase 
   - `MosaicComment` interface
 
 ### 1.2 Mock Data
-- [ ] Create `src/data/mosaics.ts`
+- [x] Create `src/data/mosaics.ts`
   - Sample mosaics of each type
   - Mock authors (link to existing profile structure)
   - Sample comments
   - Sample tags/communities
 
 ### 1.3 Basic Components
-- [ ] `MosaicCard.tsx` - renders single mosaic
+- [x] `MosaicCard.tsx` - renders single mosaic
   - Accept mosaic data prop
   - Render based on type
   - Handle background/theme
   - Show author info
-- [ ] `MosaicFeed.tsx` - vertical scroll container
+- [x] `MosaicFeed.tsx` - vertical scroll container
   - Snap scroll behavior
   - Track active mosaic
   - Keyboard navigation (desktop)
 
 ### 1.4 Routes
-- [ ] Add routes to App.tsx
+- [x] Add routes to App.tsx
   - `/mosaics` - main feed
   - `/mosaics/:id` - single mosaic view
-- [ ] Create `MosaicsPage.tsx`
+- [x] Create `MosaicsPage.tsx`
 - [ ] Create `MosaicDetailPage.tsx`
 
 ### 1.5 Initial Mosaic Types
-- [ ] `PostMosaic.tsx` - text content
-- [ ] `ImageMosaic.tsx` - single image
-- [ ] `QuoteMosaic.tsx` - styled quote
+- [x] `PostMosaic.tsx` - text content
+- [x] `ImageMosaic.tsx` - single image
+- [x] `QuoteMosaic.tsx` - styled quote
 
-**Deliverable:** Basic feed with post/image/quote mosaics, vertical scroll, using mock data
+### 1.6 Full-Screen Experience
+- [x] Mosaics render outside main Layout (no header/footer)
+- [x] Exit button to return to main site
+
+**Deliverable:** Basic feed with post/image/quote mosaics, vertical scroll, using mock data ✅
 
 ---
 
 ## Phase 2: Content Types (Week 3-4)
 
 ### 2.1 Media Mosaics
-- [ ] `GalleryMosaic.tsx` - horizontal image carousel
-  - Dot indicators
-  - Swipe gestures
-  - Preload adjacent images
-- [ ] `VideoMosaic.tsx` - video player
-  - Auto-play when active
-  - Pause when scrolled away
-  - Tap to play/pause
-  - Progress bar
-  - Mute toggle
+- [x] `GalleryMosaic.tsx` - horizontal image carousel
+  - [x] Dot indicators with active tracking
+  - [x] Swipe/scroll navigation
+  - [x] Navigation arrows (hover)
+  - [x] Image counter
+  - [ ] Preload adjacent images
+- [x] `VideoMosaic.tsx` - video player
+  - [x] Auto-play when active
+  - [x] Pause when scrolled away
+  - [x] Tap to play/pause
+  - [x] Progress bar with seeking
+  - [x] Mute toggle
+  - [x] Auto-hide controls
 
 ### 2.2 Code Mosaics
-- [ ] `CodeMosaic.tsx` - syntax highlighted code
-  - Language detection
-  - Copy button
-  - Optional "Run" button
-  - Connect to existing runners (Python, JS, SQL)
+- [x] `CodeMosaic.tsx` - syntax highlighted code
+  - [x] Language detection
+  - [x] Copy button with feedback
+  - [ ] Optional "Run" button
+  - [ ] Connect to existing runners (Python, JS, SQL)
 
 ### 2.3 MDX Support
 - [ ] Add MDX compilation for mosaic content
@@ -83,12 +90,12 @@ This plan breaks down the Mosaics feature into implementable phases. Each phase 
 - [ ] Handle MDX errors gracefully
 
 ### 2.4 Backgrounds
-- [ ] `MosaicBackground.tsx` component
+- [x] `MosaicBackground.tsx` component
   - Solid color
   - CSS gradient
   - Image (with blur/overlay options)
   - Video (looping, muted)
-- [ ] Theme support (light/dark/auto)
+- [x] Theme support (light/dark/auto)
 
 **Deliverable:** Gallery, video, code mosaics with custom backgrounds
 
@@ -97,11 +104,11 @@ This plan breaks down the Mosaics feature into implementable phases. Each phase 
 ## Phase 3: Engagement (Week 5-6)
 
 ### 3.1 Actions
-- [ ] `MosaicActionBar.tsx`
+- [x] `MosaicActionBar.tsx`
   - Like button with count
   - Comment button with count
   - Share button
-  - More menu (report, copy link, etc.)
+  - [ ] More menu (report, copy link, etc.)
 - [ ] `useMosaicActions.ts` hook
   - Local state for likes (mock)
   - Optimistic updates
@@ -120,11 +127,11 @@ This plan breaks down the Mosaics feature into implementable phases. Each phase 
 - [ ] Heart animation on double-tap
 
 ### 3.4 Polls
-- [ ] `PollMosaic.tsx`
+- [x] `PollMosaic.tsx` (basic)
   - Render options
-  - Vote handling (local state)
+  - [ ] Vote handling (local state)
   - Results display (after voting)
-  - Optional end time
+  - [ ] Optional end time
 
 **Deliverable:** Full engagement UI with likes, comments, polls (local state, ready for backend)
 
