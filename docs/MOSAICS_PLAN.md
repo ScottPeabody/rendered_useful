@@ -143,19 +143,19 @@ This plan breaks down the Mosaics feature into implementable phases. Each phase 
 ## Phase 4: Creation (Week 7-8)
 
 ### 4.1 Creator Flow
-- [ ] `MosaicCreator.tsx` - main creation component
-- [ ] `MosaicTypeSelector.tsx` - type grid
-- [ ] `MosaicStyleEditor.tsx` - background/theme picker
-- [ ] `MosaicPreview.tsx` - live preview
+- [x] `MosaicCreator.tsx` - main creation component (4-step wizard)
+- [x] `MosaicTypeSelector.tsx` - type grid (8 types)
+- [x] `MosaicStyleEditor.tsx` - background/theme picker
+- [x] `MosaicPreview.tsx` - live preview
 
 ### 4.2 Type-Specific Editors
-- [ ] Post editor (rich text)
-- [ ] Image upload/crop
-- [ ] Gallery editor (multi-image)
-- [ ] Video upload
-- [ ] Code editor (Monaco?)
-- [ ] Quote editor
-- [ ] Poll editor
+- [x] Post editor (font size, alignment)
+- [x] Image editor (URL, alt, caption, fit)
+- [ ] Gallery editor (multi-image) - placeholder
+- [ ] Video upload - placeholder
+- [x] Code editor (language, filename, highlight lines)
+- [x] Quote editor (author, source, style)
+- [x] Poll editor (question, options, multiple choice)
 
 ### 4.3 Publishing
 - [ ] Tag selection (from existing tags)
@@ -165,11 +165,12 @@ This plan breaks down the Mosaics feature into implementable phases. Each phase 
 - [ ] Add to mock data (dev mode)
 
 ### 4.4 Routes
-- [ ] `/mosaics/create` - creation page
+- [x] `/mosaics/create` - creation page
 - [ ] `/mosaics/create/:type` - direct to type
 - [ ] `/mosaics/:id/edit` - edit existing
+- [x] Floating + button on MosaicsPage
 
-**Deliverable:** Full creation flow for basic mosaic types
+**Deliverable:** Full creation flow for basic mosaic types ✅
 
 ---
 
