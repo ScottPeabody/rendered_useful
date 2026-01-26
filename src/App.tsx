@@ -36,6 +36,7 @@ const EditPage = lazy(() => import('./pages/EditPage'))
 
 // Mosaics
 const MosaicsPage = lazy(() => import('./pages/MosaicsPage'))
+const MosaicCreator = lazy(() => import('./components/mosaic/creator/MosaicCreator').then(m => ({ default: m.MosaicCreator })))
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -59,6 +60,7 @@ function App() {
         <Suspense fallback={<LoadingSpinner />}>
           <Routes>
             <Route path="/mosaics" element={<MosaicsPage />} />
+            <Route path="/mosaics/create" element={<MosaicCreator />} />
             <Route path="/mosaics/:id" element={<MosaicsPage />} />
             <Route path="/mosaics/tag/:tag" element={<MosaicsPage />} />
             <Route path="/mosaics/community/:community" element={<MosaicsPage />} />
