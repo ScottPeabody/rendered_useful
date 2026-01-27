@@ -19,7 +19,7 @@ import type {
   ThreadContent,
 } from '../types/mosaic';
 
-// Mock authors
+// Mock authors with real avatars
 export const mockAuthors: MosaicAuthor[] = [
   {
     id: '1',
@@ -31,13 +31,13 @@ export const mockAuthors: MosaicAuthor[] = [
     id: '2',
     username: 'devninja',
     displayName: 'Dev Ninja',
-    avatarUrl: undefined,
+    avatarUrl: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&h=100&fit=crop',
   },
   {
     id: '3',
     username: 'codewitch',
     displayName: 'Code Witch',
-    avatarUrl: undefined,
+    avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop',
   },
 ];
 
@@ -88,20 +88,20 @@ export const mockComments: MosaicComment[] = [
 
 // Sample mosaics
 export const mockMosaics: Mosaic[] = [
-  // Post mosaic
+  // Post mosaic - Vibrant announcement
   {
     id: '1',
     author: mockAuthors[0],
     type: 'post',
     content: {
-      text: 'Just shipped a new feature! 🚀\n\nMosaics are full-screen, swipeable content cards. Think TikTok meets MDX.',
-      fontSize: 'lg',
+      text: 'Just shipped a new feature! 🚀\n\nMosaics are full-screen, swipeable content cards.\n\nThink TikTok meets MDX.',
+      fontSize: 'xl',
       alignment: 'center',
     } as PostContent,
     background: {
       type: 'gradient',
       from: '#667eea',
-      to: '#764ba2',
+      to: '#f093fb',
       direction: 'to-br',
     },
     theme: 'dark',
@@ -119,7 +119,7 @@ export const mockMosaics: Mosaic[] = [
     updatedAt: '2026-01-24T09:00:00Z',
   },
 
-  // Quote mosaic
+  // Quote mosaic - Dark dramatic
   {
     id: '2',
     author: mockAuthors[1],
@@ -131,8 +131,10 @@ export const mockMosaics: Mosaic[] = [
       style: 'large',
     } as QuoteContent,
     background: {
-      type: 'solid',
-      color: '#1a1a2e',
+      type: 'gradient',
+      from: '#0f0c29',
+      to: '#302b63',
+      direction: 'to-br',
     },
     theme: 'dark',
     tags: [mockTags[4]],
@@ -148,13 +150,13 @@ export const mockMosaics: Mosaic[] = [
     updatedAt: '2026-01-23T14:00:00Z',
   },
 
-  // Image mosaic
+  // Image mosaic - Real photo
   {
     id: '3',
     author: mockAuthors[2],
     type: 'image',
     content: {
-      url: '/images/examples/sunset-code.jpg',
+      url: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&h=2000&fit=crop',
       alt: 'Coding at sunset with a beautiful view',
       caption: 'My favorite coding spot ✨',
       fit: 'cover',
@@ -174,7 +176,7 @@ export const mockMosaics: Mosaic[] = [
     updatedAt: '2026-01-22T18:00:00Z',
   },
 
-  // Code mosaic
+  // Code mosaic - GitHub dark style
   {
     id: '4',
     author: mockAuthors[0],
@@ -199,8 +201,10 @@ function useLocalStorage<T>(key: string, initial: T) {
       highlightLines: [3, 4, 5],
     } as CodeContent,
     background: {
-      type: 'solid',
-      color: '#0d1117',
+      type: 'gradient',
+      from: '#0d1117',
+      to: '#161b22',
+      direction: 'to-b',
     },
     theme: 'dark',
     tags: [mockTags[0], mockTags[1], mockTags[4]],
@@ -218,20 +222,26 @@ function useLocalStorage<T>(key: string, initial: T) {
     updatedAt: '2026-01-21T12:00:00Z',
   },
 
-  // Gallery mosaic
+  // Gallery mosaic - Real design images
   {
     id: '5',
     author: mockAuthors[1],
     type: 'gallery',
     content: {
       images: [
-        { url: '/images/examples/design-1.jpg', alt: 'Design iteration 1', caption: 'First draft' },
-        { url: '/images/examples/design-2.jpg', alt: 'Design iteration 2', caption: 'Getting closer' },
-        { url: '/images/examples/design-3.jpg', alt: 'Design iteration 3', caption: 'Final design! 🎉' },
+        { url: 'https://images.unsplash.com/photo-1559028012-481c04fa702d?w=800&fit=crop', alt: 'Design iteration 1', caption: 'First draft' },
+        { url: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=800&fit=crop', alt: 'Design iteration 2', caption: 'Getting closer' },
+        { url: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&fit=crop', alt: 'Design iteration 3', caption: 'Final design! 🎉' },
       ],
       transition: 'slide',
     } as GalleryContent,
-    theme: 'light',
+    background: {
+      type: 'gradient',
+      from: '#1a1a2e',
+      to: '#16213e',
+      direction: 'to-b',
+    },
+    theme: 'dark',
     tags: [mockTags[5]],
     viewCount: 1567,
     likeCount: 123,
@@ -245,18 +255,22 @@ function useLocalStorage<T>(key: string, initial: T) {
     updatedAt: '2026-01-20T16:00:00Z',
   },
 
-  // Video mosaic
+  // Video mosaic - Real poster
   {
     id: '6',
     author: mockAuthors[2],
     type: 'video',
     content: {
-      url: '/videos/examples/coding-timelapse.mp4',
-      poster: '/images/examples/coding-poster.jpg',
-      autoplay: true,
+      url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+      poster: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&fit=crop',
+      autoplay: false,
       loop: true,
       muted: true,
     } as VideoContent,
+    background: {
+      type: 'solid',
+      color: '#000000',
+    },
     theme: 'dark',
     tags: [mockTags[3]],
     communities: [mockCommunities[2]],
@@ -273,7 +287,7 @@ function useLocalStorage<T>(key: string, initial: T) {
     durationSeconds: 30,
   },
 
-  // Poll mosaic
+  // Poll mosaic - Pink/purple gradient
   {
     id: '7',
     author: mockAuthors[0],
@@ -288,9 +302,9 @@ function useLocalStorage<T>(key: string, initial: T) {
     } as PollContent,
     background: {
       type: 'gradient',
-      from: '#f093fb',
-      to: '#f5576c',
-      direction: 'to-r',
+      from: '#ec4899',
+      to: '#8b5cf6',
+      direction: 'to-br',
     },
     theme: 'dark',
     viewCount: 678,
@@ -305,7 +319,7 @@ function useLocalStorage<T>(key: string, initial: T) {
     updatedAt: '2026-01-18T10:00:00Z',
   },
 
-  // Another post with different style
+  // Another post with different style - background image
   {
     id: '8',
     author: mockAuthors[2],
@@ -317,9 +331,9 @@ function useLocalStorage<T>(key: string, initial: T) {
     } as PostContent,
     background: {
       type: 'image',
-      url: '/images/backgrounds/abstract-dark.jpg',
-      blur: 2,
-      overlay: 'rgba(0,0,0,0.6)',
+      url: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200',
+      blur: 3,
+      overlay: 'rgba(0,0,0,0.65)',
     },
     theme: 'dark',
     tags: [mockTags[3], mockTags[4]],
@@ -335,7 +349,7 @@ function useLocalStorage<T>(key: string, initial: T) {
     updatedAt: '2026-01-17T14:00:00Z',
   },
 
-  // Article Preview mosaic
+  // Article Preview mosaic - Rich preview
   {
     id: '9',
     author: mockAuthors[0],
@@ -344,7 +358,7 @@ function useLocalStorage<T>(key: string, initial: T) {
       slug: 'building-tetris-in-react',
       title: 'Building Tetris in React: A Step-by-Step Guide',
       excerpt: 'Learn how to build a fully functional Tetris game using React hooks, including game state management, collision detection, and keyboard controls.',
-      coverImage: '/images/projects/tetris-preview.png',
+      coverImage: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1200&fit=crop',
       showImage: true,
     } as ArticlePreviewContent,
     background: {
@@ -368,7 +382,7 @@ function useLocalStorage<T>(key: string, initial: T) {
     updatedAt: '2026-01-25T10:00:00Z',
   },
 
-  // Project Spotlight mosaic
+  // Project Spotlight mosaic - Game showcase
   {
     id: '10',
     author: mockAuthors[0],
@@ -377,14 +391,14 @@ function useLocalStorage<T>(key: string, initial: T) {
       slug: 'tetris-react',
       title: 'Tetris in React',
       description: 'A classic Tetris game built with React and TypeScript. Features smooth animations, keyboard controls, and responsive design.',
-      thumbnail: '/images/projects/tetris-preview.png',
+      thumbnail: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&fit=crop',
       showDemo: true,
       demoUrl: '/projects/tetris-react',
     } as ProjectSpotlightContent,
     background: {
       type: 'gradient',
       from: '#7c3aed',
-      to: '#4f46e5',
+      to: '#06b6d4',
       direction: 'to-br',
     },
     theme: 'dark',
@@ -402,7 +416,7 @@ function useLocalStorage<T>(key: string, initial: T) {
     updatedAt: '2026-01-26T08:00:00Z',
   },
 
-  // Notebook Cell mosaic
+  // Notebook Cell mosaic - Data viz
   {
     id: '11',
     author: mockAuthors[0],
@@ -412,11 +426,13 @@ function useLocalStorage<T>(key: string, initial: T) {
       cellIndex: 3,
       showCode: true,
       showOutput: true,
-      outputSnapshot: '/images/notebooks/numpy-chart-output.png',
+      outputSnapshot: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&fit=crop',
     } as NotebookCellContent,
     background: {
-      type: 'solid',
-      color: '#1e1e1e',
+      type: 'gradient',
+      from: '#1e1e1e',
+      to: '#2d2d2d',
+      direction: 'to-b',
     },
     theme: 'dark',
     tags: [mockTags[2]],
@@ -433,7 +449,7 @@ function useLocalStorage<T>(key: string, initial: T) {
     updatedAt: '2026-01-24T16:00:00Z',
   },
 
-  // Collage mosaic
+  // Collage mosaic - Weekend vibes
   {
     id: '12',
     author: mockAuthors[1],
@@ -444,7 +460,7 @@ function useLocalStorage<T>(key: string, initial: T) {
         {
           type: 'image',
           content: {
-            url: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400',
+            url: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&fit=crop',
             alt: 'Coding setup',
           } as ImageContent,
         },
@@ -459,22 +475,24 @@ function useLocalStorage<T>(key: string, initial: T) {
         {
           type: 'image',
           content: {
-            url: 'https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=400',
+            url: 'https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=400&fit=crop',
             alt: 'Coffee and code',
           } as ImageContent,
         },
         {
           type: 'image',
           content: {
-            url: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400',
+            url: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&fit=crop',
             alt: 'Monitor with code',
           } as ImageContent,
         },
       ],
     } as CollageContent,
     background: {
-      type: 'solid',
-      color: '#121212',
+      type: 'gradient',
+      from: '#0f0f0f',
+      to: '#1a1a1a',
+      direction: 'to-b',
     },
     theme: 'dark',
     tags: [mockTags[5]],

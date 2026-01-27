@@ -92,22 +92,22 @@ function MosaicBackground({ background, children }: { background?: MosaicBackgro
 // Post content renderer
 function PostMosaic({ content }: { content: PostContent }) {
   const fontSizeClass = {
-    sm: 'text-sm',
-    md: 'text-base',
-    lg: 'text-xl',
-    xl: 'text-2xl',
-    '2xl': 'text-3xl',
+    sm: 'text-base md:text-lg',
+    md: 'text-lg md:text-xl',
+    lg: 'text-xl md:text-2xl',
+    xl: 'text-2xl md:text-3xl',
+    '2xl': 'text-3xl md:text-4xl',
   }[content.fontSize || 'lg'];
 
   const alignClass = {
-    left: 'text-left',
-    center: 'text-center',
-    right: 'text-right',
+    left: 'text-left items-start',
+    center: 'text-center items-center',
+    right: 'text-right items-end',
   }[content.alignment || 'center'];
 
   return (
-    <div className={`flex items-center justify-center h-full p-8 ${alignClass}`}>
-      <p className={`${fontSizeClass} font-medium whitespace-pre-wrap leading-relaxed`}>
+    <div className={`flex flex-col justify-center h-full px-8 py-16 ${alignClass}`}>
+      <p className={`${fontSizeClass} font-semibold whitespace-pre-wrap leading-relaxed drop-shadow-lg max-w-lg`}>
         {content.text}
       </p>
     </div>
@@ -120,13 +120,15 @@ function QuoteMosaic({ content }: { content: QuoteContent }) {
   
   return (
     <div className="flex items-center justify-center h-full p-8">
-      <blockquote className="max-w-2xl">
-        <p className={`${isLarge ? 'text-3xl' : 'text-xl'} font-serif italic leading-relaxed mb-6`}>
+      <blockquote className="max-w-2xl relative">
+        {/* Decorative quote mark */}
+        <span className="absolute -top-8 -left-4 text-8xl opacity-20 font-serif leading-none select-none">"</span>
+        <p className={`${isLarge ? 'text-2xl md:text-4xl' : 'text-xl md:text-2xl'} font-serif italic leading-relaxed mb-6 drop-shadow-lg relative z-10`}>
           "{content.text}"
         </p>
         {(content.author || content.source) && (
-          <footer className="text-sm opacity-75">
-            {content.author && <cite className="font-medium not-italic">— {content.author}</cite>}
+          <footer className="text-sm md:text-base opacity-90 drop-shadow-md">
+            {content.author && <cite className="font-semibold not-italic">— {content.author}</cite>}
             {content.source && <span className="ml-2 opacity-75">{content.source}</span>}
           </footer>
         )}
@@ -946,35 +948,66 @@ function MosaicContent({ mosaic, isActive }: { mosaic: Mosaic; isActive?: boolea
   }
 }
 
-// Author info overlay
+// Author info overlay - TikTok-style bottom left
 function AuthorOverlay({ mosaic, onAuthorClick }: { mosaic: Mosaic; onAuthorClick?: () => void }) {
   return (
-    <div className="absolute top-4 left-4 right-4 flex items-center gap-3 z-20">
-      <button
-        onClick={onAuthorClick}
-        className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-      >
+    <button
+      onClick={onAuthorClick}
+      className="absolute bottom-20 left-4 z-20 flex items-center gap-3 group"
+    >
+      <div className="relative">
         {mosaic.author.avatarUrl ? (
           <img
             src={mosaic.author.avatarUrl}
             alt={mosaic.author.displayName}
-            className="w-10 h-10 rounded-full object-cover border-2 border-white/30"
+            className="w-12 h-12 rounded-full object-cover ring-2 ring-white/50 group-hover:ring-white transition-all"
           />
         ) : (
-          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-sm font-medium">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-violet-600 flex items-center justify-center text-lg font-bold ring-2 ring-white/50 group-hover:ring-white transition-all">
             {mosaic.author.displayName[0]}
           </div>
         )}
-        <div className="text-left">
-          <p className="font-medium text-sm">{mosaic.author.displayName}</p>
-          <p className="text-xs opacity-75">@{mosaic.author.username}</p>
+        {/* Follow indicator */}
+        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-pink-500 flex items-center justify-center text-xs">
+          +
         </div>
-      </button>
-    </div>
+      </div>
+      <div className="text-left text-shadow">
+        <p className="font-semibold text-sm drop-shadow-lg">{mosaic.author.displayName}</p>
+        <p className="text-xs opacity-90 drop-shadow-md">@{mosaic.author.username}</p>
+      </div>
+    </button>
   );
 }
 
-// Action bar
+// SVG Icons for action bar
+const HeartIcon = ({ filled }: { filled?: boolean }) => (
+  <svg width="28" height="28" viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+  </svg>
+);
+
+const CommentIcon = () => (
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+  </svg>
+);
+
+const ShareIcon = () => (
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+    <polyline points="16 6 12 2 8 6" />
+    <line x1="12" y1="2" x2="12" y2="15" />
+  </svg>
+);
+
+const BookmarkIcon = () => (
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+  </svg>
+);
+
+// Action bar - TikTok-style vertical sidebar on right
 function ActionBar({
   mosaic,
   onLike,
@@ -994,44 +1027,61 @@ function ActionBar({
     return count.toString();
   };
 
-  const hoverClass = reducedMotion ? '' : 'hover:scale-110 transition-transform';
+  const buttonClass = `flex flex-col items-center gap-1 ${
+    reducedMotion ? '' : 'active:scale-90 transition-transform'
+  }`;
 
   return (
-    <div className="absolute bottom-4 right-4 flex flex-col gap-4 z-20">
+    <div className="absolute bottom-24 right-3 flex flex-col items-center gap-5 z-20">
+      {/* Like button */}
       <button
         onClick={onLike}
-        className={`flex flex-col items-center gap-1 ${hoverClass}`}
+        className={buttonClass}
         aria-label={mosaic.isLiked ? 'Unlike' : 'Like'}
         aria-pressed={mosaic.isLiked}
       >
-        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-          mosaic.isLiked ? 'bg-red-500' : 'bg-white/20'
+        <div className={`w-12 h-12 rounded-full backdrop-blur-sm flex items-center justify-center transition-all ${
+          mosaic.isLiked 
+            ? 'bg-pink-500/90 text-white' 
+            : 'bg-black/30 text-white hover:bg-black/50'
         }`}>
-          <span className="text-xl">{mosaic.isLiked ? '❤️' : '🤍'}</span>
+          <HeartIcon filled={mosaic.isLiked} />
         </div>
-        <span className="text-xs font-medium">{formatCount(mosaic.likeCount)}</span>
+        <span className="text-xs font-semibold drop-shadow-lg">{formatCount(mosaic.likeCount)}</span>
       </button>
 
+      {/* Comment button */}
       <button
         onClick={onComment}
-        className={`flex flex-col items-center gap-1 ${hoverClass}`}
+        className={buttonClass}
         aria-label={`${mosaic.commentCount} comments`}
       >
-        <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-          <span className="text-xl">💬</span>
+        <div className="w-12 h-12 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/50 transition-colors">
+          <CommentIcon />
         </div>
-        <span className="text-xs font-medium">{formatCount(mosaic.commentCount)}</span>
+        <span className="text-xs font-semibold drop-shadow-lg">{formatCount(mosaic.commentCount)}</span>
       </button>
 
+      {/* Share button */}
       <button
         onClick={onShare}
-        className={`flex flex-col items-center gap-1 ${hoverClass}`}
+        className={buttonClass}
         aria-label="Share"
       >
-        <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-          <span className="text-xl">↗️</span>
+        <div className="w-12 h-12 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/50 transition-colors">
+          <ShareIcon />
         </div>
-        <span className="text-xs font-medium">{formatCount(mosaic.shareCount)}</span>
+        <span className="text-xs font-semibold drop-shadow-lg">{formatCount(mosaic.shareCount)}</span>
+      </button>
+
+      {/* Bookmark button */}
+      <button
+        className={buttonClass}
+        aria-label="Bookmark"
+      >
+        <div className="w-12 h-12 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/50 transition-colors">
+          <BookmarkIcon />
+        </div>
       </button>
     </div>
   );
@@ -1053,17 +1103,32 @@ export function MosaicCard({
   // Compact mode for grid view - minimal UI
   if (compact) {
     return (
-      <div className={`relative w-full h-full ${themeClass}`}>
+      <div className={`relative w-full h-full overflow-hidden rounded-lg ${themeClass}`}>
         <MosaicBackground background={mosaic.background}>
           <MosaicContent mosaic={mosaic} isActive={false} />
         </MosaicBackground>
         
+        {/* Gradient overlay for readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none" />
+        
         {/* Minimal overlay for grid */}
-        <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent">
+        <div className="absolute bottom-0 left-0 right-0 p-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium truncate">@{mosaic.author.username}</span>
-            <div className="flex items-center gap-2 text-xs">
-              <span>❤️ {mosaic.likeCount}</span>
+            <div className="flex items-center gap-2">
+              {mosaic.author.avatarUrl ? (
+                <img src={mosaic.author.avatarUrl} alt="" className="w-6 h-6 rounded-full object-cover" />
+              ) : (
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-pink-500 to-violet-600 flex items-center justify-center text-xs">
+                  {mosaic.author.displayName[0]}
+                </div>
+              )}
+              <span className="text-xs font-medium truncate">@{mosaic.author.username}</span>
+            </div>
+            <div className="flex items-center gap-3 text-xs">
+              <span className="flex items-center gap-1">
+                <HeartIcon filled={mosaic.isLiked} />
+                <span className="font-medium">{mosaic.likeCount}</span>
+              </span>
             </div>
           </div>
         </div>
@@ -1077,6 +1142,11 @@ export function MosaicCard({
         <MosaicContent mosaic={mosaic} isActive={isActive} />
       </MosaicBackground>
       
+      {/* Gradient overlays for content protection */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent" />
+      </div>
+      
       <AuthorOverlay mosaic={mosaic} onAuthorClick={onAuthorClick} />
       <ActionBar
         mosaic={mosaic}
@@ -1086,19 +1156,39 @@ export function MosaicCard({
         reducedMotion={reducedMotion}
       />
 
-      {/* Tags */}
+      {/* Tags - bottom left, above author */}
       {mosaic.tags && mosaic.tags.length > 0 && (
-        <div className="absolute bottom-4 left-4 flex flex-wrap gap-2 z-20 max-w-[60%]">
+        <div className="absolute bottom-4 left-4 flex flex-wrap gap-2 z-20 max-w-[65%]">
           {mosaic.tags.slice(0, 3).map((tag) => (
             <span
               key={tag.id}
-              className="px-2 py-1 text-xs rounded-full bg-white/20 backdrop-blur"
+              className="px-3 py-1 text-xs font-medium rounded-full bg-white/15 backdrop-blur-sm hover:bg-white/25 cursor-pointer transition-colors"
             >
               #{tag.slug}
             </span>
           ))}
         </div>
       )}
+      
+      {/* Type indicator - top right corner */}
+      <div className="absolute top-4 right-4 z-20">
+        <div className="px-3 py-1.5 rounded-full bg-black/30 backdrop-blur-sm text-xs font-medium capitalize flex items-center gap-1.5">
+          {mosaic.type === 'post' && '✍️'}
+          {mosaic.type === 'quote' && '💭'}
+          {mosaic.type === 'image' && '📷'}
+          {mosaic.type === 'video' && '🎬'}
+          {mosaic.type === 'code' && '💻'}
+          {mosaic.type === 'gallery' && '🖼️'}
+          {mosaic.type === 'poll' && '📊'}
+          {mosaic.type === 'article-preview' && '📄'}
+          {mosaic.type === 'project-spotlight' && '🚀'}
+          {mosaic.type === 'notebook-cell' && '📓'}
+          {mosaic.type === 'collage' && '🎨'}
+          {mosaic.type === 'diagram' && '📐'}
+          {mosaic.type === 'thread' && '🧵'}
+          <span>{mosaic.type.replace('-', ' ')}</span>
+        </div>
+      </div>
     </div>
   );
 }
