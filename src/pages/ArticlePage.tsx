@@ -1,7 +1,7 @@
 import { useParams, Link } from 'react-router-dom'
 import { useState, useEffect, type ComponentType } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Calendar, Clock, Share2, Bookmark, AlertTriangle, Sparkles } from 'lucide-react'
+import { ArrowLeft, Calendar, Clock, Share2, Bookmark, AlertTriangle } from 'lucide-react'
 import Tag from '../components/ui/Tag'
 import Button from '../components/ui/Button'
 import { formatDate } from '../lib/time'
@@ -414,11 +414,6 @@ export default function ArticlePage() {
           <Button variant="outline" icon={<Bookmark size={18} />}>
             Bookmark
           </Button>
-          <Link to={`/mosaics/create?type=article-preview&slug=${article.slug}`}>
-            <Button variant="outline" icon={<Sparkles size={18} />}>
-              Create Mosaic
-            </Button>
-          </Link>
         </motion.div>
 
         {/* Related Articles */}

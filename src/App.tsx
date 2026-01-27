@@ -34,10 +34,6 @@ const FeedPage = lazy(() => import('./pages/FeedPage'))
 // Editor
 const EditPage = lazy(() => import('./pages/EditPage'))
 
-// Mosaics
-const MosaicsPage = lazy(() => import('./pages/MosaicsPage'))
-const MosaicCreator = lazy(() => import('./components/mosaic/creator/MosaicCreator').then(m => ({ default: m.MosaicCreator })))
-
 // Scroll to top on route change
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -50,27 +46,12 @@ function ScrollToTop() {
 }
 
 function App() {
-  const location = useLocation()
-  const isMosaicsRoute = location.pathname.startsWith('/mosaics')
-
   return (
     <LayoutProvider>
-      {isMosaicsRoute ? (
-        // Mosaics render full-screen without Layout
+      <Layout>
+        <ScrollToTop />
         <Suspense fallback={<LoadingSpinner />}>
           <Routes>
-            <Route path="/mosaics" element={<MosaicsPage />} />
-            <Route path="/mosaics/create" element={<MosaicCreator />} />
-            <Route path="/mosaics/:id" element={<MosaicsPage />} />
-            <Route path="/mosaics/tag/:tag" element={<MosaicsPage />} />
-            <Route path="/mosaics/community/:community" element={<MosaicsPage />} />
-          </Routes>
-        </Suspense>
-      ) : (
-        <Layout>
-          <ScrollToTop />
-          <Suspense fallback={<LoadingSpinner />}>
-            <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/projects/:slug" element={<ProjectPage />} />
@@ -104,10 +85,9 @@ function App() {
             <Route path="/:username/posts/:slug" element={<PostPage />} />
             <Route path="/:username/feeds/:feedSlug" element={<FeedPage />} />
             <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-          </Suspense>
-        </Layout>
-      )}
+          </Routes>
+        </Suspense>
+      </Layout>
     </LayoutProvider>
   )
 }
