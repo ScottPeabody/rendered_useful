@@ -34,6 +34,11 @@ const FeedPage = lazy(() => import('./pages/FeedPage'))
 // Editor
 const EditPage = lazy(() => import('./pages/EditPage'))
 
+// Disable browser scroll restoration so pages always start at top
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual'
+}
+
 // Scroll to top on route change
 function ScrollToTop() {
   const { pathname } = useLocation()
