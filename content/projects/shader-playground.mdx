@@ -1,0 +1,627 @@
+---
+title: "Shader Playground"
+description: "Write and preview GLSL fragment shaders in real-time with WebGL"
+date: "2026-01-27"
+author: "speabody"
+tags: ["webgl", "glsl", "shaders", "graphics", "creative-coding"]
+featured: true
+status: "active"
+---
+
+import { ShaderPlayground } from '../../src/components/shaders';
+
+# Shader Playground
+
+Write GLSL fragment shaders and see them render in real-time. This playground provides a WebGL canvas with useful uniforms for creating animated, interactive graphics.
+
+## Try It Out
+
+<ShaderPlayground />
+
+---
+
+## Available Uniforms
+
+Every shader has access to these uniforms:
+
+| Uniform | Type | Description |
+|---------|------|-------------|
+| `u_resolution` | `vec2` | Canvas width and height in pixels |
+| `u_time` | `float` | Time in seconds since start |
+| `u_mouse` | `vec2` | Mouse position (0-1 range, bottom-left origin) |
+
+---
+
+## Example Shaders
+
+### 🌆 Neon Grid
+
+A cyberpunk-style infinite grid with a synthwave sun.
+
+<ShaderPlayground initialCode={`precision highp float;
+
+uniform vec2 u_resolution;
+uniform float u_time;
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / u_resolution;
+  uv = uv * 2.0 - 1.0;
+  uv.x *= u_resolution.x / u_resolution.y;
+  
+  float horizon = 0.3;
+  float fov = 0.5;
+  vec3 color = vec3(0.0);
+  
+  if (uv.y < horizon) {
+    float z = fov / (horizon - uv.y);
+    float x = uv.x * z;
+    
+    float speed = u_time * 2.0;
+    x = fract(x * 0.5) - 0.5;
+    z = fract(z * 0.3 - speed) - 0.5;
+    
+    float lineX = smoothstep(0.05, 0.0, abs(x));
+    float lineZ = smoothstep(0.05, 0.0, abs(z));
+    float grid = max(lineX, lineZ);
+    
+    float fog = 1.0 - smoothstep(0.0, 20.0, fov / (horizon - uv.y));
+    
+    vec3 gridColor = mix(
+      vec3(0.0, 1.0, 0.8),
+      vec3(1.0, 0.0, 0.8),
+      sin(u_time * 0.5) * 0.5 + 0.5
+    );
+    
+    color = gridColor * grid * fog;
+    color += gridColor * 0.1 * fog;
+  } else {
+    float t = (uv.y - horizon) / (1.0 - horizon);
+    color = mix(vec3(0.1, 0.0, 0.2), vec3(0.0, 0.0, 0.1), t);
+    
+    vec2 sunPos = vec2(0.0, horizon + 0.3);
+    float sun = 1.0 - smoothstep(0.1, 0.12, length(uv - sunPos));
+    color += vec3(1.0, 0.3, 0.5) * sun;
+    
+    float sunGlow = 1.0 - smoothstep(0.0, 0.4, length(uv - sunPos));
+    color += vec3(1.0, 0.2, 0.4) * sunGlow * 0.3;
+  }
+  
+  color *= 0.9 + 0.1 * sin(gl_FragCoord.y * 2.0);
+  
+  gl_FragColor = vec4(color, 1.0);
+}`} />
+
+---
+
+### 🌀 Fractal Warp
+
+A hypnotic animated fractal pattern.
+
+<ShaderPlayground initialCode={`precision highp float;
+
+uniform vec2 u_resolution;
+uniform float u_time;
+
+void main() {
+  vec2 uv = (gl_FragCoord.xy - 0.5 * u_resolution) / min(u_resolution.x, u_resolution.y);
+  
+  vec3 color = vec3(0.0);
+  float t = u_time * 0.5;
+  
+  // Iterate fractal
+  vec2 z = uv * 3.0;
+  for (int i = 0; i < 8; i++) {
+    // Fold space
+    z = abs(z) - 1.0;
+    
+    // Rotate
+    float angle = t * 0.3 + float(i) * 0.5;
+    float c = cos(angle);
+    float s = sin(angle);
+    z = vec2(z.x * c - z.y * s, z.x * s + z.y * c);
+    
+    // Scale and translate
+    z *= 1.5;
+    z -= 0.5;
+  }
+  
+  // Color based on final position
+  float d = length(z);
+  
+  color.r = sin(d * 0.5 + t) * 0.5 + 0.5;
+  color.g = sin(d * 0.5 + t + 2.094) * 0.5 + 0.5;
+  color.b = sin(d * 0.5 + t + 4.188) * 0.5 + 0.5;
+  
+  // Add some contrast
+  color = pow(color, vec3(1.5));
+  
+  // Vignette
+  float vignette = 1.0 - length(uv) * 0.5;
+  color *= vignette;
+  
+  gl_FragColor = vec4(color, 1.0);
+}`} />
+
+---
+
+### 🎲 Raymarched Cube
+
+3D rotating cube rendered with raymarching.
+
+<ShaderPlayground initialCode={`precision highp float;
+
+uniform vec2 u_resolution;
+uniform float u_time;
+
+mat3 rotateY(float a) {
+  float c = cos(a), s = sin(a);
+  return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+mat3 rotateX(float a) {
+  float c = cos(a), s = sin(a);
+  return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+float sdBox(vec3 p, vec3 b) {
+  vec3 q = abs(p) - b;
+  return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+}
+
+float scene(vec3 p) {
+  // Rotate the point (equivalent to rotating the cube)
+  p = rotateY(u_time * 0.7) * rotateX(u_time * 0.5) * p;
+  
+  // Cube with rounded edges
+  float cube = sdBox(p, vec3(0.5)) - 0.05;
+  
+  return cube;
+}
+
+vec3 getNormal(vec3 p) {
+  vec2 e = vec2(0.001, 0.0);
+  return normalize(vec3(
+    scene(p + e.xyy) - scene(p - e.xyy),
+    scene(p + e.yxy) - scene(p - e.yxy),
+    scene(p + e.yyx) - scene(p - e.yyx)
+  ));
+}
+
+void main() {
+  vec2 uv = (gl_FragCoord.xy - 0.5 * u_resolution) / min(u_resolution.x, u_resolution.y);
+  
+  // Camera setup
+  vec3 ro = vec3(0.0, 0.0, 2.5);  // Ray origin
+  vec3 rd = normalize(vec3(uv, -1.0));  // Ray direction
+  
+  // Raymarching
+  float t = 0.0;
+  float hit = 0.0;
+  
+  for (int i = 0; i < 64; i++) {
+    vec3 p = ro + rd * t;
+    float d = scene(p);
+    
+    if (d < 0.001) {
+      hit = 1.0;
+      break;
+    }
+    if (t > 10.0) break;
+    
+    t += d;
+  }
+  
+  vec3 color = vec3(0.05, 0.05, 0.1);  // Background
+  
+  if (hit > 0.5) {
+    vec3 p = ro + rd * t;
+    vec3 n = getNormal(p);
+    
+    // Lighting
+    vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+    float diff = max(dot(n, lightDir), 0.0);
+    float spec = pow(max(dot(reflect(-lightDir, n), -rd), 0.0), 32.0);
+    float ambient = 0.15;
+    
+    // Fresnel rim
+    float fresnel = pow(1.0 - max(dot(n, -rd), 0.0), 3.0);
+    
+    // Color based on normal (like a color cube)
+    vec3 cubeColor = n * 0.5 + 0.5;
+    cubeColor = mix(cubeColor, vec3(0.2, 0.5, 1.0), 0.3);
+    
+    color = cubeColor * (ambient + diff * 0.7) + vec3(1.0) * spec * 0.5;
+    color += vec3(0.3, 0.5, 1.0) * fresnel * 0.4;
+  }
+  
+  // Slight glow around object
+  float glow = exp(-t * 0.5) * 0.15;
+  color += vec3(0.2, 0.4, 0.8) * glow;
+  
+  gl_FragColor = vec4(color, 1.0);
+}`} />
+
+---
+
+### 💧 Water Ripples
+
+Interactive ripple effect - move your mouse!
+
+<ShaderPlayground initialCode={`precision highp float;
+
+uniform vec2 u_resolution;
+uniform float u_time;
+uniform vec2 u_mouse;
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / u_resolution;
+  uv.x *= u_resolution.x / u_resolution.y;
+  
+  vec2 mouse = u_mouse;
+  mouse.x *= u_resolution.x / u_resolution.y;
+  
+  float ripples = 0.0;
+  
+  // Mouse ripple
+  float dist1 = length(uv - mouse);
+  ripples += sin(dist1 * 40.0 - u_time * 5.0) * exp(-dist1 * 3.0);
+  
+  // Auto ripples
+  for (float i = 0.0; i < 3.0; i++) {
+    vec2 center = vec2(
+      0.3 + 0.4 * sin(u_time * 0.5 + i * 2.0),
+      0.3 + 0.4 * cos(u_time * 0.4 + i * 1.5)
+    );
+    center.x *= u_resolution.x / u_resolution.y;
+    float dist = length(uv - center);
+    float phase = u_time * 4.0 + i * 10.0;
+    ripples += sin(dist * 30.0 - phase) * exp(-dist * 2.5) * 0.5;
+  }
+  
+  vec3 deepWater = vec3(0.0, 0.1, 0.3);
+  vec3 shallowWater = vec3(0.0, 0.4, 0.5);
+  
+  float depth = 0.5 + ripples * 0.3;
+  vec3 color = mix(deepWater, shallowWater, depth);
+  
+  float highlight = pow(max(0.0, ripples), 2.0);
+  color += vec3(0.3, 0.5, 0.6) * highlight;
+  
+  float sparkle = sin(uv.x * 100.0 + u_time) * sin(uv.y * 100.0 - u_time * 0.7);
+  sparkle = pow(max(0.0, sparkle), 10.0);
+  color += vec3(1.0) * sparkle * 0.3;
+  
+  gl_FragColor = vec4(color, 1.0);
+}`} />
+
+---
+
+### 🔮 Kaleidoscope
+
+Hypnotic kaleidoscope pattern.
+
+<ShaderPlayground initialCode={`precision highp float;
+
+uniform vec2 u_resolution;
+uniform float u_time;
+
+#define PI 3.14159265359
+
+vec3 hsv2rgb(vec3 c) {
+  vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+  vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+  return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / u_resolution;
+  uv = uv * 2.0 - 1.0;
+  uv.x *= u_resolution.x / u_resolution.y;
+  
+  float angle = atan(uv.y, uv.x);
+  float radius = length(uv);
+  
+  float segments = 8.0;
+  angle = mod(angle, PI * 2.0 / segments);
+  angle = abs(angle - PI / segments);
+  
+  vec2 kaleidoUV = vec2(cos(angle), sin(angle)) * radius;
+  kaleidoUV += u_time * 0.1;
+  
+  float pattern = 0.0;
+  
+  for (float i = 0.0; i < 5.0; i++) {
+    float scale = 1.0 + i * 0.5;
+    float speed = 1.0 + i * 0.3;
+    vec2 p = kaleidoUV * scale;
+    
+    float a = u_time * speed * 0.2;
+    p = mat2(cos(a), -sin(a), sin(a), cos(a)) * p;
+    
+    float d = abs(p.x) + abs(p.y);
+    pattern += sin(d * 10.0 - u_time * 2.0) * 0.5 + 0.5;
+    pattern += smoothstep(0.5, 0.48, fract(length(p) * 3.0 - u_time));
+  }
+  
+  pattern /= 5.0;
+  
+  float hue = pattern * 0.3 + radius * 0.2 + u_time * 0.1;
+  float saturation = 0.7 + 0.3 * sin(pattern * PI);
+  float value = 0.5 + 0.5 * pattern;
+  
+  vec3 color = hsv2rgb(vec3(hue, saturation, value));
+  
+  float glow = exp(-radius * 2.0);
+  color += vec3(1.0, 0.8, 0.9) * glow * 0.3;
+  
+  color *= 1.0 - smoothstep(0.5, 1.5, radius);
+  
+  gl_FragColor = vec4(color, 1.0);
+}`} />
+
+---
+
+### 💻 Matrix Rain
+
+The iconic falling code effect.
+
+<ShaderPlayground initialCode={`precision highp float;
+
+uniform vec2 u_resolution;
+uniform float u_time;
+
+float hash(float n) {
+  return fract(sin(n) * 43758.5453123);
+}
+
+float hash2(vec2 p) {
+  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+}
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / u_resolution;
+  vec3 color = vec3(0.0);
+  
+  float columns = 40.0;
+  float aspect = u_resolution.x / u_resolution.y;
+  
+  // Column position
+  float colId = floor(uv.x * columns);
+  float colX = fract(uv.x * columns);
+  
+  // Per-column randomization
+  float colRand = hash(colId);
+  float speed = 0.8 + colRand * 1.5;
+  float offset = colRand * 100.0;
+  
+  // Scrolling Y position
+  float scrollY = uv.y + u_time * speed * 0.15 + offset;
+  float rowId = floor(scrollY * columns * 0.8);
+  float rowY = fract(scrollY * columns * 0.8);
+  
+  // Character cell
+  vec2 cell = vec2(colX, rowY);
+  
+  // Fake character pattern
+  float charRand = hash2(vec2(colId, rowId + floor(u_time * 8.0)));
+  float char = 0.0;
+  
+  // Create simple glyph shapes
+  vec2 gc = cell * 2.0 - 1.0;
+  if (charRand < 0.25) {
+    char = abs(gc.x) < 0.5 && abs(gc.y) < 0.7 ? 1.0 : 0.0;
+  } else if (charRand < 0.5) {
+    char = (abs(gc.x) < 0.6 || abs(gc.y) < 0.15) && length(gc) < 0.8 ? 1.0 : 0.0;
+  } else if (charRand < 0.75) {
+    char = abs(gc.y + gc.x * 0.5) < 0.2 || abs(gc.y - gc.x * 0.5) < 0.2 ? 1.0 : 0.0;
+  } else {
+    char = length(gc) < 0.5 && length(gc) > 0.3 ? 1.0 : 0.0;
+  }
+  
+  // Edge softening
+  float edgeDist = min(min(cell.x, 1.0 - cell.x), min(cell.y, 1.0 - cell.y));
+  char *= smoothstep(0.0, 0.1, edgeDist);
+  
+  // Trail effect - bright at top, fading down
+  float trail = 1.0 - fract(scrollY + colRand);
+  trail = pow(trail, 3.0);
+  
+  // Leading bright character
+  float lead = pow(fract(scrollY + colRand), 20.0);
+  
+  // Brightness variation per column
+  float brightness = 0.4 + 0.6 * hash(colId + floor(u_time));
+  
+  // Colors
+  vec3 matrixGreen = vec3(0.0, 0.8, 0.2);
+  vec3 brightGreen = vec3(0.6, 1.0, 0.7);
+  vec3 white = vec3(0.9, 1.0, 0.95);
+  
+  // Combine
+  color = matrixGreen * char * trail * brightness;
+  color += brightGreen * char * lead * 0.8;
+  color += white * char * pow(lead, 2.0) * 0.5;
+  
+  // Subtle glow
+  color += matrixGreen * 0.02;
+  
+  // Scanlines
+  color *= 0.92 + 0.08 * sin(gl_FragCoord.y * 1.5);
+  
+  gl_FragColor = vec4(color, 1.0);
+}`} />
+
+---
+
+### 🕳️ Infinite Tunnel
+
+Flying through a neon-lit tunnel.
+
+<ShaderPlayground initialCode={`precision highp float;
+
+uniform vec2 u_resolution;
+uniform float u_time;
+
+#define PI 3.14159265359
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / u_resolution;
+  uv = uv * 2.0 - 1.0;
+  uv.x *= u_resolution.x / u_resolution.y;
+  
+  float angle = atan(uv.y, uv.x);
+  float radius = length(uv);
+  
+  float depth = 1.0 / (radius + 0.1);
+  
+  float tunnelX = angle / PI;
+  float tunnelY = depth + u_time * 2.0;
+  
+  tunnelX += sin(tunnelY * 0.5) * 0.2;
+  
+  vec2 tunnelUV = vec2(tunnelX * 8.0, tunnelY);
+  vec2 gridID = floor(tunnelUV);
+  vec2 gridUV = fract(tunnelUV) - 0.5;
+  
+  float checker = mod(gridID.x + gridID.y, 2.0);
+  
+  float edge = max(abs(gridUV.x), abs(gridUV.y));
+  float panel = smoothstep(0.5, 0.45, edge);
+  
+  float brightness = 1.0 - smoothstep(0.0, 15.0, depth);
+  
+  vec3 color1 = vec3(0.1, 0.5, 0.8);
+  vec3 color2 = vec3(0.8, 0.2, 0.5);
+  vec3 dark = vec3(0.02, 0.02, 0.05);
+  
+  vec3 panelColor = mix(color1, color2, sin(tunnelY * 0.3) * 0.5 + 0.5);
+  panelColor = mix(panelColor, vec3(1.0), checker * 0.3);
+  
+  vec3 color = mix(dark, panelColor, panel);
+  
+  float edgeGlow = smoothstep(0.5, 0.4, edge) - smoothstep(0.4, 0.35, edge);
+  color += vec3(0.0, 1.0, 1.0) * edgeGlow * brightness;
+  
+  color *= brightness;
+  color = mix(vec3(0.0, 0.0, 0.02), color, brightness);
+  
+  float centerLight = exp(-radius * 5.0);
+  color += vec3(1.0, 0.9, 0.8) * centerLight * 0.3;
+  
+  float vignette = 1.0 - radius * 0.3;
+  color *= vignette;
+  
+  gl_FragColor = vec4(color, 1.0);
+}`} />
+
+---
+
+### 🫧 Lava Lamp
+
+Smooth metaball blobs floating around.
+
+<ShaderPlayground initialCode={`precision highp float;
+
+uniform vec2 u_resolution;
+uniform float u_time;
+
+float metaball(vec2 p, vec2 center, float radius) {
+  float d = length(p - center);
+  return radius / (d * d + 0.001);
+}
+
+vec3 hsv2rgb(vec3 c) {
+  vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+  vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+  return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / u_resolution;
+  uv.x *= u_resolution.x / u_resolution.y;
+  
+  float field = 0.0;
+  vec3 colorSum = vec3(0.0);
+  float weightSum = 0.0;
+  
+  for (float i = 0.0; i < 6.0; i++) {
+    float phase = i * 1.047;
+    float speed = 0.3 + i * 0.1;
+    
+    vec2 center = vec2(
+      0.5 + 0.3 * sin(u_time * speed + phase) * cos(u_time * speed * 0.7),
+      0.3 + 0.5 * abs(sin(u_time * speed * 0.5 + phase))
+    );
+    center.x *= u_resolution.x / u_resolution.y;
+    
+    float radius = 0.02 + 0.01 * sin(u_time + i);
+    
+    float contribution = metaball(uv, center, radius);
+    field += contribution;
+    
+    float hue = mod(i * 0.15 + u_time * 0.05, 1.0);
+    vec3 blobColor = hsv2rgb(vec3(hue, 0.8, 1.0));
+    
+    colorSum += blobColor * contribution;
+    weightSum += contribution;
+  }
+  
+  vec3 bgTop = vec3(0.1, 0.0, 0.15);
+  vec3 bgBottom = vec3(0.05, 0.0, 0.1);
+  vec3 background = mix(bgBottom, bgTop, uv.y / (u_resolution.x / u_resolution.y));
+  
+  float threshold = 1.5;
+  float edge = smoothstep(threshold - 0.3, threshold + 0.3, field);
+  
+  vec3 blobColor = colorSum / (weightSum + 0.001);
+  blobColor = mix(blobColor, vec3(1.0), 0.2);
+  
+  float innerGlow = smoothstep(threshold, threshold + 2.0, field);
+  blobColor = mix(blobColor, vec3(1.0, 0.9, 0.8), innerGlow * 0.5);
+  
+  vec3 color = mix(background, blobColor, edge);
+  
+  float outerGlow = smoothstep(threshold + 0.5, threshold - 0.5, field) * 
+                    smoothstep(threshold - 1.5, threshold - 0.5, field);
+  color += blobColor * outerGlow * 0.3;
+  
+  gl_FragColor = vec4(color, 1.0);
+}`} />
+
+---
+
+## Learning Resources
+
+- [The Book of Shaders](https://thebookofshaders.com/) - Essential guide to GLSL
+- [Shadertoy](https://www.shadertoy.com/) - Community of shader artists
+- [GLSL Sandbox](http://glslsandbox.com/) - More shader experiments
+- [Inigo Quilez](https://iquilezles.org/) - Master of raymarching and SDFs
+
+## Tips & Tricks
+
+### Normalized Coordinates
+
+Always normalize your coordinates to avoid resolution-dependent behavior:
+
+```glsl
+vec2 uv = gl_FragCoord.xy / u_resolution;  // 0 to 1
+uv = uv * 2.0 - 1.0;                        // -1 to 1 (centered)
+uv.x *= u_resolution.x / u_resolution.y;    // Aspect ratio correction
+```
+
+### Smooth Animations
+
+Use `sin()` and `cos()` with `u_time` for smooth oscillations:
+
+```glsl
+float wave = sin(u_time * 2.0) * 0.5 + 0.5;  // 0 to 1 oscillation
+```
+
+### Distance Fields
+
+The foundation of many effects:
+
+```glsl
+float d = length(uv);           // Distance from center
+float circle = smoothstep(0.5, 0.48, d);  // Soft-edged circle
+```
