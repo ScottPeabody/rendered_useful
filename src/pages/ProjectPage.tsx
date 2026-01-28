@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom'
-import { useState, useEffect, type ComponentType } from 'react'
+import { useState, useEffect, useRef, type ComponentType } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, ExternalLink, Github, Calendar, AlertTriangle } from 'lucide-react'
 import Button from '../components/ui/Button'
@@ -15,6 +15,7 @@ import Card from '../components/ui/Card'
 import NotFoundPage from './NotFoundPage'
 
 export default function ProjectPage() {
+  const topRef = useRef<HTMLDivElement>(null)
   const { slug } = useParams<{ slug: string }>()
   const project = slug ? getProject(slug) : undefined
   const author = project ? getAuthor(project.author) : undefined
@@ -39,19 +40,26 @@ export default function ProjectPage() {
   // Load MDX content if available
   useEffect(() => {
     if (!slug || !hasMDX) {
-      setIsLoading(false) // eslint-disable-line react-hooks/set-state-in-effect
-      return
+      // Defer setIsLoading to avoid cascading renders
+      Promise.resolve().then(() => setIsLoading(false));
+      return;
     }
-    
-    setIsLoading(true)
+    Promise.resolve().then(() => setIsLoading(true));
     loadProject(slug).then((result) => {
       if (result) {
-        setMDXContent(() => result.Content)
-        setFrontmatter(result.frontmatter)
+        setMDXContent(() => result.Content);
+        setFrontmatter(result.frontmatter);
       }
-      setIsLoading(false)
-    })
-  }, [slug, hasMDX])
+      setIsLoading(false);
+    });
+  }, [slug, hasMDX]);
+
+  // Scroll to topRef on mount (mobile fix)
+  useEffect(() => {
+    if (topRef.current) {
+      topRef.current.scrollIntoView({ block: 'start' })
+    }
+  }, [slug])
 
   if (!project) {
     return <NotFoundPage />
@@ -66,7 +74,7 @@ export default function ProjectPage() {
     .slice(0, 3)
 
   return (
-    <div className="pt-24 pb-16">
+    <div ref={topRef} className="pt-24 pb-16">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back Link */}
         <Link

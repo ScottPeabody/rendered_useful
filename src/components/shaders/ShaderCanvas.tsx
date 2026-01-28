@@ -18,9 +18,20 @@ export function ShaderCanvas({ fragmentShader, onError, className = '' }: Shader
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const programRef = useRef<WebGLProgram | null>(null);
   const animationRef = useRef<number>(0);
-  const startTimeRef = useRef<number>(Date.now());
+  const startTimeRef = useRef<number | null>(null);
   const mouseRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isPlaying, setIsPlaying] = useState(true);
+  const [webglSupported, setWebglSupported] = useState<boolean | null>(null);
+  // Check WebGL support on mount
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const gl = canvas.getContext('webgl');
+      setWebglSupported(!!gl);
+    } else {
+      setWebglSupported(null);
+    }
+  }, []);
 
   const compileShader = useCallback((gl: WebGLRenderingContext, type: number, source: string): WebGLShader | null => {
     const shader = gl.createShader(type);
@@ -119,12 +130,14 @@ export function ShaderCanvas({ fragmentShader, onError, className = '' }: Shader
     gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
   }, [fragmentShader, compileShader, createProgram, onError]);
 
+  // Use a ref to always have the latest render function
+  const renderRef = useRef<() => void>(() => {});
   const render = useCallback(() => {
     const gl = glRef.current;
     const program = programRef.current;
     const canvas = canvasRef.current;
 
-    if (!gl || !program || !canvas) return;
+    if (!gl || !program || !canvas || startTimeRef.current === null) return;
 
     // Resize canvas if needed
     const displayWidth = canvas.clientWidth;
@@ -154,12 +167,20 @@ export function ShaderCanvas({ fragmentShader, onError, className = '' }: Shader
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
     if (isPlaying) {
-      animationRef.current = requestAnimationFrame(render);
+      animationRef.current = requestAnimationFrame(renderRef.current);
     }
   }, [isPlaying]);
 
-  // Initialize WebGL
+  // Always keep the latest render in the ref (in effect, not render)
   useEffect(() => {
+    renderRef.current = render;
+  }, [render]);
+
+  // Initialize WebGL and set start time on mount
+  useEffect(() => {
+    if (startTimeRef.current === null) {
+      startTimeRef.current = Date.now();
+    }
     initGL();
   }, [initGL]);
 
@@ -195,7 +216,11 @@ export function ShaderCanvas({ fragmentShader, onError, className = '' }: Shader
 
   const togglePlay = useCallback(() => {
     if (!isPlaying) {
-      startTimeRef.current = Date.now() - (startTimeRef.current ? Date.now() - startTimeRef.current : 0);
+      if (startTimeRef.current !== null) {
+        startTimeRef.current = Date.now() - (Date.now() - startTimeRef.current);
+      } else {
+        startTimeRef.current = Date.now();
+      }
     }
     setIsPlaying(!isPlaying);
   }, [isPlaying]);
@@ -205,10 +230,11 @@ export function ShaderCanvas({ fragmentShader, onError, className = '' }: Shader
   }, []);
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative ${className}`} style={{ minHeight: 200 }}>
       <canvas
         ref={canvasRef}
         className="w-full h-full bg-black"
+        style={{ minHeight: 200 }}
         onMouseMove={handleMouseMove}
       />
       <div className="absolute bottom-4 left-4 flex gap-2">
@@ -225,6 +251,12 @@ export function ShaderCanvas({ fragmentShader, onError, className = '' }: Shader
           ↺ Reset
         </button>
       </div>
+      {/* WebGL error fallback */}
+      {webglSupported === false && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/80 text-red-200 text-center text-sm p-4 z-20">
+          WebGL not supported or failed to initialize.
+        </div>
+      )}
     </div>
   );
 }
