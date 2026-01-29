@@ -61,12 +61,6 @@ export function ShaderCanvas({ fragmentShader, onError, className = '' }: Shader
     const canvas = canvasRef.current;
     if (!canvas || glRef.current) return;
 
-    // On mobile, canvas might not have dimensions yet - wait if needed
-    if (canvas.clientWidth === 0 || canvas.clientHeight === 0) {
-      requestAnimationFrame(initGL);
-      return;
-    }
-
     const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl') as WebGLRenderingContext;
     if (!gl) {
       onError?.('WebGL not supported');
