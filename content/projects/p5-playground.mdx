@@ -18,6 +18,86 @@ Create interactive visualizations, generative art, physics simulations, and more
 
 ## 🎨 Generative Art
 
+### 3D Wave of Cubes
+
+A mesmerizing 3D wave effect with beautifully shaded rotating cubes.
+
+<P5Runner
+  title="3D Waving Cubes"
+  code={`
+let angle = 0;
+
+p.setup = function() {
+  p.createCanvas(p.containerWidth || 600, 400, p.WEBGL);
+};
+
+p.draw = function() {
+  p.background(20);
+
+  // Camera movement
+  let camX = p.map(p.mouseX, 0, p.width, -200, 200);
+  let camY = p.map(p.mouseY, 0, p.height, -200, 200);
+  p.camera(camX, camY, 400, 0, 0, 0, 0, 1, 0);
+
+  // Lighting
+  p.ambientLight(60, 60, 80);
+  p.directionalLight(255, 255, 255, 0.5, 0.5, -1);
+  p.pointLight(100, 200, 255, 200, -200, 200);
+
+  p.rotateX(angle * 0.3);
+  p.rotateY(angle * 0.2);
+
+  let spacing = 60;
+  let cols = 8;
+  let rows = 6;
+
+  for (let i = 0; i < cols; i++) {
+    for (let j = 0; j < rows; j++) {
+      p.push();
+
+      let x = (i - cols / 2) * spacing;
+      let y = (j - rows / 2) * spacing;
+
+      // Wave calculation
+      let distance = p.dist(i, j, cols / 2, rows / 2);
+      let offset = p.sin(angle * 2 + distance * 0.5) * 40;
+      let z = offset;
+
+      // Rotation based on wave
+      let rotAmount = p.sin(angle * 3 + distance * 0.3) * 0.5;
+
+      p.translate(x, y, z);
+      p.rotateX(rotAmount);
+      p.rotateY(rotAmount * 1.2);
+      p.rotateZ(angle * 0.5 + i * 0.1);
+
+      // Color based on position and wave
+      let hue = p.map(offset, -40, 40, 180, 280);
+      let brightness = p.map(z, -40, 40, 150, 255);
+
+      p.fill(p.color(
+        p.map(p.sin(angle + i * 0.3), -1, 1, 100, 255),
+        p.map(p.cos(angle + j * 0.3), -1, 1, 100, 200),
+        brightness
+      ));
+
+      p.specularMaterial(255);
+      p.shininess(20);
+
+      let size = 35 + p.sin(angle * 2 + distance * 0.2) * 5;
+      p.box(size);
+
+      p.pop();
+    }
+  }
+
+  angle += 0.01;
+};
+`}
+/>
+
+---
+
 ### Flowing Perlin Noise
 
 Beautiful flowing particles driven by Perlin noise.
@@ -193,8 +273,8 @@ Watch the chaotic motion of a double pendulum - tiny changes lead to wildly diff
 <P5Runner
   title="Double Pendulum"
   code={`
-let r1 = 125;
-let r2 = 125;
+let r1 = 100;
+let r2 = 100;
 let m1 = 20;
 let m2 = 20;
 let a1 = p.PI / 2;
@@ -202,22 +282,18 @@ let a2 = p.PI / 2;
 let a1_v = 0;
 let a2_v = 0;
 let g = 1;
-let px2 = -1;
-let py2 = -1;
+let path = [];
 let cx, cy;
-let buffer;
 
 p.setup = function() {
   p.createCanvas(p.containerWidth || 600, 400);
+  p.colorMode(p.HSB, 360, 100, 100, 100);
   cx = p.width / 2;
-  cy = 200;
-  buffer = p.createGraphics(p.width, p.height);
-  buffer.background(255);
-  buffer.translate(cx, cy);
+  cy = 100;
 };
 
 p.draw = function() {
-  p.image(buffer, 0, 0);
+  p.background(0, 0, 10);
   p.translate(cx, cy);
 
   let num1 = -g * (2 * m1 + m2) * p.sin(a1);
@@ -239,15 +315,6 @@ p.draw = function() {
   let x2 = x1 + r2 * p.sin(a2);
   let y2 = y1 + r2 * p.cos(a2);
 
-  p.stroke(0);
-  p.strokeWeight(2);
-  p.line(0, 0, x1, y1);
-  p.line(x1, y1, x2, y2);
-
-  p.fill(0);
-  p.circle(x1, y1, m1);
-  p.circle(x2, y2, m2);
-
   a1_v += a1_a;
   a2_v += a2_a;
   a1 += a1_v;
@@ -256,13 +323,40 @@ p.draw = function() {
   a1_v *= 0.9995;
   a2_v *= 0.9995;
 
-  buffer.stroke(0, 0, 255, 50);
-  buffer.strokeWeight(1);
-  if (px2 > -1) {
-    buffer.line(px2, py2, x2, y2);
+  // Draw the beautiful rainbow trace
+  path.unshift({x: x2, y: y2});
+  if (path.length > 500) {
+    path.pop();
   }
-  px2 = x2;
-  py2 = y2;
+
+  p.noFill();
+  p.beginShape();
+  for (let i = 0; i < path.length; i++) {
+    let hue = (p.frameCount - i) % 360;
+    let alpha = p.map(i, 0, path.length, 100, 0);
+    p.stroke(hue, 80, 90, alpha);
+    p.strokeWeight(p.map(i, 0, path.length, 3, 0.5));
+    p.vertex(path[i].x, path[i].y);
+  }
+  p.endShape();
+
+  // Draw pendulum arms with gradient
+  p.strokeWeight(3);
+  p.stroke(0, 0, 100);
+  p.line(0, 0, x1, y1);
+  p.line(x1, y1, x2, y2);
+
+  // Draw masses with glow
+  p.noStroke();
+  // Outer glow
+  p.fill(180, 80, 100, 30);
+  p.circle(x1, y1, m1 + 20);
+  p.circle(x2, y2, m2 + 20);
+  // Inner mass
+  p.fill(280, 80, 90);
+  p.circle(x1, y1, m1);
+  p.fill(180, 100, 90);
+  p.circle(x2, y2, m2);
 };
 `}
 />
