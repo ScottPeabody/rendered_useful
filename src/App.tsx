@@ -44,9 +44,14 @@ function ScrollToTop() {
   const { pathname } = useLocation()
 
   useEffect(() => {
-    // Simple, immediate scroll to top on every navigation
-    // This mimics normal website behavior where new pages start at the top
-    window.scrollTo(0, 0)
+    // Scroll to top immediately on navigation
+    // Using scrollTo with instant behavior for immediate effect
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+
+    // Also ensure we're at top after a tick to override any layout shifts
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+    })
   }, [pathname])
 
   return null

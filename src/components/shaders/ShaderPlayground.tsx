@@ -62,33 +62,41 @@ export function ShaderPlayground({
   useEffect(() => {
     if (!editorRef.current || viewRef.current) return;
 
-    const extensions = [
-      basicSetup,
-      cpp(), // GLSL is C-like, cpp works well
-      oneDark,
-      EditorView.lineWrapping,
-      EditorView.updateListener.of((update) => {
-        if (update.docChanged) {
-          setCode(update.state.doc.toString());
-        }
-      }),
-    ];
+    // Small delay to ensure DOM is ready, especially important on mobile
+    const initTimer = setTimeout(() => {
+      if (!editorRef.current) return;
 
-    const state = EditorState.create({
-      doc: code,
-      extensions,
-    });
+      const extensions = [
+        basicSetup,
+        cpp(), // GLSL is C-like, cpp works well
+        oneDark,
+        EditorView.lineWrapping,
+        EditorView.updateListener.of((update) => {
+          if (update.docChanged) {
+            setCode(update.state.doc.toString());
+          }
+        }),
+      ];
 
-    const view = new EditorView({
-      state,
-      parent: editorRef.current,
-    });
+      const state = EditorState.create({
+        doc: code,
+        extensions,
+      });
 
-    viewRef.current = view;
+      const view = new EditorView({
+        state,
+        parent: editorRef.current,
+      });
+
+      viewRef.current = view;
+    }, 100);
 
     return () => {
-      view.destroy();
-      viewRef.current = null;
+      clearTimeout(initTimer);
+      if (viewRef.current) {
+        viewRef.current.destroy();
+        viewRef.current = null;
+      }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [codeVisible]); // Re-create when code becomes visible

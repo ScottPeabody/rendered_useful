@@ -28,20 +28,21 @@ export function ShaderCanvas({ fragmentShader, onError, className = '' }: Shader
     if (canvas) {
       // Wait for canvas to have dimensions before checking WebGL support
       if (canvas.clientWidth === 0 || canvas.clientHeight === 0) {
+        let checkCount = 0;
+        const maxChecks = 40; // 2 seconds at 50ms intervals
         const checkDimensions = setInterval(() => {
+          checkCount++;
           if (canvas.clientWidth > 0 && canvas.clientHeight > 0) {
             clearInterval(checkDimensions);
             const gl = canvas.getContext('webgl');
             setWebglSupported(!!gl);
-          }
-        }, 50);
-        // Timeout after 2 seconds
-        setTimeout(() => {
-          clearInterval(checkDimensions);
-          if (canvas.clientWidth === 0 || canvas.clientHeight === 0) {
+          } else if (checkCount >= maxChecks) {
+            clearInterval(checkDimensions);
             setWebglSupported(false);
           }
-        }, 2000);
+        }, 50);
+
+        return () => clearInterval(checkDimensions);
       } else {
         const gl = canvas.getContext('webgl');
         setWebglSupported(!!gl);
@@ -86,6 +87,7 @@ export function ShaderCanvas({ fragmentShader, onError, className = '' }: Shader
     return program;
   }, [onError]);
 
+  const retryCountRef = useRef(0);
   const initGL = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -93,19 +95,31 @@ export function ShaderCanvas({ fragmentShader, onError, className = '' }: Shader
     // Ensure canvas has dimensions before initializing WebGL
     // This is critical on mobile where layout might not be complete
     if (canvas.clientWidth === 0 || canvas.clientHeight === 0) {
-      // Retry after a short delay
-      setTimeout(() => initGL(), 50);
-      return;
+      // Retry up to 20 times (1 second total)
+      if (retryCountRef.current < 20) {
+        retryCountRef.current++;
+        setTimeout(() => initGL(), 50);
+        return;
+      } else {
+        onError?.('Canvas failed to initialize with proper dimensions');
+        setWebglSupported(false);
+        return;
+      }
     }
+
+    // Reset retry count on successful size check
+    retryCountRef.current = 0;
 
     const gl = canvas.getContext('webgl', {
       alpha: false,
       antialias: true,
-      preserveDrawingBuffer: false
+      preserveDrawingBuffer: false,
+      failIfMajorPerformanceCaveat: false
     }) || canvas.getContext('experimental-webgl', {
       alpha: false,
       antialias: true,
-      preserveDrawingBuffer: false
+      preserveDrawingBuffer: false,
+      failIfMajorPerformanceCaveat: false
     }) as WebGLRenderingContext;
 
     if (!gl) {
@@ -217,7 +231,12 @@ export function ShaderCanvas({ fragmentShader, onError, className = '' }: Shader
     if (startTimeRef.current === null) {
       startTimeRef.current = Date.now();
     }
-    initGL();
+    // Delay initialization slightly to ensure DOM is fully ready (especially on mobile)
+    const initTimer = setTimeout(() => {
+      initGL();
+    }, 100);
+
+    return () => clearTimeout(initTimer);
   }, [initGL]);
 
   // Update shader when code changes
