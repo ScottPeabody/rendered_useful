@@ -66,23 +66,23 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="flex items-center justify-center gap-8 mt-12 text-sm text-[var(--color-text-muted)]"
+              className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-8 mt-12 text-sm text-[var(--color-text-muted)]"
             >
               <div className="flex items-center gap-2">
-                <Users size={18} className="text-[var(--color-accent-primary)]" />
-                <span>{authors.length} Contributors</span>
+                <Users size={18} className="text-[var(--color-accent-primary)] shrink-0" />
+                <span className="whitespace-nowrap">{authors.length} Contributors</span>
               </div>
               <div className="flex items-center gap-2">
-                <Folder size={18} className="text-[var(--color-accent-tertiary)]" />
-                <span>{projects.length} Projects</span>
+                <Folder size={18} className="text-[var(--color-accent-tertiary)] shrink-0" />
+                <span className="whitespace-nowrap">{projects.length} Projects</span>
               </div>
               <div className="flex items-center gap-2">
-                <BookOpen size={18} className="text-[var(--color-accent-secondary)]" />
-                <span>{articles.length} Articles</span>
+                <BookOpen size={18} className="text-[var(--color-accent-secondary)] shrink-0" />
+                <span className="whitespace-nowrap">{articles.length} Articles</span>
               </div>
               <div className="flex items-center gap-2">
-                <FileCode size={18} className="text-[var(--color-accent-primary)]" />
-                <span>{notebooks.length} Notebooks</span>
+                <FileCode size={18} className="text-[var(--color-accent-primary)] shrink-0" />
+                <span className="whitespace-nowrap">{notebooks.length} Notebooks</span>
               </div>
             </motion.div>
           </motion.div>
