@@ -42,11 +42,13 @@ if ('scrollRestoration' in history) {
 // Scroll to top on route change
 function ScrollToTop() {
   const { pathname } = useLocation()
-  
+
   useEffect(() => {
+    // Simple, immediate scroll to top on every navigation
+    // This mimics normal website behavior where new pages start at the top
     window.scrollTo(0, 0)
   }, [pathname])
-  
+
   return null
 }
 

@@ -26,8 +26,26 @@ export function ShaderCanvas({ fragmentShader, onError, className = '' }: Shader
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
-      const gl = canvas.getContext('webgl');
-      setWebglSupported(!!gl);
+      // Wait for canvas to have dimensions before checking WebGL support
+      if (canvas.clientWidth === 0 || canvas.clientHeight === 0) {
+        const checkDimensions = setInterval(() => {
+          if (canvas.clientWidth > 0 && canvas.clientHeight > 0) {
+            clearInterval(checkDimensions);
+            const gl = canvas.getContext('webgl');
+            setWebglSupported(!!gl);
+          }
+        }, 50);
+        // Timeout after 2 seconds
+        setTimeout(() => {
+          clearInterval(checkDimensions);
+          if (canvas.clientWidth === 0 || canvas.clientHeight === 0) {
+            setWebglSupported(false);
+          }
+        }, 2000);
+      } else {
+        const gl = canvas.getContext('webgl');
+        setWebglSupported(!!gl);
+      }
     } else {
       setWebglSupported(null);
     }
@@ -72,9 +90,27 @@ export function ShaderCanvas({ fragmentShader, onError, className = '' }: Shader
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl') as WebGLRenderingContext;
+    // Ensure canvas has dimensions before initializing WebGL
+    // This is critical on mobile where layout might not be complete
+    if (canvas.clientWidth === 0 || canvas.clientHeight === 0) {
+      // Retry after a short delay
+      setTimeout(() => initGL(), 50);
+      return;
+    }
+
+    const gl = canvas.getContext('webgl', {
+      alpha: false,
+      antialias: true,
+      preserveDrawingBuffer: false
+    }) || canvas.getContext('experimental-webgl', {
+      alpha: false,
+      antialias: true,
+      preserveDrawingBuffer: false
+    }) as WebGLRenderingContext;
+
     if (!gl) {
       onError?.('WebGL not supported');
+      setWebglSupported(false);
       return;
     }
 
@@ -230,11 +266,11 @@ export function ShaderCanvas({ fragmentShader, onError, className = '' }: Shader
   }, []);
 
   return (
-    <div className={`relative ${className}`} style={{ minHeight: 200 }}>
+    <div className={`relative ${className}`} style={{ minHeight: 200, width: '100%', height: '100%' }}>
       <canvas
         ref={canvasRef}
         className="w-full h-full bg-black"
-        style={{ minHeight: 200 }}
+        style={{ minHeight: 200, display: 'block', width: '100%', height: '100%' }}
         onMouseMove={handleMouseMove}
       />
       <div className="absolute bottom-4 left-4 flex gap-2">
