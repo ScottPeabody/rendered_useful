@@ -18,9 +18,10 @@ import { D3Runner } from './D3Runner'
 import { NivoChart } from './NivoChart'
 import { DuckDBRunner } from './DuckDBRunner'
 import SQLiteRunner from './SQLiteRunner'
+import { P5Runner } from '../p5'
 
- 
-export { Callout, TechStack, Image, Video, Audio, Todo, ThemeSelector, LayoutSelector, Mermaid, CodePlayground, Strudel, StrudelEmbed, ExcalidrawEditor, JupyterLiteEmbed, PythonRunner, RustRunner, D3Runner, NivoChart, DuckDBRunner, SQLiteRunner }
+
+export { Callout, TechStack, Image, Video, Audio, Todo, ThemeSelector, LayoutSelector, Mermaid, CodePlayground, Strudel, StrudelEmbed, ExcalidrawEditor, JupyterLiteEmbed, PythonRunner, RustRunner, D3Runner, NivoChart, DuckDBRunner, SQLiteRunner, P5Runner }
 
 interface MDXProps {
   children?: ReactNode

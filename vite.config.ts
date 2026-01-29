@@ -35,6 +35,9 @@ function absoluteImports(): Plugin {
 // https://vite.dev/config/
 export default defineConfig({
   base: '/',
+  server: {
+    host: true, // Expose to network
+  },
   plugins: [
     mdx({
       remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter, remarkGfm, remarkMath],

@@ -1,0 +1,617 @@
+---
+title: "p5.js Playground"
+description: "Create interactive graphics, animations, and simulations with p5.js"
+date: "2026-01-28"
+author: "speabody"
+tags: ["p5js", "creative-coding", "generative-art", "physics", "visualization"]
+featured: true
+status: "active"
+---
+
+import { P5Runner } from '../../src/components/p5';
+
+# p5.js Playground
+
+Create interactive visualizations, generative art, physics simulations, and more with p5.js! Each example includes editable code - try modifying the values and clicking the play button to see your changes.
+
+---
+
+## 🎨 Generative Art
+
+### Flowing Perlin Noise
+
+Beautiful flowing particles driven by Perlin noise.
+
+<P5Runner
+  title="Perlin Noise Flow Field"
+  code={`
+let particles = [];
+let flowfield;
+let cols, rows;
+let scale = 20;
+let inc = 0.1;
+let zoff = 0;
+
+p.setup = function() {
+  p.createCanvas(p.containerWidth || 600, 400);
+  p.background(0);
+  cols = p.floor(p.width / scale);
+  rows = p.floor(p.height / scale);
+  flowfield = new Array(cols * rows);
+
+  for (let i = 0; i < 500; i++) {
+    particles[i] = new Particle();
+  }
+};
+
+p.draw = function() {
+  // Fade effect
+  p.background(0, 10);
+
+  let yoff = 0;
+  for (let y = 0; y < rows; y++) {
+    let xoff = 0;
+    for (let x = 0; x < cols; x++) {
+      let index = x + y * cols;
+      let angle = p.noise(xoff, yoff, zoff) * p.TWO_PI * 4;
+      let v = p.constructor.Vector.fromAngle(angle);
+      v.setMag(0.5);
+      flowfield[index] = v;
+      xoff += inc;
+    }
+    yoff += inc;
+  }
+  zoff += 0.003;
+
+  for (let i = 0; i < particles.length; i++) {
+    particles[i].follow(flowfield);
+    particles[i].update();
+    particles[i].edges();
+    particles[i].show();
+  }
+};
+
+class Particle {
+  constructor() {
+    this.pos = p.createVector(p.random(p.width), p.random(p.height));
+    this.vel = p.createVector(0, 0);
+    this.acc = p.createVector(0, 0);
+    this.maxspeed = 2;
+    this.prevPos = this.pos.copy();
+  }
+
+  update() {
+    this.vel.add(this.acc);
+    this.vel.limit(this.maxspeed);
+    this.pos.add(this.vel);
+    this.acc.mult(0);
+  }
+
+  follow(vectors) {
+    let x = p.floor(this.pos.x / scale);
+    let y = p.floor(this.pos.y / scale);
+    let index = x + y * cols;
+    let force = vectors[index];
+    if (force) this.applyForce(force);
+  }
+
+  applyForce(force) {
+    this.acc.add(force);
+  }
+
+  show() {
+    p.stroke(255, 150);
+    p.strokeWeight(2);
+    p.line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
+    this.updatePrev();
+  }
+
+  updatePrev() {
+    this.prevPos.x = this.pos.x;
+    this.prevPos.y = this.pos.y;
+  }
+
+  edges() {
+    if (this.pos.x > p.width) {
+      this.pos.x = 0;
+      this.updatePrev();
+    }
+    if (this.pos.x < 0) {
+      this.pos.x = p.width;
+      this.updatePrev();
+    }
+    if (this.pos.y > p.height) {
+      this.pos.y = 0;
+      this.updatePrev();
+    }
+    if (this.pos.y < 0) {
+      this.pos.y = p.height;
+      this.updatePrev();
+    }
+  }
+}
+`}
+/>
+
+---
+
+### Rainbow Spiral
+
+Hypnotic rotating rainbow spiral.
+
+<P5Runner
+  title="Rainbow Spiral"
+  code={`
+let angle = 0;
+
+p.setup = function() {
+  p.createCanvas(p.containerWidth || 600, 400);
+  p.colorMode(p.HSB, 360, 100, 100);
+  p.noFill();
+  p.strokeWeight(2);
+};
+
+p.draw = function() {
+  p.background(0, 0, 10);
+  p.translate(p.width / 2, p.height / 2);
+  p.rotate(angle);
+
+  let radius = 150;
+  let steps = 200;
+
+  for (let i = 0; i < steps; i++) {
+    let hue = (i / steps * 360 + p.frameCount) % 360;
+    p.stroke(hue, 80, 90);
+
+    let a1 = p.map(i, 0, steps, 0, p.TWO_PI * 3);
+    let a2 = p.map(i + 1, 0, steps, 0, p.TWO_PI * 3);
+
+    let r1 = radius * (1 - i / steps);
+    let r2 = radius * (1 - (i + 1) / steps);
+
+    let x1 = r1 * p.cos(a1);
+    let y1 = r1 * p.sin(a1);
+    let x2 = r2 * p.cos(a2);
+    let y2 = r2 * p.sin(a2);
+
+    p.line(x1, y1, x2, y2);
+  }
+
+  angle += 0.01;
+};
+`}
+/>
+
+---
+
+## 🔬 Physics & Science
+
+### Double Pendulum (Chaos!)
+
+Watch the chaotic motion of a double pendulum - tiny changes lead to wildly different paths.
+
+<P5Runner
+  title="Double Pendulum"
+  code={`
+let r1 = 125;
+let r2 = 125;
+let m1 = 20;
+let m2 = 20;
+let a1 = p.PI / 2;
+let a2 = p.PI / 2;
+let a1_v = 0;
+let a2_v = 0;
+let g = 1;
+let px2 = -1;
+let py2 = -1;
+let cx, cy;
+let buffer;
+
+p.setup = function() {
+  p.createCanvas(p.containerWidth || 600, 400);
+  cx = p.width / 2;
+  cy = 200;
+  buffer = p.createGraphics(p.width, p.height);
+  buffer.background(255);
+  buffer.translate(cx, cy);
+};
+
+p.draw = function() {
+  p.image(buffer, 0, 0);
+  p.translate(cx, cy);
+
+  let num1 = -g * (2 * m1 + m2) * p.sin(a1);
+  let num2 = -m2 * g * p.sin(a1 - 2 * a2);
+  let num3 = -2 * p.sin(a1 - a2) * m2;
+  let num4 = a2_v * a2_v * r2 + a1_v * a1_v * r1 * p.cos(a1 - a2);
+  let den = r1 * (2 * m1 + m2 - m2 * p.cos(2 * a1 - 2 * a2));
+  let a1_a = (num1 + num2 + num3 * num4) / den;
+
+  num1 = 2 * p.sin(a1 - a2);
+  num2 = a1_v * a1_v * r1 * (m1 + m2);
+  num3 = g * (m1 + m2) * p.cos(a1);
+  num4 = a2_v * a2_v * r2 * m2 * p.cos(a1 - a2);
+  den = r2 * (2 * m1 + m2 - m2 * p.cos(2 * a1 - 2 * a2));
+  let a2_a = (num1 * (num2 + num3 + num4)) / den;
+
+  let x1 = r1 * p.sin(a1);
+  let y1 = r1 * p.cos(a1);
+  let x2 = x1 + r2 * p.sin(a2);
+  let y2 = y1 + r2 * p.cos(a2);
+
+  p.stroke(0);
+  p.strokeWeight(2);
+  p.line(0, 0, x1, y1);
+  p.line(x1, y1, x2, y2);
+
+  p.fill(0);
+  p.circle(x1, y1, m1);
+  p.circle(x2, y2, m2);
+
+  a1_v += a1_a;
+  a2_v += a2_a;
+  a1 += a1_v;
+  a2 += a2_v;
+
+  a1_v *= 0.9995;
+  a2_v *= 0.9995;
+
+  buffer.stroke(0, 0, 255, 50);
+  buffer.strokeWeight(1);
+  if (px2 > -1) {
+    buffer.line(px2, py2, x2, y2);
+  }
+  px2 = x2;
+  py2 = y2;
+};
+`}
+/>
+
+---
+
+### Fourier Series Drawing
+
+Watch circles draw complex shapes using Fourier series!
+
+<P5Runner
+  title="Fourier Series"
+  code={`
+let time = 0;
+let wave = [];
+let path = [];
+
+p.setup = function() {
+  p.createCanvas(p.containerWidth || 600, 400);
+};
+
+p.draw = function() {
+  p.background(0);
+  p.translate(150, 200);
+
+  let x = 0;
+  let y = 0;
+
+  for (let i = 0; i < 5; i++) {
+    let prevx = x;
+    let prevy = y;
+
+    let n = i * 2 + 1;
+    let radius = 75 * (4 / (n * p.PI));
+    x += radius * p.cos(n * time);
+    y += radius * p.sin(n * time);
+
+    p.stroke(255, 100);
+    p.noFill();
+    p.circle(prevx, prevy, radius * 2);
+
+    p.stroke(255);
+    p.line(prevx, prevy, x, y);
+  }
+
+  wave.unshift(y);
+
+  p.translate(200, 0);
+  p.line(x - 200, y, 0, wave[0]);
+  p.beginShape();
+  p.noFill();
+  for (let i = 0; i < wave.length; i++) {
+    p.vertex(i, wave[i]);
+  }
+  p.endShape();
+
+  time += 0.05;
+
+  if (wave.length > 250) {
+    wave.pop();
+  }
+};
+`}
+/>
+
+---
+
+## 🎯 Engineering & Math
+
+### Sorting Visualizer
+
+Watch different sorting algorithms in action!
+
+<P5Runner
+  title="Bubble Sort Visualizer"
+  code={`
+let values = [];
+let i = 0;
+let j = 0;
+let sorting = false;
+
+p.setup = function() {
+  p.createCanvas(p.containerWidth || 600, 400);
+  values = new Array(p.floor(p.width / 4));
+  for (let i = 0; i < values.length; i++) {
+    values[i] = p.random(p.height);
+  }
+};
+
+p.draw = function() {
+  p.background(0);
+
+  if (sorting) {
+    for (let k = 0; k < 5; k++) {
+      if (i < values.length) {
+        if (j < values.length - i - 1) {
+          let a = values[j];
+          let b = values[j + 1];
+          if (a > b) {
+            [values[j], values[j + 1]] = [values[j + 1], values[j]];
+          }
+          j++;
+        } else {
+          j = 0;
+          i++;
+        }
+      } else {
+        sorting = false;
+      }
+    }
+  }
+
+  for (let i = 0; i < values.length; i++) {
+    p.stroke(100, 200, 255);
+    p.fill(100, 200, 255);
+    p.rect(i * 4, p.height - values[i], 3, values[i]);
+  }
+};
+
+p.mousePressed = function() {
+  if (!sorting) {
+    values = new Array(p.floor(p.width / 4));
+    for (let i = 0; i < values.length; i++) {
+      values[i] = p.random(p.height);
+    }
+    i = 0;
+    j = 0;
+    sorting = true;
+  }
+};
+`}
+/>
+
+---
+
+### Fractal Tree
+
+Click to grow a beautiful recursive fractal tree!
+
+<P5Runner
+  title="Fractal Tree"
+  code={`
+let angle = 0;
+
+p.setup = function() {
+  p.createCanvas(p.containerWidth || 600, 400);
+};
+
+p.draw = function() {
+  p.background(51);
+  angle = p.map(p.mouseX, 0, p.width, 0, p.PI/2);
+  p.stroke(255);
+  p.translate(p.width/2, p.height);
+  branch(100);
+};
+
+function branch(len) {
+  p.line(0, 0, 0, -len);
+  p.translate(0, -len);
+  if (len > 4) {
+    p.push();
+    p.rotate(angle);
+    branch(len * 0.67);
+    p.pop();
+    p.push();
+    p.rotate(-angle);
+    branch(len * 0.67);
+    p.pop();
+  }
+}
+`}
+/>
+
+---
+
+## 🎮 Interactive & Fun
+
+### Particle System
+
+Click and drag to create a colorful particle explosion!
+
+<P5Runner
+  title="Particle Fireworks"
+  code={`
+let particles = [];
+
+p.setup = function() {
+  p.createCanvas(p.containerWidth || 600, 400);
+  p.colorMode(p.HSB, 360, 100, 100, 100);
+};
+
+p.draw = function() {
+  p.background(0, 0, 0, 25);
+
+  if (p.mouseIsPressed) {
+    for (let i = 0; i < 5; i++) {
+      particles.push(new Particle(p.mouseX, p.mouseY));
+    }
+  }
+
+  for (let i = particles.length - 1; i >= 0; i--) {
+    particles[i].update();
+    particles[i].show();
+    if (particles[i].finished()) {
+      particles.splice(i, 1);
+    }
+  }
+};
+
+class Particle {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.vx = p.random(-2, 2);
+    this.vy = p.random(-5, 0);
+    this.alpha = 100;
+    this.hue = p.random(360);
+  }
+
+  finished() {
+    return this.alpha < 0;
+  }
+
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.vy += 0.2;
+    this.alpha -= 2;
+  }
+
+  show() {
+    p.noStroke();
+    p.fill(this.hue, 80, 100, this.alpha);
+    p.circle(this.x, this.y, 8);
+  }
+}
+`}
+/>
+
+---
+
+### Starfield
+
+Travel through space! Move your mouse to control speed.
+
+<P5Runner
+  title="Starfield Simulation"
+  code={`
+let stars = [];
+
+p.setup = function() {
+  p.createCanvas(p.containerWidth || 600, 400);
+  for (let i = 0; i < 800; i++) {
+    stars[i] = new Star();
+  }
+};
+
+p.draw = function() {
+  let speed = p.map(p.mouseX, 0, p.width, 0, 20);
+  p.background(0);
+  p.translate(p.width / 2, p.height / 2);
+  for (let i = 0; i < stars.length; i++) {
+    stars[i].update(speed);
+    stars[i].show();
+  }
+};
+
+class Star {
+  constructor() {
+    this.x = p.random(-p.width, p.width);
+    this.y = p.random(-p.height, p.height);
+    this.z = p.random(p.width);
+    this.pz = this.z;
+  }
+
+  update(speed) {
+    this.z = this.z - speed;
+    if (this.z < 1) {
+      this.z = p.width;
+      this.x = p.random(-p.width, p.width);
+      this.y = p.random(-p.height, p.height);
+      this.pz = this.z;
+    }
+  }
+
+  show() {
+    p.fill(255);
+    p.noStroke();
+
+    let sx = p.map(this.x / this.z, 0, 1, 0, p.width);
+    let sy = p.map(this.y / this.z, 0, 1, 0, p.height);
+    let r = p.map(this.z, 0, p.width, 8, 0);
+    p.circle(sx, sy, r);
+
+    let px = p.map(this.x / this.pz, 0, 1, 0, p.width);
+    let py = p.map(this.y / this.pz, 0, 1, 0, p.height);
+
+    this.pz = this.z;
+
+    p.stroke(255);
+    p.line(px, py, sx, sy);
+  }
+}
+`}
+/>
+
+---
+
+## Tips for Using p5.js
+
+### Basic Structure
+
+Every p5.js sketch needs a `setup()` and `draw()` function:
+
+```javascript
+p.setup = function() {
+  p.createCanvas(p.containerWidth || 600, 400);
+  // Runs once at start
+};
+
+p.draw = function() {
+  // Runs continuously (60fps by default)
+};
+```
+
+### Common Functions
+
+- `p.createCanvas(width, height)` - Create drawing canvas
+- `p.background(color)` - Set background color
+- `p.fill(color)` - Set fill color
+- `p.stroke(color)` - Set outline color
+- `p.circle(x, y, diameter)` - Draw circle
+- `p.line(x1, y1, x2, y2)` - Draw line
+- `p.rect(x, y, width, height)` - Draw rectangle
+
+### Interactivity
+
+- `p.mouseX`, `p.mouseY` - Current mouse position
+- `p.mouseIsPressed` - Is mouse button pressed?
+- `p.mousePressed()` - Function called when mouse clicked
+- `p.keyPressed()` - Function called when key pressed
+
+### Resources
+
+- [p5.js Reference](https://p5js.org/reference/)
+- [The Coding Train](https://thecodingtrain.com/) - Excellent video tutorials
+- [OpenProcessing](https://openprocessing.org/) - Community sketches
+- [Generative Artistry](https://generativeartistry.com/) - Tutorials
+
+---
+
+Have fun creating! Try modifying the code, changing colors, adjusting speeds, and making these examples your own! 🎨✨
