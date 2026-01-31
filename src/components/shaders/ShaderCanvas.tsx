@@ -18,7 +18,7 @@ export function ShaderCanvas({ fragmentShader, onError, className = '' }: Shader
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const programRef = useRef<WebGLProgram | null>(null);
   const animationRef = useRef<number>(0);
-  const startTimeRef = useRef<number>(Date.now());
+  const startTimeRef = useRef<number | null>(null);
   const mouseRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isPlaying, setIsPlaying] = useState(true);
 
@@ -143,6 +143,10 @@ export function ShaderCanvas({ fragmentShader, onError, className = '' }: Shader
     const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
     const mouseLocation = gl.getUniformLocation(program, 'u_mouse');
 
+    // Lazily initialize start time on first render
+    if (startTimeRef.current === null) {
+      startTimeRef.current = Date.now();
+    }
     const time = (Date.now() - startTimeRef.current) / 1000;
     gl.uniform1f(timeLocation, time);
     gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
@@ -152,11 +156,24 @@ export function ShaderCanvas({ fragmentShader, onError, className = '' }: Shader
     gl.clearColor(0, 0, 0, 1);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }, []);
 
-    if (isPlaying) {
-      animationRef.current = requestAnimationFrame(render);
+  // Animation loop effect
+  useEffect(() => {
+    if (isPlaying && programRef.current) {
+      const animate = () => {
+        render();
+        animationRef.current = requestAnimationFrame(animate);
+      };
+      animationRef.current = requestAnimationFrame(animate);
     }
-  }, [isPlaying]);
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [isPlaying, render]);
 
   // Initialize WebGL on mount
   useEffect(() => {
@@ -197,7 +214,7 @@ export function ShaderCanvas({ fragmentShader, onError, className = '' }: Shader
 
   const togglePlay = useCallback(() => {
     if (!isPlaying) {
-      startTimeRef.current = Date.now() - (Date.now() - startTimeRef.current);
+      startTimeRef.current = Date.now() - (Date.now() - (startTimeRef.current ?? Date.now()));
     }
     setIsPlaying(!isPlaying);
   }, [isPlaying]);

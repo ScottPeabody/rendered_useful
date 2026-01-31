@@ -1,0 +1,563 @@
+---
+title: "Three.js Playground"
+description: "Create stunning 3D animations and visualizations with Three.js and React Three Fiber"
+date: "2026-01-29"
+author: "speabody"
+tags: ["threejs", "3d", "webgl", "creative-coding", "animation"]
+featured: true
+status: "active"
+---
+
+import { ThreeRunner } from '../../src/components/three';
+
+# Three.js Playground
+
+Create mesmerizing 3D scenes and animations with Three.js! Each example showcases advanced techniques including custom materials, particle systems, and camera controls. Edit the code and watch your changes in real-time.
+
+---
+
+## 🌌 Cosmic Particle Galaxy
+
+A massive spiral galaxy with 15,000 particles, dynamic rotation, and beautiful color gradients.
+
+<ThreeRunner
+  title="Cosmic Galaxy"
+  height={600}
+  code={`
+function Scene() {
+  const pointsRef = useRef();
+
+  const particles = useMemo(() => {
+    const count = 15000;
+    const positions = new Float32Array(count * 3);
+    const colors = new Float32Array(count * 3);
+    const sizes = new Float32Array(count);
+
+    for (let i = 0; i < count; i++) {
+      const i3 = i * 3;
+
+      // Spiral galaxy formation
+      const radius = Math.random() * 10;
+      const spinAngle = radius * 0.7;
+      const branchAngle = ((i % 5) / 5) * Math.PI * 2;
+
+      const randomX = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.5;
+      const randomY = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.3;
+      const randomZ = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.5;
+
+      positions[i3] = Math.cos(branchAngle + spinAngle) * radius + randomX;
+      positions[i3 + 1] = randomY;
+      positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * radius + randomZ;
+
+      // Color gradient from center to edge
+      const mixedColor = new THREE.Color();
+      const centerColor = new THREE.Color('#ff006e');
+      const middleColor = new THREE.Color('#8338ec');
+      const outerColor = new THREE.Color('#3a86ff');
+
+      if (radius < 5) {
+        mixedColor.lerpColors(centerColor, middleColor, radius / 5);
+      } else {
+        mixedColor.lerpColors(middleColor, outerColor, (radius - 5) / 5);
+      }
+
+      colors[i3] = mixedColor.r;
+      colors[i3 + 1] = mixedColor.g;
+      colors[i3 + 2] = mixedColor.b;
+
+      // Vary particle sizes
+      sizes[i] = Math.random() * 1.5 + 0.5;
+    }
+
+    return { positions, colors, sizes };
+  }, []);
+
+  useFrame((state) => {
+    if (pointsRef.current) {
+      pointsRef.current.rotation.y = state.clock.elapsedTime * 0.08;
+      pointsRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.1) * 0.15;
+    }
+  });
+
+  return (
+    <>
+      <color attach="background" args={['#000000']} />
+
+      <points ref={pointsRef}>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            count={particles.positions.length / 3}
+            array={particles.positions}
+            itemSize={3}
+          />
+          <bufferAttribute
+            attach="attributes-color"
+            count={particles.colors.length / 3}
+            array={particles.colors}
+            itemSize={3}
+          />
+          <bufferAttribute
+            attach="attributes-size"
+            count={particles.sizes.length}
+            array={particles.sizes}
+            itemSize={1}
+          />
+        </bufferGeometry>
+        <pointsMaterial
+          size={0.15}
+          sizeAttenuation={true}
+          vertexColors={true}
+          transparent={true}
+          opacity={0.9}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
+      </points>
+
+      {/* Ambient stars */}
+      <Stars radius={100} depth={50} count={3000} />
+    </>
+  );
+}
+
+// Helper component for background stars
+function Stars({ radius = 100, depth = 50, count = 3000 }) {
+  const positions = useMemo(() => {
+    const positions = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      const r = radius + Math.random() * depth;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(Math.random() * 2 - 1);
+      positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+      positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+      positions[i * 3 + 2] = r * Math.cos(phi);
+    }
+    return positions;
+  }, [count, radius, depth]);
+
+  return (
+    <points>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
+      </bufferGeometry>
+      <pointsMaterial size={0.5} color="white" transparent opacity={0.4} />
+    </points>
+  );
+}
+`}
+/>
+
+---
+
+## 💎 Holographic Crystal
+
+A mesmerizing iridescent crystal with physically-based rendering, dynamic lighting, and auto-rotating camera.
+
+<ThreeRunner
+  title="Holographic Crystal"
+  height={600}
+  code={`
+function Scene() {
+  const crystalRef = useRef();
+  const groupRef = useRef();
+
+  useFrame((state) => {
+    const t = state.clock.elapsedTime;
+
+    // Rotate the entire group
+    if (groupRef.current) {
+      groupRef.current.rotation.y = t * 0.3;
+      groupRef.current.rotation.x = Math.sin(t * 0.2) * 0.2;
+    }
+
+    // Pulse the crystal
+    if (crystalRef.current) {
+      const scale = 1 + Math.sin(t * 2) * 0.08;
+      crystalRef.current.scale.set(scale, scale, scale);
+    }
+
+    // Orbit camera
+    state.camera.position.x = Math.sin(t * 0.5) * 8;
+    state.camera.position.z = Math.cos(t * 0.5) * 8;
+    state.camera.position.y = 3 + Math.sin(t * 0.3) * 2;
+    state.camera.lookAt(0, 0, 0);
+  });
+
+  return (
+    <>
+      <color attach="background" args={['#1a0a2e']} />
+
+      {/* Bright dramatic lighting */}
+      <ambientLight intensity={0.8} />
+      <pointLight position={[10, 10, 10]} intensity={3} color="#ff00ff" />
+      <pointLight position={[-10, -10, -10]} intensity={3} color="#00ffff" />
+      <pointLight position={[0, 10, 0]} intensity={2} color="#ffff00" />
+      <pointLight position={[5, 0, 5]} intensity={2} color="#00ff00" />
+      <spotLight
+        position={[0, 15, 0]}
+        angle={0.4}
+        penumbra={1}
+        intensity={4}
+        color="#ffffff"
+      />
+
+      <group ref={groupRef}>
+        {/* Main crystal - octahedron */}
+        <mesh ref={crystalRef}>
+          <octahedronGeometry args={[2.5, 0]} />
+          <meshPhysicalMaterial
+            color="#ffffff"
+            metalness={0.9}
+            roughness={0.05}
+            transmission={0.95}
+            thickness={0.5}
+            envMapIntensity={3}
+            clearcoat={1}
+            clearcoatRoughness={0.1}
+            ior={2.4}
+            emissive="#ff00ff"
+            emissiveIntensity={0.3}
+          />
+        </mesh>
+
+        {/* Bright inner glowing core */}
+        <mesh scale={0.8}>
+          <icosahedronGeometry args={[1, 0]} />
+          <meshBasicMaterial color="#ff00ff" transparent opacity={0.6} />
+        </mesh>
+
+        {/* Orbiting energy particles */}
+        <OrbitingParticles />
+      </group>
+
+      {/* Reflective floor */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -3, 0]}>
+        <planeGeometry args={[50, 50]} />
+        <meshStandardMaterial
+          color="#1a0a2e"
+          metalness={1}
+          roughness={0.1}
+          emissive="#8338ec"
+          emissiveIntensity={0.2}
+        />
+      </mesh>
+
+      {/* Background grid - brighter */}
+      <gridHelper args={[50, 50, '#ff00ff', '#8338ec']} position={[0, -3, 0]} />
+    </>
+  );
+}
+
+function OrbitingParticles() {
+  const particlesRef = useRef();
+
+  const particles = useMemo(() => {
+    const count = 150;
+    const positions = new Float32Array(count * 3);
+    const colors = new Float32Array(count * 3);
+
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2;
+      const radius = 3.5 + Math.random() * 2;
+      const height = (Math.random() - 0.5) * 5;
+
+      positions[i * 3] = Math.cos(angle) * radius;
+      positions[i * 3 + 1] = height;
+      positions[i * 3 + 2] = Math.sin(angle) * radius;
+
+      const color = new THREE.Color();
+      color.setHSL(i / count, 1, 0.6);
+      colors[i * 3] = color.r;
+      colors[i * 3 + 1] = color.g;
+      colors[i * 3 + 2] = color.b;
+    }
+
+    return { positions, colors };
+  }, []);
+
+  useFrame((state) => {
+    if (particlesRef.current) {
+      particlesRef.current.rotation.y = state.clock.elapsedTime * 0.5;
+    }
+  });
+
+  return (
+    <points ref={particlesRef}>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          count={particles.positions.length / 3}
+          array={particles.positions}
+          itemSize={3}
+        />
+        <bufferAttribute
+          attach="attributes-color"
+          count={particles.colors.length / 3}
+          array={particles.colors}
+          itemSize={3}
+        />
+      </bufferGeometry>
+      <pointsMaterial
+        size={0.15}
+        vertexColors
+        transparent
+        opacity={0.8}
+        blending={THREE.AdditiveBlending}
+      />
+    </points>
+  );
+}
+`}
+/>
+
+---
+
+## 🌀 Infinite Terrain Canyon
+
+Fly through an endless procedurally-generated canyon with wireframe landscape floor, ceiling, and walls. Like Tron meets nature!
+
+<ThreeRunner
+  title="Infinite Canyon Flight"
+  height={600}
+  code={`
+// Simple Perlin noise function
+function noise(x, y) {
+  const X = Math.floor(x) & 255;
+  const Y = Math.floor(y) & 255;
+  x -= Math.floor(x);
+  y -= Math.floor(y);
+  const u = fade(x);
+  const v = fade(y);
+  const a = p[X] + Y;
+  const b = p[X + 1] + Y;
+  return lerp(v,
+    lerp(u, grad(p[a], x, y), grad(p[b], x - 1, y)),
+    lerp(u, grad(p[a + 1], x, y - 1), grad(p[b + 1], x - 1, y - 1))
+  );
+}
+
+function fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+function lerp(t, a, b) { return a + t * (b - a); }
+function grad(hash, x, y) {
+  const h = hash & 3;
+  return ((h & 1) === 0 ? x : -x) + ((h & 2) === 0 ? y : -y);
+}
+
+const p = new Array(512);
+for (let i = 0; i < 256; i++) p[i] = p[i + 256] = Math.floor(Math.random() * 256);
+
+function Scene() {
+  const floorRef = useRef();
+  const ceilingRef = useRef();
+  const leftWallRef = useRef();
+  const rightWallRef = useRef();
+  const timeRef = useRef(0);
+
+  // Create terrain plane geometry
+  const createTerrain = (width, depth, segments) => {
+    const geometry = new THREE.PlaneGeometry(width, depth, segments, segments);
+    const positions = geometry.attributes.position.array;
+    const originalPositions = new Float32Array(positions.length);
+    
+    // Copy positions to originalPositions
+    for (let i = 0; i < positions.length; i++) {
+      originalPositions[i] = positions[i];
+    }
+    
+    geometry.setAttribute('originalPosition', new THREE.BufferAttribute(originalPositions, 3));
+    return geometry;
+  };
+
+  const floorGeometry = useMemo(() => createTerrain(20, 100, 40), []);
+  const ceilingGeometry = useMemo(() => createTerrain(20, 100, 40), []);
+  const wallGeometry = useMemo(() => createTerrain(10, 100, 20), []);
+
+  useFrame((state, delta) => {
+    timeRef.current += delta;
+    const t = timeRef.current;
+
+    // Set camera position
+    state.camera.position.set(
+      Math.sin(t * 0.3) * 0.5, 
+      0, 
+      Math.cos(t * 0.2) * 0.3
+    );
+    state.camera.lookAt(0, 0, -50);
+
+    // Animate floor terrain
+    if (floorRef.current && floorRef.current.geometry.attributes.position) {
+      const positions = floorRef.current.geometry.attributes.position.array;
+      const originalPos = floorRef.current.geometry.attributes.originalPosition.array;
+
+      for (let i = 0; i < positions.length; i += 3) {
+        const x = originalPos[i];
+        const y = originalPos[i + 1];
+        
+        // Create rolling hills with Perlin noise
+        const elevation = noise(x * 0.3, y * 0.1 - t * 2) * 3;
+        positions[i + 2] = elevation - 1;
+      }
+      
+      floorRef.current.geometry.attributes.position.needsUpdate = true;
+      
+      // Infinite scrolling
+      floorRef.current.position.z = ((t * 10) % 100) - 100;
+    }
+
+    // Animate ceiling terrain (inverted)
+    if (ceilingRef.current && ceilingRef.current.geometry.attributes.position) {
+      const positions = ceilingRef.current.geometry.attributes.position.array;
+      const originalPos = ceilingRef.current.geometry.attributes.originalPosition.array;
+
+      for (let i = 0; i < positions.length; i += 3) {
+        const x = originalPos[i];
+        const y = originalPos[i + 1];
+        
+        const elevation = noise(x * 0.3 + 100, y * 0.1 - t * 2) * 3;
+        positions[i + 2] = -elevation + 1;
+      }
+      
+      ceilingRef.current.geometry.attributes.position.needsUpdate = true;
+      ceilingRef.current.position.z = ((t * 10) % 100) - 100;
+    }
+
+    // Animate left wall
+    if (leftWallRef.current && leftWallRef.current.geometry.attributes.position) {
+      const positions = leftWallRef.current.geometry.attributes.position.array;
+      const originalPos = leftWallRef.current.geometry.attributes.originalPosition.array;
+
+      for (let i = 0; i < positions.length; i += 3) {
+        const x = originalPos[i];
+        const y = originalPos[i + 1];
+        
+        const wave = noise(y * 0.1 - t * 2, x * 0.5) * 2;
+        positions[i + 2] = wave;
+      }
+      
+      leftWallRef.current.geometry.attributes.position.needsUpdate = true;
+      leftWallRef.current.position.z = ((t * 10) % 100) - 100;
+    }
+
+    // Animate right wall
+    if (rightWallRef.current && rightWallRef.current.geometry.attributes.position) {
+      const positions = rightWallRef.current.geometry.attributes.position.array;
+      const originalPos = rightWallRef.current.geometry.attributes.originalPosition.array;
+
+      for (let i = 0; i < positions.length; i += 3) {
+        const x = originalPos[i];
+        const y = originalPos[i + 1];
+        
+        const wave = noise(y * 0.1 - t * 2 + 50, x * 0.5 + 50) * 2;
+        positions[i + 2] = wave;
+      }
+      
+      rightWallRef.current.geometry.attributes.position.needsUpdate = true;
+      rightWallRef.current.position.z = ((t * 10) % 100) - 100;
+    }
+  });
+
+  return (
+    <>
+      <color attach="background" args={['#000000']} />
+      <fog attach="fog" args={['#000510', 10, 80]} />
+
+      <ambientLight intensity={0.3} />
+      <pointLight position={[0, 0, 5]} intensity={3} color="#00ffff" />
+      <pointLight position={[0, 0, -30]} intensity={2} color="#ff00ff" />
+
+      {/* Floor */}
+      <mesh ref={floorRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, -5, 0]}>
+        <primitive object={floorGeometry} />
+        <meshStandardMaterial
+          color="#00ffff"
+          wireframe={true}
+          emissive="#00ffff"
+          emissiveIntensity={0.5}
+        />
+      </mesh>
+
+      {/* Ceiling */}
+      <mesh ref={ceilingRef} rotation={[Math.PI / 2, 0, 0]} position={[0, 5, 0]}>
+        <primitive object={ceilingGeometry} />
+        <meshStandardMaterial
+          color="#ff00ff"
+          wireframe={true}
+          emissive="#ff00ff"
+          emissiveIntensity={0.5}
+        />
+      </mesh>
+
+      {/* Left Wall */}
+      <mesh ref={leftWallRef} rotation={[0, Math.PI / 2, 0]} position={[-10, 0, 0]}>
+        <primitive object={wallGeometry} />
+        <meshStandardMaterial
+          color="#00ff88"
+          wireframe={true}
+          emissive="#00ff88"
+          emissiveIntensity={0.4}
+        />
+      </mesh>
+
+      {/* Right Wall */}
+      <mesh ref={rightWallRef} rotation={[0, -Math.PI / 2, 0]} position={[10, 0, 0]}>
+        <primitive object={wallGeometry} />
+        <meshStandardMaterial
+          color="#ff8800"
+          wireframe={true}
+          emissive="#ff8800"
+          emissiveIntensity={0.4}
+        />
+      </mesh>
+    </>
+  );
+}
+`}
+/>
+
+---
+
+## Tips & Resources
+
+### Controls
+- **Mouse**: Drag to orbit (if OrbitControls enabled)
+- **Scroll**: Zoom in/out
+- **Edit Code**: Make changes and see them live
+
+### Key Concepts
+
+**Materials**:
+- `MeshPhysicalMaterial` - Advanced PBR with transmission, clearcoat
+- `MeshStandardMaterial` - Standard PBR materials
+- `PointsMaterial` - For particle systems
+- Use `emissive` for glowing effects
+
+**Lighting**:
+- `pointLight` - Localized light source with distance falloff
+- `directionalLight` - Sunlight-like parallel rays
+- `spotLight` - Cone-shaped light
+- `ambientLight` - Overall scene illumination
+
+**Animation**:
+```javascript
+useFrame((state, delta) => {
+  const t = state.clock.elapsedTime;
+  mesh.rotation.y += delta;
+  mesh.position.y = Math.sin(t) * 2;
+});
+```
+
+**Camera Control**:
+```javascript
+state.camera.position.x = Math.sin(time) * radius;
+state.camera.position.z = Math.cos(time) * radius;
+state.camera.lookAt(0, 0, 0);
+```
+
+### Resources
+- [Three.js Documentation](https://threejs.org/docs/)
+- [React Three Fiber](https://docs.pmnd.rs/react-three-fiber/)
+- [Drei Helpers](https://github.com/pmndrs/drei)
+- [Three.js Examples](https://threejs.org/examples/)
+
+Create stunning 3D experiences! 🚀✨

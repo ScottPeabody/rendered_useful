@@ -1,9 +1,14 @@
-import { useRef, useEffect, useState, useCallback } from 'react';
+import { useRef, useEffect, useState, useCallback, useMemo, Suspense } from 'react';
+import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { EditorView, basicSetup } from 'codemirror';
 import { EditorState } from '@codemirror/state';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Html } from '@react-three/drei';
+import * as THREE from 'three';
+import * as Babel from '@babel/standalone';
 import {
   RotateCcw,
   Maximize2,
@@ -15,9 +20,8 @@ import {
   EyeOff,
   Play,
 } from 'lucide-react';
-import p5 from 'p5';
 
-interface P5RunnerProps {
+interface ThreeRunnerProps {
   code: string;
   title?: string;
   showCode?: boolean;
@@ -25,23 +29,22 @@ interface P5RunnerProps {
   className?: string;
 }
 
-export function P5Runner({
+export function ThreeRunner({
   code,
-  title = 'p5.js Sketch',
+  title = 'Three.js Scene',
   showCode = true,
   height = 400,
   className = '',
-}: P5RunnerProps) {
+}: ThreeRunnerProps) {
   const [editorCode, setEditorCode] = useState(code);
   const [error, setError] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [codeVisible, setCodeVisible] = useState(showCode);
   const [originalCode] = useState(code);
+  const [SceneComponent, setSceneComponent] = useState<React.ComponentType | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
-  const canvasContainerRef = useRef<HTMLDivElement>(null);
-  const p5InstanceRef = useRef<p5 | null>(null);
 
   // Initialize CodeMirror
   useEffect(() => {
@@ -49,7 +52,7 @@ export function P5Runner({
 
     const extensions = [
       basicSetup,
-      javascript(),
+      javascript({ jsx: true, typescript: true }),
       oneDark,
       EditorView.lineWrapping,
       EditorView.updateListener.of((update) => {
@@ -78,64 +81,63 @@ export function P5Runner({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [codeVisible]);
 
-  // Run p5.js sketch
-  const runSketch = useCallback((sketchCode: string) => {
-    if (!canvasContainerRef.current) return;
-
-    // Clean up previous instance
-    if (p5InstanceRef.current) {
-      p5InstanceRef.current.remove();
-      p5InstanceRef.current = null;
-    }
-
-    // Clear container
-    canvasContainerRef.current.innerHTML = '';
-
+  // Compile and run Three.js scene
+  const runScene = useCallback((sceneCode: string) => {
     try {
       setError(null);
 
-      // Create the sketch function
-      const sketch = new Function('p', sketchCode);
+      // Transpile JSX to JavaScript using Babel
+      const transpiledCode = Babel.transform(sceneCode, {
+        presets: ['react'],
+        filename: 'scene.jsx',
+      }).code;
 
-      // Get container width for responsive canvas
-      const containerWidth = canvasContainerRef.current.clientWidth || 600;
+      // Create a function that returns a component
+      const componentCreator = new Function(
+        'React',
+        'THREE',
+        'useFrame',
+        'useThree',
+        'useRef',
+        'useState',
+        'useEffect',
+        'useMemo',
+        'Html',
+        `
+        ${transpiledCode}
+        return Scene;
+        `
+      );
 
-      // Create new p5 instance
-      p5InstanceRef.current = new p5((p: p5) => {
-        // Make container width available to sketch
-        (p as p5 & { containerWidth: number }).containerWidth = containerWidth;
+      // Call with imported dependencies
+      const Component = componentCreator(
+        React,
+        THREE,
+        useFrame,
+        useThree,
+        useRef,
+        useState,
+        useEffect,
+        useMemo,
+        Html
+      );
 
-        try {
-          sketch(p);
-        } catch (err) {
-          setError((err as Error).message);
-          console.error('p5.js sketch error:', err);
-        }
-      }, canvasContainerRef.current);
+      setSceneComponent(() => Component);
     } catch (err) {
       setError((err as Error).message);
-      console.error('p5.js execution error:', err);
+      console.error('Three.js scene error:', err);
+      setSceneComponent(null);
     }
   }, []);
 
-  // Run sketch when code changes (debounced)
+  // Run scene when code changes (debounced)
   useEffect(() => {
     const timer = setTimeout(() => {
-      runSketch(editorCode);
+      runScene(editorCode);
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [editorCode, runSketch]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (p5InstanceRef.current) {
-        p5InstanceRef.current.remove();
-        p5InstanceRef.current = null;
-      }
-    };
-  }, []);
+  }, [editorCode, runScene]);
 
   const handleCopy = useCallback(async () => {
     try {
@@ -163,8 +165,8 @@ export function P5Runner({
   }, [isFullscreen]);
 
   const handleRerun = useCallback(() => {
-    runSketch(editorCode);
-  }, [editorCode, runSketch]);
+    runScene(editorCode);
+  }, [editorCode, runScene]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -186,7 +188,7 @@ export function P5Runner({
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700">
         <div className="flex items-center gap-3">
-          <Code size={18} className="text-pink-400" />
+          <Code size={18} className="text-cyan-400" />
           <span className="text-sm font-medium text-slate-200">{title}</span>
         </div>
         <div className="flex items-center gap-1 sm:gap-2">
@@ -265,10 +267,14 @@ export function P5Runner({
 
       {/* Canvas Output */}
       <div
-        className="relative bg-white w-full overflow-hidden"
+        className="relative bg-black"
         style={{ height: isFullscreen ? 'calc(100vh - 200px)' : height }}
       >
-        <div ref={canvasContainerRef} className="w-full h-full" />
+        <Canvas camera={{ position: [0, 0, 5], fov: 75 }}>
+          <Suspense fallback={null}>
+            {SceneComponent && <SceneComponent />}
+          </Suspense>
+        </Canvas>
       </div>
     </div>
   );
