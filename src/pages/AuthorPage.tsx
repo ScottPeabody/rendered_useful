@@ -44,7 +44,7 @@ export default function AuthorPage() {
               className="w-32 h-32 rounded-2xl ring-4 ring-[var(--color-border)]"
             />
             {author.isCoreMaintainer && (
-              <div className="absolute -bottom-2 -right-2 px-2 py-1 text-xs font-medium bg-[var(--color-accent-primary)] text-white rounded-full">
+              <div className="absolute -bottom-2 -right-2 px-2 py-1 text-xs font-medium bg-[var(--color-accent-primary)] text-[var(--color-accent-contrast)] rounded-full">
                 Core
               </div>
             )}
@@ -163,7 +163,7 @@ export default function AuthorPage() {
                     className="group relative p-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-accent-primary)]/50 hover:bg-[var(--color-surface-elevated)] transition-all"
                   >
                     {isMainSpace && (
-                      <div className="absolute top-3 right-3 px-2 py-1 text-xs font-medium bg-[var(--color-accent-primary)] text-white rounded-full">
+                      <div className="absolute top-3 right-3 px-2 py-1 text-xs font-medium bg-[var(--color-accent-primary)] text-[var(--color-accent-contrast)] rounded-full">
                         Main
                       </div>
                     )}

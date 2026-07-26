@@ -262,7 +262,7 @@ export function NotebookRenderer({ notebookUrl }: NotebookRendererProps) {
           <p className="text-red-400 mb-4">{error || 'Failed to load notebook'}</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-4 py-2 rounded bg-[var(--color-accent-primary)] text-white hover:opacity-90"
+            className="px-4 py-2 rounded bg-[var(--color-accent-primary)] text-[var(--color-accent-contrast)] hover:opacity-90"
           >
             Try Again
           </button>

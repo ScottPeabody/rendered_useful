@@ -272,7 +272,7 @@ export default function CodePlayground({
             onClick={() => setShowConsole(!showConsole)}
             className={`px-2 py-1 text-xs rounded transition-colors ${
               showConsole 
-                ? 'bg-[var(--color-accent-primary)] text-white' 
+                ? 'bg-[var(--color-accent-primary)] text-[var(--color-accent-contrast)]' 
                 : 'bg-[var(--color-surface)] text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]'
             }`}
           >

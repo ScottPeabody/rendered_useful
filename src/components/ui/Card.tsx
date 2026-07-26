@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { ExternalLink, Github, Calendar, Clock } from 'lucide-react'
 import Tag from './Tag'
 import { getAuthor } from '../../data/content'
@@ -52,10 +51,8 @@ export default function Card({
   // List variant
   if (variant === 'list') {
     return (
-      <motion.article
-        whileHover={{ x: 4 }}
-        transition={{ duration: 0.2 }}
-        className={`group relative flex items-start gap-4 p-4 bg-[var(--color-surface)] rounded-xl border border-[var(--color-border)] card-hover ${className}`}
+      <article
+        className={`group relative flex items-start gap-4 p-4 bg-[var(--color-surface)] rounded-lg border border-[var(--color-border)] card-hover ${className}`}
       >
         {/* Cover Image (smaller for list) */}
         {coverImage && (
@@ -63,7 +60,7 @@ export default function Card({
             <img
               src={coverImage}
               alt={title}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className="w-full h-full object-cover"
             />
           </Link>
         )}
@@ -78,7 +75,7 @@ export default function Card({
               </h3>
             </Link>
             {featured && (
-              <span className="shrink-0 px-2 py-0.5 text-xs font-medium bg-[var(--color-accent-primary)] text-white rounded-full">
+              <span className="shrink-0 px-2 py-0.5 text-xs font-medium bg-[var(--color-accent-primary)] text-[var(--color-accent-contrast)] rounded-full">
                 Featured
               </span>
             )}
@@ -159,16 +156,14 @@ export default function Card({
             )}
           </div>
         </div>
-      </motion.article>
+      </article>
     )
   }
 
   // Card variant (default)
   return (
-    <motion.article
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.2 }}
-      className={`group relative flex flex-col bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] overflow-hidden card-hover ${className}`}
+    <article
+      className={`group relative flex flex-col bg-[var(--color-surface)] rounded-lg border border-[var(--color-border)] overflow-hidden card-hover ${className}`}
     >
       {/* Cover Image */}
       {coverImage && (
@@ -176,11 +171,11 @@ export default function Card({
           <img
             src={coverImage}
             alt={title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-cover"
           />
           {/* Featured Badge - on cover image if present */}
           {featured && (
-            <div className="absolute top-3 right-3 px-2 py-1 text-xs font-medium bg-[var(--color-accent-primary)] text-white rounded-full">
+            <div className="absolute top-3 right-3 px-2 py-1 text-xs font-medium bg-[var(--color-accent-primary)] text-[var(--color-accent-contrast)] rounded-full">
               Featured
             </div>
           )}
@@ -201,7 +196,7 @@ export default function Card({
           </div>
           {/* Featured Badge - inline if no cover image */}
           {featured && !coverImage && (
-            <span className="shrink-0 px-2 py-1 text-xs font-medium bg-[var(--color-accent-primary)] text-white rounded-full">
+            <span className="shrink-0 px-2 py-1 text-xs font-medium bg-[var(--color-accent-primary)] text-[var(--color-accent-contrast)] rounded-full">
               Featured
             </span>
           )}
@@ -275,7 +270,7 @@ export default function Card({
                 href={demoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium !text-white bg-[var(--color-accent-primary)] hover:bg-[var(--color-accent-secondary)] rounded-lg transition-colors"
+                className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium !text-[var(--color-accent-contrast)] bg-[var(--color-accent-primary)] hover:bg-[var(--color-accent-secondary)] rounded-lg transition-colors"
               >
                 <ExternalLink size={14} />
                 Demo
@@ -295,6 +290,6 @@ export default function Card({
           </div>
         )}
       </div>
-    </motion.article>
+    </article>
   )
 }

@@ -115,7 +115,7 @@ export default function ProjectsPage() {
                   onClick={() => setViewMode('grid')}
                   className={`p-2 rounded-md transition-colors ${
                     viewMode === 'grid'
-                      ? 'bg-[var(--color-accent-primary)] text-white'
+                      ? 'bg-[var(--color-accent-primary)] text-[var(--color-accent-contrast)]'
                       : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
                   }`}
                 >
@@ -125,7 +125,7 @@ export default function ProjectsPage() {
                   onClick={() => setViewMode('list')}
                   className={`p-2 rounded-md transition-colors ${
                     viewMode === 'list'
-                      ? 'bg-[var(--color-accent-primary)] text-white'
+                      ? 'bg-[var(--color-accent-primary)] text-[var(--color-accent-contrast)]'
                       : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
                   }`}
                 >
@@ -144,7 +144,7 @@ export default function ProjectsPage() {
                 onClick={() => setSelectedType(type.value)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   selectedType === type.value
-                    ? 'bg-[var(--color-accent-primary)] text-white'
+                    ? 'bg-[var(--color-accent-primary)] text-[var(--color-accent-contrast)]'
                     : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] border border-[var(--color-border)]'
                 }`}
               >

@@ -57,7 +57,7 @@ export default function LayoutSelector({ defaultLayout = 'default', onChange }: 
               onClick={() => handleChange(name)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 currentLayout === name
-                  ? 'bg-[var(--color-accent-primary)] text-white'
+                  ? 'bg-[var(--color-accent-primary)] text-[var(--color-accent-contrast)]'
                   : 'bg-[var(--color-surface-elevated)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
               }`}
             >

@@ -152,7 +152,7 @@ export function JupyterLiteEmbed({
               <p className="text-red-500">{error}</p>
               <button
                 onClick={handleReset}
-                className="px-4 py-2 rounded bg-[var(--color-accent-primary)] text-white hover:opacity-90 transition-opacity"
+                className="px-4 py-2 rounded bg-[var(--color-accent-primary)] text-[var(--color-accent-contrast)] hover:opacity-90 transition-opacity"
               >
                 Try Again
               </button>

@@ -16,7 +16,7 @@ interface ButtonProps {
 }
 
 const variantClasses = {
-  primary: 'bg-[var(--color-accent-primary)] hover:bg-[var(--color-accent-secondary)] !text-white shadow-lg shadow-[var(--color-accent-primary)]/25',
+  primary: 'bg-[var(--color-accent-primary)] hover:bg-[var(--color-accent-secondary)] !text-[var(--color-accent-contrast)]',
   secondary: 'bg-[var(--color-surface-elevated)] hover:bg-[var(--color-border)] text-[var(--color-text-primary)]',
   ghost: 'hover:bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]',
   outline: 'border border-[var(--color-border)] hover:border-[var(--color-accent-primary)] text-[var(--color-text-secondary)] hover:text-[var(--color-accent-primary)]',
@@ -29,12 +29,10 @@ const sizeClasses = {
 }
 
 const motionProps = {
-  whileHover: { scale: 1.02 },
   whileTap: { scale: 0.98 },
 }
 
 const disabledMotionProps = {
-  whileHover: { scale: 1 },
   whileTap: { scale: 1 },
 }
 
@@ -50,7 +48,7 @@ export default function Button({
   icon,
   iconPosition = 'left',
 }: ButtonProps) {
-  const baseClass = `inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 ${variantClasses[variant]} ${sizeClasses[size]} ${
+  const baseClass = `inline-flex items-center justify-center font-medium rounded-lg transition-colors duration-200 ${variantClasses[variant]} ${sizeClasses[size]} ${
     disabled ? 'opacity-50 cursor-not-allowed' : ''
   } ${className}`
 

@@ -28,7 +28,9 @@ export default function Footer() {
           {/* Brand */}
           <div className="md:col-span-2">
             <Link to="/" className="inline-block">
-              <span className="font-bold text-xl gradient-text">rendered_useful</span>
+              <span className="font-mono font-medium text-lg text-[var(--color-text-primary)]">
+                rendered<span className="text-[var(--color-accent-primary)]">_</span>useful
+              </span>
             </Link>
             <p className="mt-4 text-[var(--color-text-muted)] max-w-sm">
               A collaborative platform for developers to share projects, articles, and ideas. 

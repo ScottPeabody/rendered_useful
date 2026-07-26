@@ -121,11 +121,13 @@ export default function Navbar() {
           {/* Logo */}
           <Link
             to="/"
-            className={`flex items-center gap-2 font-bold text-[var(--color-text-primary)] hover:text-[var(--color-accent-primary)] transition-colors ${
-              navbarStyle === 'minimal' ? 'text-lg' : 'text-xl'
+            className={`flex items-center gap-2 font-mono font-medium text-[var(--color-text-primary)] hover:text-[var(--color-accent-primary)] transition-colors ${
+              navbarStyle === 'minimal' ? 'text-base' : 'text-lg'
             }`}
           >
-            <span className="gradient-text">rendered_useful</span>
+            <span>
+              rendered<span className="text-[var(--color-accent-primary)]">_</span>useful
+            </span>
           </Link>
 
           {/* Desktop Navigation */}

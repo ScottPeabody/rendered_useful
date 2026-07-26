@@ -115,7 +115,7 @@ export default function NotebooksPage() {
                 onClick={() => setViewMode('grid')}
                 className={`p-2 rounded-lg transition-colors ${
                   viewMode === 'grid'
-                    ? 'bg-[var(--color-accent-primary)] text-white'
+                    ? 'bg-[var(--color-accent-primary)] text-[var(--color-accent-contrast)]'
                     : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
                 }`}
                 aria-label="Grid view"
@@ -126,7 +126,7 @@ export default function NotebooksPage() {
                 onClick={() => setViewMode('list')}
                 className={`p-2 rounded-lg transition-colors ${
                   viewMode === 'list'
-                    ? 'bg-[var(--color-accent-primary)] text-white'
+                    ? 'bg-[var(--color-accent-primary)] text-[var(--color-accent-contrast)]'
                     : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
                 }`}
                 aria-label="List view"
@@ -144,7 +144,7 @@ export default function NotebooksPage() {
                 onClick={() => setSelectedKernel(option.value)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   selectedKernel === option.value
-                    ? 'bg-[var(--color-accent-primary)] text-white'
+                    ? 'bg-[var(--color-accent-primary)] text-[var(--color-accent-contrast)]'
                     : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] border border-[var(--color-border)]'
                 }`}
               >

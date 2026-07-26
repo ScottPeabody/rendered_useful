@@ -453,7 +453,7 @@ export default function EditPage() {
           <button
             onClick={handleSave}
             disabled={isSaving || !hasUnsavedChanges}
-            className="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium bg-[var(--color-accent-primary)] text-white rounded-lg hover:bg-[var(--color-accent-secondary)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium bg-[var(--color-accent-primary)] text-[var(--color-accent-contrast)] rounded-lg hover:bg-[var(--color-accent-secondary)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSaving ? 'Saving...' : 'Save'}
           </button>
@@ -507,7 +507,7 @@ export default function EditPage() {
             onClick={() => setViewMode('edit')}
             className={`px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium rounded-md transition-colors ${
               viewMode === 'edit'
-                ? 'bg-[var(--color-accent-primary)] text-white'
+                ? 'bg-[var(--color-accent-primary)] text-[var(--color-accent-contrast)]'
                 : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-elevated)]'
             }`}
           >
@@ -517,7 +517,7 @@ export default function EditPage() {
             onClick={() => setViewMode('preview')}
             className={`px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium rounded-md transition-colors ${
               viewMode === 'preview'
-                ? 'bg-[var(--color-accent-primary)] text-white'
+                ? 'bg-[var(--color-accent-primary)] text-[var(--color-accent-contrast)]'
                 : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-elevated)]'
             }`}
           >

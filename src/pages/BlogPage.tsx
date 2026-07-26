@@ -101,7 +101,7 @@ export default function BlogPage() {
                   onClick={() => setViewMode('grid')}
                   className={`p-2 rounded-md transition-colors ${
                     viewMode === 'grid'
-                      ? 'bg-[var(--color-accent-primary)] text-white'
+                      ? 'bg-[var(--color-accent-primary)] text-[var(--color-accent-contrast)]'
                       : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
                   }`}
                 >
@@ -111,7 +111,7 @@ export default function BlogPage() {
                   onClick={() => setViewMode('list')}
                   className={`p-2 rounded-md transition-colors ${
                     viewMode === 'list'
-                      ? 'bg-[var(--color-accent-primary)] text-white'
+                      ? 'bg-[var(--color-accent-primary)] text-[var(--color-accent-contrast)]'
                       : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
                   }`}
                 >

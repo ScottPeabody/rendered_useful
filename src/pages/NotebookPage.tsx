@@ -140,7 +140,7 @@ export default function NotebookPage() {
                   onClick={() => handleViewModeChange('rendered')}
                   className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors ${
                     viewMode === 'rendered'
-                      ? 'bg-[var(--color-accent-primary)] text-white'
+                      ? 'bg-[var(--color-accent-primary)] text-[var(--color-accent-contrast)]'
                       : 'bg-[var(--color-surface)] text-[var(--color-text-primary)] hover:bg-[var(--color-border)]/50'
                   }`}
                   title="Run code interactively in browser with Pyodide"
@@ -152,7 +152,7 @@ export default function NotebookPage() {
                   onClick={() => handleViewModeChange('jupyterlab')}
                   className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors border-l border-[var(--color-border)] ${
                     viewMode === 'jupyterlab'
-                      ? 'bg-[var(--color-accent-primary)] text-white'
+                      ? 'bg-[var(--color-accent-primary)] text-[var(--color-accent-contrast)]'
                       : 'bg-[var(--color-surface)] text-[var(--color-text-primary)] hover:bg-[var(--color-border)]/50'
                   }`}
                   title="Open in full JupyterLab interface"

@@ -139,7 +139,7 @@ export default function ContentList({
               onClick={() => setViewMode('grid')}
               className={`p-2 rounded-md transition-colors ${
                 viewMode === 'grid'
-                  ? 'bg-[var(--color-accent-primary)] text-white'
+                  ? 'bg-[var(--color-accent-primary)] text-[var(--color-accent-contrast)]'
                   : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
               }`}
               title="Grid view"
@@ -150,7 +150,7 @@ export default function ContentList({
               onClick={() => setViewMode('list')}
               className={`p-2 rounded-md transition-colors ${
                 viewMode === 'list'
-                  ? 'bg-[var(--color-accent-primary)] text-white'
+                  ? 'bg-[var(--color-accent-primary)] text-[var(--color-accent-contrast)]'
                   : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
               }`}
               title="List view"
@@ -223,7 +223,7 @@ export default function ContentList({
                   onClick={() => goToPage(page)}
                   className={`min-w-[36px] h-9 px-3 rounded-lg text-sm font-medium transition-colors ${
                     currentPage === page
-                      ? 'bg-[var(--color-accent-primary)] text-white'
+                      ? 'bg-[var(--color-accent-primary)] text-[var(--color-accent-contrast)]'
                       : 'border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)]'
                   }`}
                 >
