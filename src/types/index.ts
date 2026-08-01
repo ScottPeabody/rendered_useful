@@ -327,10 +327,14 @@ export interface FeedInfo extends Feed {
   posts: PostInfo[]
 }
 
-// Space: A user's customizable page
+// Space: a customizable multi-page site at /@slug
+// Invariant: exactly one of `author` / `group` is set; `alias` implies `author`.
 export interface Space extends Versionable {
-  author: string          // author slug
+  slug: string            // unique @-handle (author slug, alias slug, or group slug)
+  author?: string         // author slug (unset for group-owned spaces)
   alias?: string          // alias slug (if this is an alias space)
+  group?: string          // group slug (set only for group-owned spaces)
+  defaultPage?: string    // page slug rendered at /@slug (default 'feed')
   theme?: string          // theme slug
   layout?: string         // layout slug
   bio?: string            // space-specific bio (can differ from author bio)
@@ -338,9 +342,32 @@ export interface Space extends Versionable {
     type: 'article' | 'project' | 'post'
     slug: string
   }>
+  /** @deprecated superseded by spacePages (see SpacePageDef) */
   sections?: string[]     // ordered list of sections to show: 'feed', 'articles', 'projects', 'about'
   feeds?: string[]        // which feeds to show (if multiple)
   defaultFeed?: string    // which feed to show by default
+}
+
+// Group: a set of authors sharing a space. Declarative only — no auth/permissions.
+export interface Group {
+  slug: string            // shares the @ namespace with author + alias slugs
+  name: string
+  description: string
+  avatar?: string
+  members: string[]       // author slugs
+  owner?: string          // author slug — primary maintainer
+  createdDate: string
+}
+
+// SpacePageDef: registry entry for one page of a space
+export interface SpacePageDef {
+  space: string           // Space.slug
+  slug: string            // page slug — '/@handle/<slug>'; 'posts' and 'feeds' are RESERVED
+  title: string           // nav tab label
+  order: number           // ascending sort in nav
+  showInNav?: boolean     // default true; false = reachable but not tabbed
+  builtin?: 'feed'        // built-in page type; absent ⇒ MDX at content/spaces/<space>/<slug>.mdx
+  description?: string
 }
 
 // Alias: An alternate identity under the same account

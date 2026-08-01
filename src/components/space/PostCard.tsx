@@ -40,7 +40,7 @@ export function PostCard({ post, showAuthor = false, compact = false }: PostCard
     : post.content
 
   return (
-    <article className="group border-b border-gray-200 dark:border-gray-700 pb-6 mb-6 last:border-b-0 last:mb-0 last:pb-0">
+    <article className="group border-b border-[var(--color-border)] pb-6 mb-6 last:border-b-0 last:mb-0 last:pb-0">
       {/* Header: Author + Time */}
       <div className="flex items-center gap-3 mb-3">
         {showAuthor && author && (
@@ -56,24 +56,24 @@ export function PostCard({ post, showAuthor = false, compact = false }: PostCard
                   className="w-8 h-8 rounded-full object-cover"
                 />
               )}
-              <span className="font-medium text-gray-900 dark:text-gray-100">
+              <span className="font-medium text-[var(--color-text-primary)]">
                 {author.name}
               </span>
             </Link>
-            <span className="text-gray-400">·</span>
+            <span className="text-[var(--color-text-muted)]">·</span>
           </>
         )}
         <time 
           dateTime={post.date}
-          className="text-sm text-gray-500 dark:text-gray-400"
+          className="text-sm text-[var(--color-text-muted)]"
           title={new Date(post.date).toLocaleString()}
         >
           {timeAgo}
         </time>
         {post.pinned && (
           <>
-            <span className="text-gray-400">·</span>
-            <span className="text-xs font-medium text-amber-600 dark:text-amber-400 flex items-center gap-1">
+            <span className="text-[var(--color-text-muted)]">·</span>
+            <span className="text-xs font-medium text-[var(--color-accent-warning)] flex items-center gap-1">
               📌 Pinned
             </span>
           </>
@@ -86,7 +86,7 @@ export function PostCard({ post, showAuthor = false, compact = false }: PostCard
           to={`/@${post.author}/posts/${post.slug}`}
           className="block mb-2"
         >
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-accent-primary)] transition-colors">
             {post.title}
           </h3>
         </Link>
@@ -97,7 +97,7 @@ export function PostCard({ post, showAuthor = false, compact = false }: PostCard
         to={`/@${post.author}/posts/${post.slug}`}
         className="block"
       >
-        <div className="prose prose-sm dark:prose-invert max-w-none text-gray-700 dark:text-gray-300">
+        <div className="prose prose-sm dark:prose-invert max-w-none text-[var(--color-text-secondary)]">
           {/* Simple markdown-like rendering - in real app, use MDX */}
           <div className="whitespace-pre-wrap">
             {displayContent.split('```').map((segment, i) => {
@@ -109,7 +109,7 @@ export function PostCard({ post, showAuthor = false, compact = false }: PostCard
                 return (
                   <pre 
                     key={i} 
-                    className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 my-3 overflow-x-auto text-sm"
+                    className="bg-[var(--color-surface-elevated)] rounded-lg p-4 my-3 overflow-x-auto text-sm"
                   >
                     <code className={`language-${language}`}>{code}</code>
                   </pre>
@@ -132,7 +132,7 @@ export function PostCard({ post, showAuthor = false, compact = false }: PostCard
 
       {/* Series indicator */}
       {post.series && (
-        <div className="mt-3 text-sm text-gray-500 dark:text-gray-400">
+        <div className="mt-3 text-sm text-[var(--color-text-muted)]">
           Part of series: <span className="font-medium">{post.series}</span>
           {post.seriesOrder && ` (#${post.seriesOrder})`}
         </div>
@@ -140,9 +140,9 @@ export function PostCard({ post, showAuthor = false, compact = false }: PostCard
 
       {/* Feed indicators */}
       {post.feeds && post.feeds.length > 1 && (
-        <div className="flex gap-2 mt-3 text-xs text-gray-400 dark:text-gray-500">
+        <div className="flex gap-2 mt-3 text-xs text-[var(--color-text-muted)]">
           {post.feeds.map((feed) => (
-            <span key={feed} className="bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded">
+            <span key={feed} className="bg-[var(--color-surface-elevated)] px-2 py-0.5 rounded">
               #{feed}
             </span>
           ))}

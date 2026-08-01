@@ -43,6 +43,23 @@ export interface ProjectFrontmatter {
   contentWidth?: 'narrow' | 'default' | 'wide' | 'full'
 }
 
+export interface SpacePageFrontmatter {
+  title: string
+  description?: string
+  author?: string         // author slug — page attribution (mainly for group spaces)
+  date?: string
+  // Theme customization — overrides the space's theme for this page
+  theme?: string
+  // Layout customization — overrides the space's layout for this page
+  layout?: string
+  // Individual layout overrides
+  hideNavbar?: boolean
+  hideFooter?: boolean
+  contentWidth?: 'narrow' | 'default' | 'wide' | 'full'
+  verticalSpacing?: 'compact' | 'default' | 'relaxed'
+  showSpaceHeader?: boolean // default true; false = immersive page without the profile header
+}
+
 export interface MDXModule<T> {
   default: ComponentType
   frontmatter?: T
@@ -55,6 +72,12 @@ const articleModules = import.meta.glob<MDXModule<ArticleFrontmatter>>(
 
 const projectModules = import.meta.glob<MDXModule<ProjectFrontmatter>>(
   '/content/projects/*.mdx',
+  { eager: false }
+)
+
+// Space pages live exactly one directory deep: content/spaces/<space>/<page>.mdx
+const spacePageModules = import.meta.glob<MDXModule<SpacePageFrontmatter>>(
+  '/content/spaces/*/*.mdx',
   { eager: false }
 )
 
@@ -104,6 +127,29 @@ export async function loadProject(slug: string): Promise<{
   }
 }
 
+export async function loadSpacePage(spaceSlug: string, pageSlug: string): Promise<{
+  Content: ComponentType
+  frontmatter: SpacePageFrontmatter
+} | null> {
+  const path = `/content/spaces/${spaceSlug}/${pageSlug}.mdx`
+  const loader = spacePageModules[path]
+
+  if (!loader) {
+    return null
+  }
+
+  try {
+    const module = await loader()
+    return {
+      Content: module.default,
+      frontmatter: module.frontmatter || {} as SpacePageFrontmatter,
+    }
+  } catch (error) {
+    console.error(`Failed to load space page: ${spaceSlug}/${pageSlug}`, error)
+    return null
+  }
+}
+
 // Check if an article MDX file exists
 export function hasArticleMDX(slug: string): boolean {
   return `/content/articles/${slug}.mdx` in articleModules
@@ -112,4 +158,9 @@ export function hasArticleMDX(slug: string): boolean {
 // Check if a project MDX file exists
 export function hasProjectMDX(slug: string): boolean {
   return `/content/projects/${slug}.mdx` in projectModules
+}
+
+// Check if a space page MDX file exists
+export function hasSpacePageMDX(spaceSlug: string, pageSlug: string): boolean {
+  return `/content/spaces/${spaceSlug}/${pageSlug}.mdx` in spacePageModules
 }

@@ -1,0 +1,31 @@
+---
+title: "Uses"
+description: "Tools and setup."
+contentWidth: "narrow"
+date: "2026-08-01T12:00:00"
+---
+
+# Uses
+
+The obligatory tools page. This one demonstrates an *individual* layout override: no preset, just `contentWidth: narrow` in the frontmatter.
+
+## Editor
+
+- **VS Code** with the Claude Code extension doing most of the typing lately
+- Theme: whatever matches the site's warm-ink dark mode closest this week
+- Font: JetBrains Mono, same as the site's wordmark
+
+## Stack
+
+- **React 19 + TypeScript**: strict mode, no exceptions
+- **Vite**: the MDX pipeline in this site compiles every page to its own chunk
+- **Tailwind v4**: CSS-first config; all colors go through `var(--color-*)` tokens
+
+## Hardware
+
+- A laptop that gets too hot running the in-browser JupyterLab
+- A second monitor that's permanently a dev-tools window
+
+<Callout type="tip" title="Convention over configuration">
+  The real tool is the PR workflow: content is files in git. This page shipped the same way an article does.
+</Callout>

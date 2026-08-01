@@ -1,0 +1,91 @@
+---
+title: "Building Multi-Page Spaces: Groups in the @ Namespace"
+description: "Extending space ownership beyond a single author: a declarative Group model, handle resolution across authors, aliases, and groups, and shared feeds without a backend."
+date: "2026-08-03T12:00:00"
+author: "scott-peabody"
+tags: ["react", "typescript", "features", "design", "architecture"]
+series: "multi-page-spaces"
+seriesOrder: 3
+readingTime: 8
+---
+
+The [personal spaces feature](/articles/building-personal-spaces) had a quiet assumption baked into its data model: every space belongs to exactly one author. Aliases bent that rule (one author, many identities) but never broke it. This final part breaks it. A space can now belong to a **group**, and the ultimate goal of this whole series lands: people can share a space they build together.
+
+<Callout type="info" title="Try It">
+  [/@render-lab](/@render-lab) is the first group space: two members, a shared About page as the default, an Activity feed that interleaves both members' posts, and pages with individual bylines.
+</Callout>
+
+## Groups are data, not accounts
+
+There's no sign-up flow, no permissions table, no backend. A group is a registry entry like everything else on this site:
+
+```typescript
+export interface Group {
+  slug: string            // shares the @ namespace with authors and aliases
+  name: string
+  description: string
+  members: string[]       // author slugs
+  owner?: string          // primary maintainer; declarative only
+  createdDate: string
+}
+```
+
+This looks like a limitation. I think it's the honest design for a git-based platform: **the pull request review process already is the permission system.** Want to add a page to Render Lab? Open a PR. A member will review it. Adding auth on top would duplicate, badly, what the repo already does well.
+
+## One namespace, three kinds of owner
+
+The decision I went back and forth on: do groups live at `/@render-lab` or at `/g/render-lab`? Splitting the namespace felt safer, but it fractures the concept. A space is a space; the URL shouldn't make you care what species of owner it has.
+
+So handles resolve through one function, in priority order:
+
+```typescript
+export const resolveSpaceHandle = (handle: string): ResolvedSpaceHandle | undefined => {
+  const author = getAuthor(handle)
+  if (author) return { kind: 'author', author, space: getSpace(author.slug) }
+
+  const aliasSpace = getSpaceByAlias(handle)
+  if (aliasSpace?.author) { /* ... kind: 'alias' ... */ }
+
+  const group = getGroup(handle)
+  if (group) { /* ... kind: 'group' ... */ }
+}
+```
+
+The discriminated union does the heavy lifting downstream. `SpacePage` switches on `kind` exactly once, to decide where the feed content comes from, and everything else (pages, nav, themes, layouts from [part two](/articles/building-per-page-themes-layouts)) is identical across all three kinds.
+
+The cost of a shared namespace is collisions: an author named `render-lab` would shadow the group. The resolution order makes that deterministic, and a dev-mode warning flags any handle that matches more than one identity. Small price for one coherent concept.
+
+## The shared feed is a query, not a thing
+
+Group members post to their own spaces, as themselves. The group's Activity feed is derived: the union of members' public posts, newest first:
+
+```typescript
+export const getPostsByGroup = (groupSlug: string, count = 10): Post[] => {
+  const group = getGroup(groupSlug)
+  if (!group) return []
+  return posts
+    .filter((p) => p.visibility === 'public' && !p.alias && group.members.includes(p.author))
+    .sort((a, b) => compareDates(a.date, b.date))
+    .slice(0, count)
+}
+```
+
+No group-owned `Feed` entities in v1, no cross-posting mechanics, no syndication rules. If a post is by a member, it shows up. This is deliberately the dumbest thing that works. The dashboard extraction from [part one](/articles/building-multi-page-spaces) means a smarter version later is a data-layer change, not a UI rewrite.
+
+Attribution flips on automatically: the group feed renders each post with its author's name and avatar, because for the first time "whose post is this?" isn't answerable from the URL.
+
+## Pages get bylines
+
+Group pages have one addition over personal pages: `author` in frontmatter. The [About page](/@render-lab) is mine; the [Roadmap](/@render-lab/roadmap) is Ada's. Same space, different voices, and the byline links back to each member's personal space.
+
+<Callout type="tip" title="The arc of this series">
+  Part one made spaces plural inside (many pages). Part two made pages individual (own themes, layouts, components). Part three made spaces plural outside (many owners). Each step leaned on the last: group spaces would have been a rewrite without the page model, and pointless without per-page identity.
+</Callout>
+
+## What I didn't build
+
+- **Auth and roles**: see above; the repo is the source of truth
+- **Group aliases**: a group pretending to be other groups is a novel I don't want to read
+- **Membership UI**: joining a group is a one-line PR to the registry
+
+The platform now has a complete answer to "where does collaborative work live?", and it took three data types, one route, and zero servers.

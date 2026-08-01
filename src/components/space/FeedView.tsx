@@ -44,7 +44,7 @@ export function FeedView({
 
   if (sortedPosts.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+      <div className="text-center py-12 text-[var(--color-text-muted)]">
         <p>{emptyMessage}</p>
       </div>
     )
@@ -53,21 +53,21 @@ export function FeedView({
   return (
     <div className="space-y-0">
       {feed && (
-        <header className="mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+        <header className="mb-6 pb-4 border-b border-[var(--color-border)]">
           <div className="flex items-center gap-2">
             {feed.icon && <span className="text-xl">{feed.icon}</span>}
             <h2 
-              className="text-xl font-semibold text-gray-900 dark:text-gray-100"
+              className="text-xl font-semibold text-[var(--color-text-primary)]"
               style={{ color: feed.color }}
             >
               {feed.name}
             </h2>
           </div>
           {feed.description && (
-            <p className="mt-1 text-gray-600 dark:text-gray-400">{feed.description}</p>
+            <p className="mt-1 text-[var(--color-text-secondary)]">{feed.description}</p>
           )}
           {'postCount' in feed && (
-            <p className="mt-1 text-sm text-gray-400 dark:text-gray-500">
+            <p className="mt-1 text-sm text-[var(--color-text-muted)]">
               {feed.postCount} {feed.postCount === 1 ? 'post' : 'posts'}
             </p>
           )}

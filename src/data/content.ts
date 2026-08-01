@@ -1,4 +1,4 @@
-import type { Author, Article, Project, TagInfo, Community, CommunityInfo, Series, SeriesInfo, Event, EventInfo, VersionInfo, Versionable, Concept, ConceptInfo, Language, LanguageInfo, Location, LocationInfo, Post, PostInfo, Feed, FeedInfo, Space, Notebook } from '../types'
+import type { Author, Article, Project, TagInfo, Community, CommunityInfo, Series, SeriesInfo, Event, EventInfo, VersionInfo, Versionable, Concept, ConceptInfo, Language, LanguageInfo, Location, LocationInfo, Post, PostInfo, Feed, FeedInfo, Space, Group, SpacePageDef, Notebook } from '../types'
 import { compareDates, getEventStatus } from '../lib/time'
 
 // ============================================
@@ -452,6 +452,15 @@ export const series: Series[] = [
     tags: ['d3', 'charts', 'visualization', 'data'],
     createdDate: '2026-01-22',
   },
+  {
+    slug: 'multi-page-spaces',
+    title: 'Multi-Page Spaces',
+    description: 'A build log on turning personal spaces into multi-page, multi-owner sites: everything-is-a-page, per-page themes and layouts, and shared group spaces.',
+    status: 'completed',
+    community: 'rendered-useful',
+    tags: ['architecture', 'features', 'design', 'react'],
+    createdDate: '2026-08-01',
+  },
 ]
 
 export const communities: Community[] = [
@@ -510,9 +519,60 @@ export const authors: Author[] = [
     joinedDate: '2021-01-01',
     isCoreMaintainer: true,
   },
+  {
+    slug: 'ada-quill',
+    name: 'Ada Quill',
+    avatar: 'https://api.dicebear.com/9.x/shapes/svg?seed=ada-quill',
+    bio: 'Systems tinkerer and reluctant frontend developer. Half of Render Lab.',
+    role: 'Contributor',
+    joinedDate: '2026-06-01',
+  },
 ]
 
 export const articles: Article[] = [
+  {
+    slug: 'building-multi-page-spaces',
+    title: 'Building Multi-Page Spaces: Everything Is a Page',
+    description: 'How I turned personal spaces from a single hardcoded dashboard into an ordered collection of pages, including demoting the dashboard itself to just another page.',
+    author: 'scott-peabody',
+    date: '2026-08-01T12:00:00',
+    tags: ['react', 'typescript', 'features', 'design', 'architecture'],
+    communities: ['rendered-useful', 'opensource'],
+    series: 'multi-page-spaces',
+    seriesOrder: 1,
+    readingTime: 9,
+    featured: true,
+    concepts: ['platform-architecture', 'content-systems'],
+    languages: ['typescript', 'english'],
+  },
+  {
+    slug: 'building-per-page-themes-layouts',
+    title: 'Building Multi-Page Spaces: Per-Page Themes and Layouts',
+    description: 'Wiring space pages to MDX files with their own frontmatter, reviving dead layout code, and teaching the layout context to accept option-level overrides.',
+    author: 'scott-peabody',
+    date: '2026-08-02T12:00:00',
+    tags: ['react', 'typescript', 'features', 'mdx', 'design'],
+    communities: ['rendered-useful', 'opensource'],
+    series: 'multi-page-spaces',
+    seriesOrder: 2,
+    readingTime: 10,
+    concepts: ['platform-architecture', 'content-systems'],
+    languages: ['typescript', 'english'],
+  },
+  {
+    slug: 'building-group-spaces',
+    title: 'Building Multi-Page Spaces: Groups in the @ Namespace',
+    description: 'Extending space ownership beyond a single author: a declarative Group model, handle resolution across authors, aliases, and groups, and shared feeds without a backend.',
+    author: 'scott-peabody',
+    date: '2026-08-03T12:00:00',
+    tags: ['react', 'typescript', 'features', 'design', 'architecture'],
+    communities: ['rendered-useful', 'opensource'],
+    series: 'multi-page-spaces',
+    seriesOrder: 3,
+    readingTime: 8,
+    concepts: ['platform-architecture', 'identity', 'content-systems'],
+    languages: ['typescript', 'english'],
+  },
   {
     slug: 'd3-introduction',
     title: 'Getting Started with D3.js: Interactive Data Visualization',
@@ -1119,6 +1179,39 @@ export const feeds: Feed[] = [
 // Posts - lightweight content between tweets and articles
 export const posts: Post[] = [
   {
+    slug: 'render-lab-benchmarks',
+    title: 'Benchmarking the MDX Glob Loader',
+    content: `Ran some quick numbers on the space-page loader for the Render Lab roadmap work.
+
+Each page compiles to its own lazy chunk, so the cost of adding pages is close to zero until someone actually visits one:
+
+\`\`\`
+content/spaces/render-lab/about.mdx    ->  4.1 kB chunk
+content/spaces/render-lab/roadmap.mdx  ->  5.8 kB chunk
+\`\`\`
+
+The interesting part: Vite's import.meta.glob with a one-level pattern keeps the manifest tiny. No measurable difference between 6 pages and 60 in dev startup.
+
+More in the roadmap page as this lands.`,
+    author: 'ada-quill',
+    date: '2026-07-28T15:20:00Z',
+    tags: ['building', 'performance', 'mdx'],
+    visibility: 'public',
+  },
+  {
+    slug: 'joining-render-lab',
+    title: 'Joining Render Lab',
+    content: `Scott talked me into co-maintaining a shared space for platform experiments. We're calling it Render Lab.
+
+The premise: instead of each of us prototyping in private branches, we work in the open in one space we both own. Pages get authored like any other content here: MDX files, pull requests, review.
+
+First up: the multi-page spaces feature itself. Building the thing inside the thing.`,
+    author: 'ada-quill',
+    date: '2026-07-25T09:00:00Z',
+    tags: ['meta', 'collaboration'],
+    visibility: 'public',
+  },
+  {
     slug: 'excalidraw-fullscreen',
     title: 'Added Fullscreen Mode to Excalidraw',
     content: `Just shipped a small but useful feature: fullscreen mode for the Excalidraw editor.
@@ -1341,9 +1434,11 @@ The math for rotation animations was... intense. But seeing those faces actually
 // Spaces - user customization for their page
 export const spaces: Space[] = [
   {
+    slug: 'scott-peabody',
     author: 'scott-peabody',
     theme: undefined, // uses default
     layout: undefined, // uses default
+    defaultPage: 'feed',
     pinnedContent: [
       { type: 'post', slug: 'hello-world' },
     ],
@@ -1352,11 +1447,13 @@ export const spaces: Space[] = [
     defaultFeed: 'main',
   },
   {
+    slug: 'pixel-wizard',
     author: 'scott-peabody',
     alias: 'pixel-wizard',
     bio: 'Retro game enthusiast and pixel art dabbler. Where I share gamedev experiments and nostalgia-fueled projects.',
     theme: 'terminal',
     layout: 'minimal',
+    defaultPage: 'feed',
     pinnedContent: [
       { type: 'post', slug: 'gamedev-journey' },
     ],
@@ -1364,6 +1461,44 @@ export const spaces: Space[] = [
     feeds: ['gamedev'],
     defaultFeed: 'gamedev',
   },
+  {
+    slug: 'render-lab',
+    group: 'render-lab',
+    theme: 'ocean',
+    defaultPage: 'about',
+    bio: 'Prototypes, build logs, and shared experiments from the rendered_useful maintainers.',
+  },
+]
+
+// Groups: authors sharing a space. Slugs share the @ namespace with authors and
+// aliases. Resolution order is author → alias → group, so avoid collisions.
+export const groups: Group[] = [
+  {
+    slug: 'render-lab',
+    name: 'Render Lab',
+    description: 'A shared space where rendered_useful contributors prototype platform features in the open.',
+    members: ['scott-peabody', 'ada-quill'],
+    owner: 'scott-peabody',
+    createdDate: '2026-07-01',
+  },
+]
+
+// Space pages: the ordered pages of each space. 'posts' and 'feeds' are reserved
+// slugs (they collide with the /@handle/posts/* and /@handle/feeds/* routes).
+// Pages without `builtin` load MDX from content/spaces/<space>/<slug>.mdx.
+export const spacePages: SpacePageDef[] = [
+  // scott-peabody
+  { space: 'scott-peabody', slug: 'feed', title: 'Feed', order: 1, builtin: 'feed' },
+  { space: 'scott-peabody', slug: 'now', title: 'Now', order: 2 },
+  { space: 'scott-peabody', slug: 'uses', title: 'Uses', order: 3 },
+  { space: 'scott-peabody', slug: 'lab', title: 'Lab', order: 4 },
+  // pixel-wizard
+  { space: 'pixel-wizard', slug: 'feed', title: 'Feed', order: 1, builtin: 'feed' },
+  { space: 'pixel-wizard', slug: 'shrine', title: 'Shrine', order: 2 },
+  // render-lab (group space; feed demoted to a non-default "Activity" page)
+  { space: 'render-lab', slug: 'about', title: 'About', order: 1 },
+  { space: 'render-lab', slug: 'feed', title: 'Activity', order: 2, builtin: 'feed' },
+  { space: 'render-lab', slug: 'roadmap', title: 'Roadmap', order: 3 },
 ]
 
 // Helper to filter articles to only latest versions
@@ -2259,3 +2394,69 @@ export const getSpacesByAuthor = (authorSlug: string): Space[] =>
 // Get a specific space by alias
 export const getSpaceByAlias = (alias: string): Space | undefined =>
   spaces.find((s) => s.alias === alias)
+
+// Get a space by its @-handle slug
+export const getSpaceBySlug = (slug: string): Space | undefined =>
+  spaces.find((s) => s.slug === slug)
+
+// Group helpers
+export const getGroup = (slug: string): Group | undefined =>
+  groups.find((g) => g.slug === slug)
+
+export const getGroupMembers = (slug: string): Author[] =>
+  getGroup(slug)?.members
+    .map((m) => getAuthor(m))
+    .filter((a): a is Author => Boolean(a)) || []
+
+// Union of members' public, non-alias posts, newest first.
+// Group spaces do not own Feed entities in v1; the group feed is derived.
+export const getPostsByGroup = (groupSlug: string, count = 10): Post[] => {
+  const group = getGroup(groupSlug)
+  if (!group) return []
+  return posts
+    .filter((p) => p.visibility === 'public' && !p.alias && group.members.includes(p.author))
+    .sort((a, b) => compareDates(a.date, b.date))
+    .slice(0, count)
+}
+
+// Space page helpers
+export const getSpacePages = (spaceSlug: string): SpacePageDef[] =>
+  spacePages
+    .filter((p) => p.space === spaceSlug)
+    .sort((a, b) => a.order - b.order)
+
+// Spaces with no registered pages still get the classic feed dashboard
+export const getSpacePagesWithFallback = (spaceSlug: string): SpacePageDef[] => {
+  const pages = getSpacePages(spaceSlug)
+  if (pages.length > 0) return pages
+  return [{ space: spaceSlug, slug: 'feed', title: 'Feed', order: 1, builtin: 'feed' }]
+}
+
+export const getSpacePage = (spaceSlug: string, pageSlug: string): SpacePageDef | undefined =>
+  getSpacePagesWithFallback(spaceSlug).find((p) => p.slug === pageSlug)
+
+// Handle resolution: one @ namespace shared by authors, aliases, and groups
+export type ResolvedSpaceHandle =
+  | { kind: 'author'; author: Author; space?: Space }
+  | { kind: 'alias'; author: Author; space: Space }
+  | { kind: 'group'; group: Group; space: Space }
+
+export const resolveSpaceHandle = (handle: string): ResolvedSpaceHandle | undefined => {
+  if (import.meta.env.DEV) {
+    const matches = [getAuthor(handle), getSpaceByAlias(handle), getGroup(handle)].filter(Boolean)
+    if (matches.length > 1) {
+      console.warn(`[resolveSpaceHandle] '@${handle}' matches multiple identities; earlier kinds shadow later ones (author → alias → group)`)
+    }
+  }
+  const author = getAuthor(handle)
+  if (author) return { kind: 'author', author, space: getSpace(author.slug) }
+  const aliasSpace = getSpaceByAlias(handle)
+  if (aliasSpace?.author) {
+    const aliasAuthor = getAuthor(aliasSpace.author)
+    if (aliasAuthor) return { kind: 'alias', author: aliasAuthor, space: aliasSpace }
+  }
+  const group = getGroup(handle)
+  const groupSpace = group ? getSpaceBySlug(group.slug) : undefined
+  if (group && groupSpace) return { kind: 'group', group, space: groupSpace }
+  return undefined
+}

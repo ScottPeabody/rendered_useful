@@ -1,0 +1,38 @@
+---
+title: "Roadmap"
+description: "What Render Lab is building next."
+author: "ada-quill"
+layout: "docs"
+contentWidth: "wide"
+date: "2026-07-28T12:00:00"
+---
+
+# Roadmap
+
+Maintained by whoever touched it last. That's the point of a shared space. This page uses the `docs` layout with a `wide` content override.
+
+## Multi-page spaces
+
+<Todo items={[
+  { text: "Space pages as MDX files with per-page frontmatter", done: true },
+  { text: "Everything-is-a-page: dashboard demoted to a builtin page", done: true },
+  { text: "Group ownership in the @ namespace", done: true },
+  { text: "Per-page themes and layouts, incl. option-level overrides", done: true },
+  { text: "Space theme inheritance on posts/feeds sub-pages", done: false },
+  { text: "Page-level table of contents (tocPosition is still unwired)", done: false },
+]} />
+
+## Under consideration
+
+<Mermaid chart={`
+flowchart TD
+    A["Multi-page spaces (shipped)"] --> B["Space templates: fork a page set"]
+    A --> C["Group feeds as first-class Feed entities"]
+    C --> D["Cross-space syndication"]
+    B --> E["Per-space custom nav styling"]
+`} />
+
+## Non-goals
+
+- **Auth or permissions**: membership is declarative; the PR review process *is* the permission system
+- **A WYSIWYG page builder**: pages are documents, not widget grids

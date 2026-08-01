@@ -92,8 +92,9 @@ function App() {
             {/* Editor */}
             <Route path="/edit" element={<EditPage />} />
             <Route path="/edit/:slug" element={<EditPage />} />
-            {/* Personal spaces - using @ prefix for usernames */}
+            {/* Spaces (author, alias, or group) - using @ prefix for handles */}
             <Route path="/:username" element={<SpacePage />} />
+            <Route path="/:username/:pageSlug" element={<SpacePage />} />
             <Route path="/:username/posts/:slug" element={<PostPage />} />
             <Route path="/:username/feeds/:feedSlug" element={<FeedPage />} />
             <Route path="*" element={<NotFoundPage />} />

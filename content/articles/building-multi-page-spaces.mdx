@@ -1,0 +1,83 @@
+---
+title: "Building Multi-Page Spaces: Everything Is a Page"
+description: "How I turned personal spaces from a single hardcoded dashboard into an ordered collection of pages, including demoting the dashboard itself to just another page."
+date: "2026-08-01T12:00:00"
+author: "scott-peabody"
+tags: ["react", "typescript", "features", "design", "architecture"]
+series: "multi-page-spaces"
+seriesOrder: 1
+featured: true
+readingTime: 9
+---
+
+When I built [personal spaces](/articles/building-personal-spaces), a space was one thing: a profile header, a feed, a sidebar. You could theme it, and aliases let one person run several of them, but every space was structurally identical. One page, fixed shape.
+
+That bothered me more the longer it lived. A space with exactly one page isn't a *space*. It's a profile. The whole point of giving people a corner of the platform is that they get to decide what's in it.
+
+<Callout type="info" title="Try It">
+  Visit [/@scott-peabody](/@scott-peabody) and look at the tab bar: Feed, Now, Uses, Lab. Each tab is a page, each page is an MDX file, and each one can look completely different.
+</Callout>
+
+## The core decision: everything is a page
+
+The obvious design would have been "keep the dashboard, allow extra pages." I started there and backed out. It creates two kinds of thing (the *real* space page and the *bonus* pages), and every future feature has to answer "does this work on the dashboard, or just on pages?"
+
+The better model: **a space is an ordered collection of pages, and the old dashboard is just one page type you can include**. The registry entry for a page looks like this:
+
+```typescript
+export interface SpacePageDef {
+  space: string           // Space.slug
+  slug: string            // '/@handle/<slug>'; 'posts' and 'feeds' are reserved
+  title: string           // nav tab label
+  order: number           // ascending sort in nav
+  showInNav?: boolean     // default true
+  builtin?: 'feed'        // built-in page type; absent ⇒ MDX file
+  description?: string
+}
+```
+
+The `builtin: 'feed'` entry is the old dashboard, extracted into a component and demoted to a peer of every other page. It can be first, last, renamed, or absent. The [Render Lab](/@render-lab) space renames it "Activity" and doesn't even make it the default. The About page greets you instead.
+
+## Spaces got names
+
+The sneaky prerequisite: spaces had no identity of their own. A space was found by `(author, alias)` pair, which works fine until you want a space that belongs to *neither*, which is exactly where this series ends up in [part three](/articles/building-group-spaces).
+
+So `Space` gained a `slug`, and the handle in the URL is now the space's own name:
+
+```typescript
+export interface Space extends Versionable {
+  slug: string            // unique @-handle
+  author?: string         // unset for group spaces
+  alias?: string
+  group?: string          // set only for group-owned spaces
+  defaultPage?: string    // page rendered at /@slug
+  // ...theme, layout, bio, pinned content
+}
+```
+
+## Routing: one more segment
+
+The route table grew by exactly one line:
+
+```tsx
+<Route path="/:username" element={<SpacePage />} />
+<Route path="/:username/:pageSlug" element={<SpacePage />} />
+<Route path="/:username/posts/:slug" element={<PostPage />} />
+<Route path="/:username/feeds/:feedSlug" element={<FeedPage />} />
+```
+
+React Router ranks static segments above params, so `/@scott-peabody/posts/hello-world` still reaches `PostPage`. The cost is that `posts` and `feeds` become reserved page slugs: a space can't have a page named `posts`. I enforce that in `SpacePage` and documented it on the type. Namespaces always collect a few tombstones like this; better to name them than discover them.
+
+The root URL renders `defaultPage`. Navigating between pages doesn't remount `SpacePage`. The same component re-resolves from params, which matters a lot in [part two](/articles/building-per-page-themes-layouts) when pages start carrying their own themes and something has to clean up after them.
+
+## What the dashboard extraction bought
+
+Pulling the old dashboard out of `SpacePage` into `SpaceFeedDashboard` forced the page to stop assuming "one author, their feeds, their posts." It now takes its content as props (posts, feeds, articles, projects) and doesn't care where they came from. That's what makes the group-space feed in part three a composition change instead of a rewrite.
+
+<Callout type="tip" title="Deleting code by moving it">
+  The rewrite made SpacePage shorter than the original, despite doing far more. Orchestration (resolve handle, pick page, load content, delegate) is a smaller job than rendering, and it's the only job the page component keeps.
+</Callout>
+
+## Where this goes
+
+Part one is the skeleton: pages exist, they're ordered, the dashboard is one of them. [Part two](/articles/building-per-page-themes-layouts) makes pages *individual*: MDX files with their own frontmatter, themes, and layouts. [Part three](/articles/building-group-spaces) makes spaces *shared*.

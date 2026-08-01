@@ -1,0 +1,27 @@
+---
+title: "About"
+description: "What Render Lab is and why it exists."
+author: "scott-peabody"
+date: "2026-07-25T12:00:00"
+---
+
+# Render Lab
+
+Render Lab is a **shared space**, the first one on rendered_useful owned by a group instead of a single author. Two of us maintain it, and everything here is co-owned: the pages, the roadmap, the activity feed.
+
+## Why a group space
+
+Personal spaces answer "who are you?". A group space answers "what are we building together?". Features get prototyped here in the open instead of in private branches:
+
+- Pages are MDX files in `content/spaces/render-lab/`, so either of us can PR a change
+- The [Activity](/@render-lab/feed) page interleaves both members' posts automatically
+- Each page carries its own byline (check the one at the top of this page and the [Roadmap](/@render-lab/roadmap))
+
+## Members
+
+- [Scott Peabody](/@scott-peabody): platform, design system, this feature
+- [Ada Quill](/@ada-quill): performance, loaders, keeping Scott honest about bundle size
+
+<Callout type="info" title="How it works">
+  There's no auth and no backend. The group, its members, and this space are all declared in the same content registry as everything else. Resolution happens at `/@render-lab` by checking authors, then aliases, then groups. The build log is in [Groups in the @ Namespace](/articles/building-group-spaces).
+</Callout>

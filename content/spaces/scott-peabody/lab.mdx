@@ -1,0 +1,32 @@
+---
+title: "Lab"
+description: "Interactive experiments living on my space."
+theme: "cyberpunk"
+layout: "showcase"
+date: "2026-08-01T12:00:00"
+---
+
+# Lab
+
+This page overrides its space's theme (`cyberpunk`) and layout (`showcase`): proof that pages, not spaces, own their presentation. Navigate back to the [feed](/@scott-peabody) and the default theme snaps back.
+
+## How a page becomes a page
+
+<Mermaid chart={`
+flowchart LR
+    A["content/spaces/&lt;space&gt;/&lt;page&gt;.mdx"] --> B["import.meta.glob"]
+    B --> C["lazy chunk"]
+    C --> D["SpacePage resolves handle + page"]
+    D --> E["frontmatter theme/layout applied"]
+    E --> F["MDX renders with full component map"]
+`} />
+
+## Components just work
+
+Every component available to articles is available here, because space pages render through the same `MDXContentProvider`. For instance, an entire Rubik's cube:
+
+<RubiksCube />
+
+## Why this matters
+
+A space page isn't a template with slots. It's a document with the whole component library behind it. The difference between "profile customization" and "personal site".

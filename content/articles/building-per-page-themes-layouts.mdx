@@ -1,0 +1,104 @@
+---
+title: "Building Multi-Page Spaces: Per-Page Themes and Layouts"
+description: "Wiring space pages to MDX files with their own frontmatter, reviving dead layout code, and teaching the layout context to accept option-level overrides."
+date: "2026-08-02T12:00:00"
+author: "scott-peabody"
+tags: ["react", "typescript", "features", "mdx", "design"]
+series: "multi-page-spaces"
+seriesOrder: 2
+readingTime: 10
+---
+
+[Part one](/articles/building-multi-page-spaces) gave spaces a page model. This part makes each page an individual: its own content file, its own theme, its own layout, its own components.
+
+<Callout type="info" title="Try It">
+  [/@scott-peabody/lab](/@scott-peabody/lab) runs the cyberpunk theme and showcase layout on a space that otherwise uses the site default. [/@pixel-wizard/shrine](/@pixel-wizard/shrine) overrides the terminal-themed pixel-wizard space with retro, and hides the footer from frontmatter.
+</Callout>
+
+## Pages are files
+
+Space pages live at `content/spaces/<space>/<page>.mdx` and load through the same machinery as articles: a Vite glob where every file becomes its own lazy chunk:
+
+```typescript
+const spacePageModules = import.meta.glob<MDXModule<SpacePageFrontmatter>>(
+  '/content/spaces/*/*.mdx',
+  { eager: false }
+)
+```
+
+That one decision carries most of the feature. Because a page is an MDX module rendered through `MDXContentProvider`, the entire component library (Mermaid, D3, the runners, even the Rubik's cube) works inside a space page with zero extra wiring. And because it's a file in the repo, publishing a page is a pull request, same as an article. No second content pipeline, no builder UI, no drafts database.
+
+The frontmatter contract is where each page declares its personality:
+
+```typescript
+export interface SpacePageFrontmatter {
+  title: string
+  author?: string          // byline; matters for group pages
+  theme?: string           // overrides the space's theme
+  layout?: string          // overrides the space's layout
+  hideNavbar?: boolean     // individual option overrides
+  hideFooter?: boolean
+  contentWidth?: 'narrow' | 'default' | 'wide' | 'full'
+  verticalSpacing?: 'compact' | 'default' | 'relaxed'
+  showSpaceHeader?: boolean
+}
+```
+
+## Confession: the layout system was dead code
+
+Here's the embarrassing part. The site has had a full layout system for months: six presets, seventeen options, a `useArticleLayout` hook that merges default → preset → overrides. Almost none of it was wired to anything. `Space.layout` was stored and never read. Article frontmatter declared `layout` and nothing consumed it. The merge hook had *zero call sites*.
+
+This feature finally paid that debt. `useArticleLayout` now does exactly the job it was written for, on every custom space page:
+
+```typescript
+const { options } = useArticleLayout({
+  layout: frontmatter.layout ?? spaceLayout,
+  overrides: {
+    contentWidth: frontmatter.contentWidth,
+    verticalSpacing: frontmatter.verticalSpacing,
+  },
+})
+```
+
+And pixel-wizard's `layout: 'minimal'`, sitting in the data since the original spaces feature doing nothing, finally renders.
+
+<Callout type="tip" title="Half-built beats un-built">
+  I could have designed a new layout system for pages. Instead the feature shipped faster because a past version of me had already built one and just never connected it. Audit your dead code before replacing it.
+</Callout>
+
+## The context problem
+
+One wrinkle: `hideNavbar` and `hideFooter` can't be applied locally. The navbar and footer render *above* the page in the tree, so the only channel to them is the layout context, and that context only accepted a preset *name*. You could say "use the minimal preset," but not "hide the footer, keep everything else."
+
+The fix was to give the context a second, option-level layer:
+
+```typescript
+// Merge order: default → preset → option-level overrides
+const layoutOptions = useMemo(() => {
+  const baseOptions = getLayoutOptions('default')!
+  const presetOptions = layoutOverride ? getLayoutOptions(layoutOverride) : undefined
+  return { ...baseOptions, ...(presetOptions || {}), ...(optionOverrides || {}) }
+}, [layoutOverride, optionOverrides])
+```
+
+`SpacePage` sets both on page change and nulls both on cleanup. The existing `<LayoutSelector>` MDX widget keeps working untouched, since presets and option overrides compose instead of competing.
+
+## Cleanup is the feature
+
+Theming a page is easy. *Un*-theming it is the actual work. Navigating from `/@scott-peabody/lab` (cyberpunk) to `/@scott-peabody/now` (default) doesn't remount `SpacePage`; only the params change. Three things keep that honest:
+
+1. **Frontmatter state resets before each load.** A slow or failed page load can't leave the previous page's theme smeared across the next one.
+2. **`useArticleTheme` restores originals.** It snapshots every CSS variable it touches and puts them back when the theme changes or the page unmounts, the same hook articles have used all along.
+3. **Layout effects null on cleanup.** Leave a `hideFooter: true` page and the footer comes back, because the effect teardown clears both the preset and the option overrides.
+
+The theme resolution itself is one line: page wins, space is the fallback:
+
+```typescript
+useArticleTheme({ theme: frontmatter?.theme ?? space?.theme })
+```
+
+## Bonus: the feed finally speaks token
+
+The old feed components were hardcoded `gray-*` Tailwind: invisible on the default theme, glaring under terminal green or ocean blue. They now use the site's `var(--color-*)` tokens, so a themed space themes *all* of its pages, dashboard included.
+
+Next up, the reason spaces needed their own names in the first place: [group spaces](/articles/building-group-spaces).
